@@ -4,7 +4,7 @@ cache is a Go cache manager. It can use many cache adapters. The repo is inspire
 
 ## How to install?
 
-	go get github.com/astaxie/beego/cache
+	go get github.com/GNURub/beego/cache
 
 
 ## What adapters are supported?
@@ -17,7 +17,7 @@ As of now this cache support memory, Memcache and Redis.
 First you must import it
 
 	import (
-		"github.com/astaxie/beego/cache"
+		"github.com/GNURub/beego/cache"
 	)
 
 Then init a Cache (example with memory adapter)
@@ -26,10 +26,10 @@ Then init a Cache (example with memory adapter)
 
 Use it like this:	
 	
-	bm.Put("astaxie", 1, 10 * time.Second)
-	bm.Get("astaxie")
-	bm.IsExist("astaxie")
-	bm.Delete("astaxie")
+	bm.Put("GNURub", 1, 10 * time.Second)
+	bm.Get("GNURub")
+	bm.IsExist("GNURub")
+	bm.Delete("GNURub")
 
 
 ## Memory adapter

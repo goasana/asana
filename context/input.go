@@ -28,7 +28,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/astaxie/beego/session"
+	"github.com/GNURub/beego/session"
 )
 
 // Regexes for checking the accept headers
@@ -414,13 +414,13 @@ func (input *BeegoInput) ParseFormOrMulitForm(maxMemory int64) error {
 }
 
 // Bind data from request.Form[key] to dest
-// like /?id=123&isok=true&ft=1.2&ol[0]=1&ol[1]=2&ul[]=str&ul[]=array&user.Name=astaxie
+// like /?id=123&isok=true&ft=1.2&ol[0]=1&ol[1]=2&ul[]=str&ul[]=array&user.Name=GNURub
 // var id int  beegoInput.Bind(&id, "id")  id ==123
 // var isok bool  beegoInput.Bind(&isok, "isok")  isok ==true
 // var ft float64  beegoInput.Bind(&ft, "ft")  ft ==1.2
 // ol := make([]int, 0, 2)  beegoInput.Bind(&ol, "ol")  ol ==[1 2]
 // ul := make([]string, 0, 2)  beegoInput.Bind(&ul, "ul")  ul ==[str array]
-// user struct{Name}  beegoInput.Bind(&user, "user")  user == {Name:"astaxie"}
+// user struct{Name}  beegoInput.Bind(&user, "user")  user == {Name:"GNURub"}
 func (input *BeegoInput) Bind(dest interface{}, key string) error {
 	value := reflect.ValueOf(dest)
 	if value.Kind() != reflect.Ptr {

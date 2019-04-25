@@ -21,8 +21,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/context"
+	"github.com/GNURub/beego"
+	"github.com/GNURub/beego/context"
 )
 
 // HTTPHeaderGuardRecorder is httptest.ResponseRecorder with own http.Header

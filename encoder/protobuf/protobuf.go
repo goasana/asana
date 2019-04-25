@@ -3,7 +3,7 @@ package protobuf
 import (
 	"github.com/gogo/protobuf/proto"
 
-	"github.com/astaxie/beego/encoder"
+	"github.com/GNURub/beego/encoder"
 )
 
 func init() {

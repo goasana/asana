@@ -20,7 +20,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/astaxie/beego/config"
+	"github.com/GNURub/beego/config"
 )
 
 // Is needed add to kubernetes ex: kubectl get configmap beego --namespace default {"appname": "beeapi", ...}
@@ -110,10 +110,10 @@ func TestConfigMap(t *testing.T) {
 		}
 	}
 
-	if err = jsonconf.Set("name", "astaxie"); err != nil {
+	if err = jsonconf.Set("name", "GNURub"); err != nil {
 		t.Fatal(err)
 	}
-	if jsonconf.String("name") != "astaxie" {
+	if jsonconf.String("name") != "GNURub" {
 		t.Fatal("get name error")
 	}
 }

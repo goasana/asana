@@ -20,8 +20,8 @@
 //
 // Usage:
 // import(
-//   _ "github.com/astaxie/beego/cache/redis"
-//   "github.com/astaxie/beego/cache"
+//   _ "github.com/GNURub/beego/cache/redis"
+//   "github.com/GNURub/beego/cache"
 // )
 //
 //  bm, err := cache.NewCache("redis", `{"conn":"127.0.0.1:11211"}`)
@@ -38,7 +38,7 @@ import (
 
 	"github.com/gomodule/redigo/redis"
 
-	"github.com/astaxie/beego/cache"
+	"github.com/GNURub/beego/cache"
 	"strings"
 )
 
@@ -104,8 +104,18 @@ func (rc *Cache) GetMulti(keys []string) []interface{} {
 
 // Put put cache to redis.
 func (rc *Cache) Put(key string, val interface{}, timeout time.Duration) error {
-	_, err := rc.do("SETEX", key, int64(timeout/time.Second), val)
-	return err
+	var ttl int32 = 0
+	if timeout != 0 {
+		ttl = int32(timeout / time.Second)
+	}
+
+	if ttl > 0 {
+		_, err := rc.do("SETEX", key, ttl, val)
+		return err
+	} else {
+		_, err := rc.do("SET", key, ttl, val)
+		return err
+	}
 }
 
 // Delete delete cache in redis.
@@ -227,5 +237,5 @@ func (rc *Cache) connectInit() {
 }
 
 func init() {
-	cache.Register("redis", NewRedisCache)
+	cache.Register(cache.RedisProvider, NewRedisCache)
 }

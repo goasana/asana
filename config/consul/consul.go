@@ -19,8 +19,8 @@
 //
 // Usage:
 //  import(
-//    _ "github.com/astaxie/beego/config/consul"
-//      "github.com/astaxie/beego/config"
+//    _ "github.com/GNURub/beego/config/consul"
+//      "github.com/GNURub/beego/config"
 //  )
 //
 //  cnf, err := NewConfig(config.ConsulProvider, "myConfAppName")
@@ -34,9 +34,9 @@ import (
 	"net"
 	"strings"
 
-	"github.com/astaxie/beego/config"
-	"github.com/astaxie/beego/config/base"
-	"github.com/astaxie/beego/encoder"
+	"github.com/GNURub/beego/config"
+	"github.com/GNURub/beego/config/base"
+	"github.com/GNURub/beego/encoder"
 	"github.com/hashicorp/consul/api"
 )
 

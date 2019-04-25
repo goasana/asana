@@ -20,8 +20,8 @@
 //
 // Usage:
 // import(
-//   _ "github.com/astaxie/beego/cache/memcache"
-//   "github.com/astaxie/beego/cache"
+//   _ "github.com/GNURub/beego/cache/memcache"
+//   "github.com/GNURub/beego/cache"
 // )
 //
 //  bm, err := cache.NewCache("memcache", `{"conn":"127.0.0.1:11211"}`)
@@ -35,7 +35,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/astaxie/beego/cache"
+	"github.com/GNURub/beego/cache"
 	"github.com/bradfitz/gomemcache/memcache"
 )
 
@@ -95,7 +95,13 @@ func (rc *Cache) Put(key string, val interface{}, timeout time.Duration) error {
 			return err
 		}
 	}
-	item := memcache.Item{Key: key, Expiration: int32(timeout / time.Second)}
+
+	var ttl int32 = 0
+	if timeout != 0 {
+		ttl = int32(timeout / time.Second)
+	}
+
+	item := memcache.Item{Key: key, Expiration: ttl}
 	if v, ok := val.([]byte); ok {
 		item.Value = v
 	} else if str, ok := val.(string); ok {
@@ -184,5 +190,5 @@ func (rc *Cache) connectInit() error {
 }
 
 func init() {
-	cache.Register("memcache", NewMemCache)
+	cache.Register(cache.MemCachedProvider, NewMemCache)
 }

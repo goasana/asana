@@ -14,7 +14,7 @@
 
 // Package config is used to parse config.
 // Usage:
-//  import "github.com/astaxie/beego/config"
+//  import "github.com/GNURub/beego/config"
 //Examples.
 //
 //  cnf, err := config.NewConfig("configMap", "beego")
@@ -47,8 +47,8 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/astaxie/beego/encoder"
-	"github.com/astaxie/beego/encoder/json"
+	"github.com/GNURub/beego/encoder"
+	"github.com/GNURub/beego/encoder/json"
 )
 
 type ConfigProvider string
@@ -204,7 +204,7 @@ func ExpandValueEnvForMap(m map[string]interface{}) map[string]interface{} {
 // Examples:
 //	v1 := config.ExpandValueEnv("${GOPATH}")			// return the GOPATH environment variable.
 //	v2 := config.ExpandValueEnv("${GOAsta||/usr/local/go}")	// return the default value "/usr/local/go/".
-//	v3 := config.ExpandValueEnv("Astaxie")				// return the value "Astaxie".
+//	v3 := config.ExpandValueEnv("GNURub")				// return the value "GNURub".
 func ExpandValueEnv(value string) (realValue string) {
 	realValue = value
 

@@ -249,5 +249,5 @@ func (bc *MemoryCache) clearItems(keys []string) {
 }
 
 func init() {
-	Register("memory", NewMemoryCache)
+	Register(MemoryProvider, NewMemoryCache)
 }

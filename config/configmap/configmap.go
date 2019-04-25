@@ -21,8 +21,8 @@
 //
 // Usage:
 //  import(
-//    _ "github.com/astaxie/beego/config/configmap"
-//      "github.com/astaxie/beego/config"
+//    _ "github.com/GNURub/beego/config/configmap"
+//      "github.com/GNURub/beego/config"
 //  )
 //
 //  cnf, err := NewConfig(config.KConfigMapProvider, "myConfAppName")
@@ -33,15 +33,15 @@ package configmap
 import (
 	"context"
 	"fmt"
-	"github.com/astaxie/beego/encoder/json"
+	"github.com/GNURub/beego/encoder/json"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
-	"github.com/astaxie/beego/config"
-	"github.com/astaxie/beego/config/base"
+	"github.com/GNURub/beego/config"
+	"github.com/GNURub/beego/config/base"
 )
 
 func getClient() (*kubernetes.Clientset, error) {

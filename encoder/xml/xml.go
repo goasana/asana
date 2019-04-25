@@ -3,7 +3,7 @@ package xml
 import (
 	"encoding/xml"
 
-	"github.com/astaxie/beego/encoder"
+	"github.com/GNURub/beego/encoder"
 )
 
 func init() {

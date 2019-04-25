@@ -3,7 +3,7 @@ package json
 import (
 	"encoding/json"
 
-	"github.com/astaxie/beego/encoder"
+	"github.com/GNURub/beego/encoder"
 )
 
 func init()  {

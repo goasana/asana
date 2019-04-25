@@ -1,7 +1,7 @@
 package yaml
 
 import (
-	"github.com/astaxie/beego/encoder"
+	"github.com/GNURub/beego/encoder"
 
 	"gopkg.in/yaml.v2"
 )

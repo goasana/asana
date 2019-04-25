@@ -21,8 +21,8 @@
 //
 // Usage:
 //  import(
-//    _ "github.com/astaxie/beego/config/file"
-//      "github.com/astaxie/beego/config"
+//    _ "github.com/GNURub/beego/config/file"
+//      "github.com/GNURub/beego/config"
 //  )
 //
 //  cnf, err := NewConfig(config.FileProvider, "/conf/conf.json")
@@ -36,9 +36,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/astaxie/beego/config"
-	"github.com/astaxie/beego/config/base"
-	"github.com/astaxie/beego/encoder"
+	"github.com/GNURub/beego/config"
+	"github.com/GNURub/beego/config/base"
+	"github.com/GNURub/beego/encoder"
 )
 
 // ConfigFile is a json config parser and implements ConfigFile interface.

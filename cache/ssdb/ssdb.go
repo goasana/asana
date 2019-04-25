@@ -9,7 +9,7 @@ import (
 
 	"github.com/ssdb/gossdb/ssdb"
 
-	"github.com/astaxie/beego/cache"
+	"github.com/GNURub/beego/cache"
 )
 
 // Cache SSDB adapter
@@ -23,7 +23,7 @@ func NewSsdbCache() cache.Cache {
 	return &Cache{}
 }
 
-// Get get value from memcache.
+// Get get value from ssdb.
 func (rc *Cache) Get(key string) interface{} {
 	if rc.conn == nil {
 		if err := rc.connectInit(); err != nil {
@@ -37,7 +37,7 @@ func (rc *Cache) Get(key string) interface{} {
 	return nil
 }
 
-// GetMulti get value from memcache.
+// GetMulti get value from ssdb.
 func (rc *Cache) GetMulti(keys []string) []interface{} {
 	size := len(keys)
 	var values []interface{}
@@ -63,7 +63,7 @@ func (rc *Cache) GetMulti(keys []string) []interface{} {
 	return values
 }
 
-// DelMulti get value from memcache.
+// DelMulti get value from ssdb.
 func (rc *Cache) DelMulti(keys []string) error {
 	if rc.conn == nil {
 		if err := rc.connectInit(); err != nil {
@@ -74,7 +74,7 @@ func (rc *Cache) DelMulti(keys []string) error {
 	return err
 }
 
-// Put put value to memcache. only support string.
+// Put put value to ssdb. only support string.
 func (rc *Cache) Put(key string, value interface{}, timeout time.Duration) error {
 	if rc.conn == nil {
 		if err := rc.connectInit(); err != nil {
@@ -87,7 +87,10 @@ func (rc *Cache) Put(key string, value interface{}, timeout time.Duration) error
 	}
 	var resp []string
 	var err error
-	ttl := int(timeout / time.Second)
+	var ttl = 0
+	if timeout != 0 {
+		ttl = int(timeout / time.Second)
+	}
 	if ttl < 0 {
 		resp, err = rc.conn.Do("set", key, v)
 	} else {
@@ -102,7 +105,7 @@ func (rc *Cache) Put(key string, value interface{}, timeout time.Duration) error
 	return errors.New("bad response")
 }
 
-// Delete delete value in memcache.
+// Delete delete value in ssdb.
 func (rc *Cache) Delete(key string) error {
 	if rc.conn == nil {
 		if err := rc.connectInit(); err != nil {
@@ -135,7 +138,7 @@ func (rc *Cache) Decr(key string) error {
 	return err
 }
 
-// IsExist check value exists in memcache.
+// IsExist check value exists in ssdb.
 func (rc *Cache) IsExist(key string) bool {
 	if rc.conn == nil {
 		if err := rc.connectInit(); err != nil {
@@ -153,7 +156,7 @@ func (rc *Cache) IsExist(key string) bool {
 
 }
 
-// ClearAll clear all cached in memcache.
+// ClearAll clear all cached in ssdb.
 func (rc *Cache) ClearAll() error {
 	if rc.conn == nil {
 		if err := rc.connectInit(); err != nil {
@@ -195,7 +198,7 @@ func (rc *Cache) Scan(keyStart string, keyEnd string, limit int) ([]string, erro
 	return resp, nil
 }
 
-// StartAndGC start memcache adapter.
+// StartAndGC start ssdb adapter.
 // config string is like {"conn":"connection info"}.
 // if connecting error, return.
 func (rc *Cache) StartAndGC(config string) error {
@@ -213,7 +216,7 @@ func (rc *Cache) StartAndGC(config string) error {
 	return nil
 }
 
-// connect to memcache and keep the connection.
+// connect to ssdb and keep the connection.
 func (rc *Cache) connectInit() error {
 	conninfoArray := strings.Split(rc.conninfo[0], ":")
 	host := conninfoArray[0]
@@ -227,5 +230,5 @@ func (rc *Cache) connectInit() error {
 }
 
 func init() {
-	cache.Register("ssdb", NewSsdbCache)
+	cache.Register(cache.SSDBProvider, NewSsdbCache)
 }

@@ -18,7 +18,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/astaxie/beego/context"
+	"github.com/GNURub/beego/context"
 )
 
 type testinfo struct {
@@ -79,10 +79,10 @@ func init() {
 func TestTreeRouters(t *testing.T) {
 	for _, r := range routers {
 		tr := NewTree()
-		tr.AddRouter(r.url, "astaxie")
+		tr.AddRouter(r.url, "GNURub")
 		ctx := context.NewContext()
 		obj := tr.Match(r.requesturl, ctx)
-		if obj == nil || obj.(string) != "astaxie" {
+		if obj == nil || obj.(string) != "GNURub" {
 			t.Fatal(r.url+" can't get obj, Expect ", r.requesturl)
 		}
 		if r.params != nil {
@@ -114,13 +114,13 @@ func TestStaticPath(t *testing.T) {
 
 func TestAddTree(t *testing.T) {
 	tr := NewTree()
-	tr.AddRouter("/shop/:id/account", "astaxie")
-	tr.AddRouter("/shop/:sd/ttt_:id(.+)_:page(.+).html", "astaxie")
+	tr.AddRouter("/shop/:id/account", "GNURub")
+	tr.AddRouter("/shop/:sd/ttt_:id(.+)_:page(.+).html", "GNURub")
 	t1 := NewTree()
 	t1.AddTree("/v1/zl", tr)
 	ctx := context.NewContext()
 	obj := t1.Match("/v1/zl/shop/123/account", ctx)
-	if obj == nil || obj.(string) != "astaxie" {
+	if obj == nil || obj.(string) != "GNURub" {
 		t.Fatal("/v1/zl/shop/:id/account can't get obj ")
 	}
 	if ctx.Input.ParamsLen() == 0 {
@@ -131,7 +131,7 @@ func TestAddTree(t *testing.T) {
 	}
 	ctx.Input.Reset(ctx)
 	obj = t1.Match("/v1/zl/shop/123/ttt_1_12.html", ctx)
-	if obj == nil || obj.(string) != "astaxie" {
+	if obj == nil || obj.(string) != "GNURub" {
 		t.Fatal("/v1/zl//shop/:sd/ttt_:id(.+)_:page(.+).html can't get obj ")
 	}
 	if ctx.Input.ParamsLen() == 0 {
@@ -145,7 +145,7 @@ func TestAddTree(t *testing.T) {
 	t2.AddTree("/v1/:shopid", tr)
 	ctx.Input.Reset(ctx)
 	obj = t2.Match("/v1/zl/shop/123/account", ctx)
-	if obj == nil || obj.(string) != "astaxie" {
+	if obj == nil || obj.(string) != "GNURub" {
 		t.Fatal("/v1/:shopid/shop/:id/account can't get obj ")
 	}
 	if ctx.Input.ParamsLen() == 0 {
@@ -156,7 +156,7 @@ func TestAddTree(t *testing.T) {
 	}
 	ctx.Input.Reset(ctx)
 	obj = t2.Match("/v1/zl/shop/123/ttt_1_12.html", ctx)
-	if obj == nil || obj.(string) != "astaxie" {
+	if obj == nil || obj.(string) != "GNURub" {
 		t.Fatal("/v1/:shopid/shop/:sd/ttt_:id(.+)_:page(.+).html can't get obj ")
 	}
 	if ctx.Input.ParamsLen() == 0 {
@@ -169,13 +169,13 @@ func TestAddTree(t *testing.T) {
 
 func TestAddTree2(t *testing.T) {
 	tr := NewTree()
-	tr.AddRouter("/shop/:id/account", "astaxie")
-	tr.AddRouter("/shop/:sd/ttt_:id(.+)_:page(.+).html", "astaxie")
+	tr.AddRouter("/shop/:id/account", "GNURub")
+	tr.AddRouter("/shop/:sd/ttt_:id(.+)_:page(.+).html", "GNURub")
 	t3 := NewTree()
 	t3.AddTree("/:version(v1|v2)/:prefix", tr)
 	ctx := context.NewContext()
 	obj := t3.Match("/v1/zl/shop/123/account", ctx)
-	if obj == nil || obj.(string) != "astaxie" {
+	if obj == nil || obj.(string) != "GNURub" {
 		t.Fatal("/:version(v1|v2)/:prefix/shop/:id/account can't get obj ")
 	}
 	if ctx.Input.ParamsLen() == 0 {
@@ -188,13 +188,13 @@ func TestAddTree2(t *testing.T) {
 
 func TestAddTree3(t *testing.T) {
 	tr := NewTree()
-	tr.AddRouter("/create", "astaxie")
-	tr.AddRouter("/shop/:sd/account", "astaxie")
+	tr.AddRouter("/create", "GNURub")
+	tr.AddRouter("/shop/:sd/account", "GNURub")
 	t3 := NewTree()
 	t3.AddTree("/table/:num", tr)
 	ctx := context.NewContext()
 	obj := t3.Match("/table/123/shop/123/account", ctx)
-	if obj == nil || obj.(string) != "astaxie" {
+	if obj == nil || obj.(string) != "GNURub" {
 		t.Fatal("/table/:num/shop/:sd/account can't get obj ")
 	}
 	if ctx.Input.ParamsLen() == 0 {
@@ -205,20 +205,20 @@ func TestAddTree3(t *testing.T) {
 	}
 	ctx.Input.Reset(ctx)
 	obj = t3.Match("/table/123/create", ctx)
-	if obj == nil || obj.(string) != "astaxie" {
+	if obj == nil || obj.(string) != "GNURub" {
 		t.Fatal("/table/:num/create can't get obj ")
 	}
 }
 
 func TestAddTree4(t *testing.T) {
 	tr := NewTree()
-	tr.AddRouter("/create", "astaxie")
-	tr.AddRouter("/shop/:sd/:account", "astaxie")
+	tr.AddRouter("/create", "GNURub")
+	tr.AddRouter("/shop/:sd/:account", "GNURub")
 	t4 := NewTree()
 	t4.AddTree("/:info:int/:num/:id", tr)
 	ctx := context.NewContext()
 	obj := t4.Match("/12/123/456/shop/123/account", ctx)
-	if obj == nil || obj.(string) != "astaxie" {
+	if obj == nil || obj.(string) != "GNURub" {
 		t.Fatal("/:info:int/:num/:id/shop/:sd/:account can't get obj ")
 	}
 	if ctx.Input.ParamsLen() == 0 {
@@ -231,7 +231,7 @@ func TestAddTree4(t *testing.T) {
 	}
 	ctx.Input.Reset(ctx)
 	obj = t4.Match("/12/123/456/create", ctx)
-	if obj == nil || obj.(string) != "astaxie" {
+	if obj == nil || obj.(string) != "GNURub" {
 		t.Fatal("/:info:int/:num/:id/create can't get obj ")
 	}
 }

@@ -251,5 +251,5 @@ func GobDecode(data []byte, to *FileCacheItem) error {
 }
 
 func init() {
-	Register("file", NewFileCache)
+	Register(FileProvider, NewFileCache)
 }

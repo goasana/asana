@@ -16,17 +16,17 @@
 // Usage:
 //
 // import(
-//   "github.com/astaxie/beego/cache"
+//   "github.com/GNURub/beego/cache"
 // )
 //
 // bm, err := cache.NewCache("memory", `{"interval":60}`)
 //
 // Use it like this:
 //
-//	bm.Put("astaxie", 1, 10 * time.Second)
-//	bm.Get("astaxie")
-//	bm.IsExist("astaxie")
-//	bm.Delete("astaxie")
+//	bm.Put("GNURub", 1, 10 * time.Second)
+//	bm.Get("GNURub")
+//	bm.IsExist("GNURub")
+//	bm.Delete("GNURub")
 //
 //  more docs http://beego.me/docs/module/cache.md
 package cache
@@ -67,31 +67,42 @@ type Cache interface {
 	StartAndGC(config string) error
 }
 
+type CacheProvider string
+
+const (
+	RedisProvider     CacheProvider = "redis"
+	MemCachedProvider CacheProvider = "memcached"
+	SSDBProvider      CacheProvider = "ssdb"
+	GCacheProvider    CacheProvider = "gCache"
+	MemoryProvider    CacheProvider = "memory"
+	FileProvider      CacheProvider = "file"
+)
+
 // Instance is a function create a new Cache Instance
 type Instance func() Cache
 
-var adapters = make(map[string]Instance)
+var adapters = make(map[CacheProvider]Instance)
 
 // Register makes a cache adapter available by the adapter name.
 // If Register is called twice with the same name or if driver is nil,
 // it panics.
-func Register(name string, adapter Instance) {
+func Register(provider CacheProvider, adapter Instance) {
 	if adapter == nil {
 		panic("cache: Register adapter is nil")
 	}
-	if _, ok := adapters[name]; ok {
-		panic("cache: Register called twice for adapter " + name)
+	if _, ok := adapters[provider]; ok {
+		panic("cache: Register called twice for adapter " + provider)
 	}
-	adapters[name] = adapter
+	adapters[provider] = adapter
 }
 
 // NewCache Create a new cache driver by adapter name and config string.
 // config need to be correct JSON as string: {"interval":360}.
 // it will start gc automatically.
-func NewCache(adapterName, config string) (adapter Cache, err error) {
-	instanceFunc, ok := adapters[adapterName]
+func NewCache(provider CacheProvider, config string) (adapter Cache, err error) {
+	instanceFunc, ok := adapters[provider]
 	if !ok {
-		err = fmt.Errorf("cache: unknown adapter name %q (forgot to import?)", adapterName)
+		err = fmt.Errorf("cache: unknown adapter name %q (forgot to import?)", provider)
 		return
 	}
 	adapter = instanceFunc()

@@ -8,8 +8,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/astaxie/beego/config"
-	"github.com/astaxie/beego/encoder"
+	"github.com/GNURub/beego/config"
+	"github.com/GNURub/beego/encoder"
 )
 
 // ConfigBaseContainer A ConfigFile represents the json configuration.

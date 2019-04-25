@@ -1,10 +1,11 @@
-module github.com/astaxie/beego
+module github.com/GNURub/beego
 
 require (
 	github.com/Knetic/govaluate v3.0.0+incompatible // indirect
 	github.com/OwnLocal/goes v1.0.0
 	github.com/beego/goyaml2 v0.0.0-20130207012346-5545475820dd
 	github.com/beego/x2j v0.0.0-20131220205130-a0352aadc542
+	github.com/bluele/gcache v0.0.0-20190301044115-79ae3b2d8680
 	github.com/bradfitz/gomemcache v0.0.0-20180710155616-bc664df96737
 	github.com/casbin/casbin v1.7.0
 	github.com/cloudflare/golz4 v0.0.0-20150217214814-ef862a3cdc58

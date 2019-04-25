@@ -18,10 +18,10 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/astaxie/beego/config"
-	"github.com/astaxie/beego/config/file"
-	"github.com/astaxie/beego/encoder"
-	"github.com/astaxie/beego/encoder/json"
+	"github.com/GNURub/beego/config"
+	"github.com/GNURub/beego/config/file"
+	"github.com/GNURub/beego/encoder"
+	"github.com/GNURub/beego/encoder/json"
 )
 
 func TestDefaults(t *testing.T) {
