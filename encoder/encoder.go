@@ -14,7 +14,7 @@ func Register(name string, enc Encoder)  {
 
 func GetEncoder(name string) Encoder {
 	if _, ok := encoders[name]; !ok {
-		panic("encoders: Register called twice for encoder " + name)
+		panic("encoders: Register called twice for encoder: " + name)
 	}
 
 	return encoders[name]

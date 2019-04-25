@@ -25,7 +25,7 @@
 //      "github.com/astaxie/beego/config"
 //  )
 //
-//  cnf, err := NewConfigFile("file", "/conf/conf.json")
+//  cnf, err := NewConfig(config.FileProvider, "/conf/conf.json")
 //
 //More docs http://beego.me/docs/module/md
 package file
@@ -105,8 +105,8 @@ func NewConfigFile(option config.Option) *ConfigFile {
 }
 
 func init() {
-	config.Register("file", NewConfigFile(config.Option{
+	config.Register(config.FileProvider, NewConfigFile(config.Option{
 		SeparatorKeys: "::",
-		Context: context.Background(),
+		Context:       context.Background(),
 	}))
 }

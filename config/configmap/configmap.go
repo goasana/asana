@@ -25,7 +25,7 @@
 //      "github.com/astaxie/beego/config"
 //  )
 //
-//  cnf, err := NewConfigMap("configMap", "myConfAppName")
+//  cnf, err := NewConfig(config.KConfigMapProvider, "myConfAppName")
 //
 //More docs http://beego.me/docs/module/md
 package configmap
@@ -149,7 +149,7 @@ func NewConfigMap(option config.Option) *ConfigMap {
 }
 
 func init() {
-	config.Register("configMap", NewConfigMap(config.Option{
+	config.Register(config.KConfigMapProvider, NewConfigMap(config.Option{
 		ConfigName:    "beego",
 		Context:       context.Background(),
 		Encoder:       json.NewEncoder(),

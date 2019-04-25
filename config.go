@@ -131,7 +131,7 @@ var (
 	// appConfigPath is the path to the config files
 	appConfigPath string
 	// appConfigProvider is the provider for the config, default is file
-	appConfigProvider = "file"
+	appConfigProvider = config.FileProvider
 )
 
 func init() {
@@ -371,7 +371,7 @@ func assignSingleConfig(p interface{}, ac config.Configer) {
 		case reflect.Int, reflect.Int64:
 			pf.SetInt(ac.DefaultInt64(pf.Int(), name))
 		case reflect.Bool:
-			valDef :=  pf.Bool()
+			valDef := pf.Bool()
 			pf.SetBool(ac.DefaultBool(valDef, name))
 		case reflect.Struct:
 		default:
@@ -381,7 +381,7 @@ func assignSingleConfig(p interface{}, ac config.Configer) {
 }
 
 // LoadAppConfig allow developer to apply a config
-func LoadAppConfig(adapterName, configName string) error {
+func LoadAppConfig(adapterName config.ConfigProvider, configName string) error {
 	appConfigProvider = adapterName
 	return parseConfig(configName)
 }
@@ -390,7 +390,7 @@ type beegoAppConfig struct {
 	config.Configer
 }
 
-func newAppConfig(appConfigProvider, appConfigPath string) (*beegoAppConfig, error) {
+func newAppConfig(appConfigProvider config.ConfigProvider, appConfigPath string) (*beegoAppConfig, error) {
 	ac, err := config.NewConfig(appConfigProvider, appConfigPath)
 
 	if err != nil {

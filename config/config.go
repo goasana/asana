@@ -51,9 +51,17 @@ import (
 	"github.com/astaxie/beego/encoder/json"
 )
 
+type ConfigProvider string
+
+const (
+	FileProvider       ConfigProvider = "file"
+	ConsulProvider     ConfigProvider = "consul"
+	KConfigMapProvider ConfigProvider = "kConfigMap"
+)
+
 // Configer defines how to get and set value from configuration raw data.
 type Configer interface {
-	Set(key, val string) error   //support section::key type in given key when using ini type.
+	Set(key, val string) error       //support section::key type in given key when using ini type.
 	String(keys ...string) string    //support section::key type in key string when using ini and json type; Int,Int64,Bool,Float,DIY are same.
 	Strings(keys ...string) []string //get string slice
 	Int(keys ...string) (int, error)
@@ -90,28 +98,28 @@ type Config interface {
 	SetOption(option Option)
 }
 
-var adapters = make(map[string]Config)
+var adapters = make(map[ConfigProvider]Config)
 
 // Register makes a config adapter available by the adapter name.
 // If Register is called twice with the same name or if driver is nil,
 // it panics.
-func Register(name string, adapter Config) {
+func Register(provider ConfigProvider, adapter Config) {
 	if adapter == nil {
 		panic("config: Register adapter is nil")
 	}
-	if _, ok := adapters[name]; ok {
-		panic("config: Register called twice for adapter " + name)
+	if _, ok := adapters[provider]; ok {
+		panic("config: Register called twice for adapter " + provider)
 	}
 
-	adapters[name] = adapter
+	adapters[provider] = adapter
 }
 
 // NewConfig adapterName is env/memory/configMap/consul/file.
 // configName is path <file> in case file or config name
-func NewConfig(adapterName, configName string, opts ...Option) (Configer, error) {
-	adapter, ok := adapters[adapterName]
+func NewConfig(provider ConfigProvider, configName string, opts ...Option) (Configer, error) {
+	adapter, ok := adapters[provider]
 	if !ok {
-		return nil, fmt.Errorf("config: unknown adaptername %q (forgotten import?)", adapterName)
+		return nil, fmt.Errorf("config: unknown adaptername %q (forgotten import?)", provider)
 	}
 
 	// Default options
@@ -134,7 +142,7 @@ func NewConfig(adapterName, configName string, opts ...Option) (Configer, error)
 
 // NewConfigData adapterName is ini/json/xml/yaml/configMap.
 // data is the config data.
-func NewConfigData(adapterName string, data []byte, opts ...Option) (Configer, error) {
+func NewConfigData(adapterName ConfigProvider, data []byte, opts ...Option) (Configer, error) {
 	adapter, ok := adapters[adapterName]
 	if !ok {
 		return nil, fmt.Errorf("config: unknown adaptername %q (forgotten import?)", adapterName)

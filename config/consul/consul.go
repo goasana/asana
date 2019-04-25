@@ -23,7 +23,7 @@
 //      "github.com/astaxie/beego/config"
 //  )
 //
-//  cnf, err := NewConfigConsul("consul", "myConfAppName")
+//  cnf, err := NewConfig(config.ConsulProvider, "myConfAppName")
 //
 //More docs http://beego.me/docs/module/md
 package configmap
@@ -126,7 +126,7 @@ func NewConfigConsul(option config.Option) *ConfigConsul {
 }
 
 func init() {
-	config.Register("consul", NewConfigConsul(config.Option{
+	config.Register(config.ConsulProvider, NewConfigConsul(config.Option{
 		ConfigName:    DefaultPrefix,
 		SeparatorKeys: "::",
 		Context:       context.Background(),
