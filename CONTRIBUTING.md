@@ -1,6 +1,6 @@
-# Contributing to beego
+# Contributing to asana
 
-beego is an open source project.
+asana is an open source project.
 
 It is the work of hundreds of contributors. We appreciate your help!
 
@@ -11,7 +11,7 @@ please let us know if anything feels wrong or incomplete.
 
 ### Pull requests
 
-First of all. beego follow the gitflow. So please send you pull request 
+First of all. asana follow the gitflow. So please send you pull request 
 to **develop** branch. We will close the pull request to master branch.
 
 We are always happy to receive pull requests, and do our best to
@@ -22,7 +22,7 @@ If your pull request is not accepted on the first try, don't be
 discouraged! Sometimes we can make a mistake, please do more explaining 
 for us. We will appreciate it.
 
-We're trying very hard to keep beego simple and fast. We don't want it
+We're trying very hard to keep asana simple and fast. We don't want it
 to do everything for everybody. This means that we might decide against
 incorporating a new feature. But we will give you some advice on how to 
 do it in other way.
@@ -30,12 +30,12 @@ do it in other way.
 ### Create issues
 
 Any significant improvement should be documented as [a GitHub
-issue](https://github.com/GNURub/beego/issues) before anybody
+issue](https://github.com/goasana/framework/issues) before anybody
 starts working on it. 
 
 Also when filing an issue, make sure to answer these five questions:
 
-- What version of beego are you using (bee version)?
+- What version of asana are you using (bee version)?
 - What operating system and processor architecture are you using?
 - What did you do?
 - What did you expect to see?
@@ -49,4 +49,4 @@ never hurts to add a quick "+1" or "I have this problem too". This will
 help prioritize the most common problems and requests.
 
 Also if you don't know how to use it. please make sure you have read though
-the docs in http://beego.me/docs
+the docs in http://asana.me/docs

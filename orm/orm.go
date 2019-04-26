@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 //
 //	import (
 //		"fmt"
-//		"github.com/GNURub/beego/orm"
+//		"github.com/asana/asana/orm"
 //		_ "github.com/go-sql-driver/mysql" // import your used driver
 //	)
 //
@@ -41,7 +41,7 @@
 //		// insert
 //		id, err := o.Insert(&user)
 //		// update
-//		user.Name = "GNURub"
+//		user.Name = "asana"
 //		num, err := o.Update(&user)
 //		// read one
 //		u := User{Id: user.Id}
@@ -50,7 +50,7 @@
 //		num, err = o.Delete(&u)
 //	}
 //
-// more docs: http://beego.me/docs/mvc/model/overview.md
+// more docs: http://asana.me/docs/mvc/model/overview.md
 package orm
 
 import (

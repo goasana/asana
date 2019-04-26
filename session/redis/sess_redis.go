@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
 //
 // Usage:
 // import(
-//   _ "github.com/GNURub/beego/session/redis"
-//   "github.com/GNURub/beego/session"
+//   _ "github.com/goasana/framework/session/redis"
+//   "github.com/goasana/framework/session"
 // )
 //
 // 	func init() {
@@ -29,7 +29,7 @@
 // 		go globalSessions.GC()
 // 	}
 //
-// more docs: http://beego.me/docs/module/session.md
+// more docs: http://asana.me/docs/module/session.md
 package redis
 
 import (
@@ -39,7 +39,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/GNURub/beego/session"
+	"github.com/goasana/framework/session"
 
 	"github.com/gomodule/redigo/redis"
 )
@@ -120,7 +120,7 @@ type Provider struct {
 
 // SessionInit init redis session
 // savepath like redis server addr,pool size,password,dbnum,IdleTimeout second
-// e.g. 127.0.0.1:6379,100,GNURub,0,30
+// e.g. 127.0.0.1:6379,100,asana,0,30
 func (rp *Provider) SessionInit(maxlifetime int64, savePath string) error {
 	rp.maxlifetime = maxlifetime
 	configs := strings.Split(savePath, ",")

@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,13 +20,13 @@
 //
 // Usage:
 // import(
-//   _ "github.com/GNURub/beego/cache/memcache"
-//   "github.com/GNURub/beego/cache"
+//   _ "github.com/goasana/framework/cache/memcache"
+//   "github.com/goasana/framework/cache"
 // )
 //
 //  bm, err := cache.NewCache("memcache", `{"conn":"127.0.0.1:11211"}`)
 //
-//  more docs http://beego.me/docs/module/cache.md
+//  more docs http://asana.me/docs/module/cache.md
 package memcache
 
 import (
@@ -35,7 +35,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/GNURub/beego/cache"
+	"github.com/goasana/framework/cache"
 	"github.com/bradfitz/gomemcache/memcache"
 )
 

@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package beego
+package asana
 
 import (
 	"encoding/json"
@@ -30,16 +30,16 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/GNURub/beego/context/param"
-	"github.com/GNURub/beego/logs"
-	"github.com/GNURub/beego/utils"
+	"github.com/goasana/framework/context/param"
+	"github.com/goasana/framework/logs"
+	"github.com/goasana/framework/utils"
 )
 
 var globalRouterTemplate = `package routers
 
 import (
-	"github.com/GNURub/beego"
-	"github.com/GNURub/beego/context/param"{{.globalimport}}
+	"github.com/goasana/framework"
+	"github.com/goasana/framework/context/param"{{.globalimport}}
 )
 
 func init() {
@@ -54,19 +54,19 @@ var (
 	genInfoList        map[string][]ControllerComments
 
 	routerHooks = map[string]int{
-		"beego.BeforeStatic": BeforeStatic,
-		"beego.BeforeRouter": BeforeRouter,
-		"beego.BeforeExec":   BeforeExec,
-		"beego.AfterExec":    AfterExec,
-		"beego.FinishRouter": FinishRouter,
+		"asana.BeforeStatic": BeforeStatic,
+		"asana.BeforeRouter": BeforeRouter,
+		"asana.BeforeExec":   BeforeExec,
+		"asana.AfterExec":    AfterExec,
+		"asana.FinishRouter": FinishRouter,
 	}
 
 	routerHooksMapping = map[int]string{
-		BeforeStatic: "beego.BeforeStatic",
-		BeforeRouter: "beego.BeforeRouter",
-		BeforeExec:   "beego.BeforeExec",
-		AfterExec:    "beego.AfterExec",
-		FinishRouter: "beego.FinishRouter",
+		BeforeStatic: "asana.BeforeStatic",
+		BeforeRouter: "asana.BeforeRouter",
+		BeforeExec:   "asana.BeforeExec",
+		AfterExec:    "asana.AfterExec",
+		FinishRouter: "asana.FinishRouter",
 	}
 )
 
@@ -372,7 +372,7 @@ filterLoop:
 	return
 }
 
-// direct copy from bee\g_docs.go
+// direct copy from asana\g_docs.go
 // analysis params return []string
 // @Param	query		form	 string	true		"The email for login"
 // [query form string true "The email for login"]
@@ -476,7 +476,7 @@ func genRouterCode(pkgRealpath string) {
 			filters := ""
 			if len(c.FilterComments) > 0 {
 				for _, f := range c.FilterComments {
-					filters += fmt.Sprintf(`                &beego.ControllerFilter{
+					filters += fmt.Sprintf(`                &asana.ControllerFilter{
                     Pattern: "%s",
                     Pos: %s,
                     Filter: %s,
@@ -489,7 +489,7 @@ func genRouterCode(pkgRealpath string) {
 			if filters == "" {
 				filters = "nil"
 			} else {
-				filters = fmt.Sprintf(`[]*beego.ControllerFilter{
+				filters = fmt.Sprintf(`[]*asana.ControllerFilter{
 %s
             }`, filters)
 			}
@@ -497,8 +497,8 @@ func genRouterCode(pkgRealpath string) {
 			globalimport += imports
 
 			globalinfo = globalinfo + `
-    beego.GlobalControllerRouter["` + k + `"] = append(beego.GlobalControllerRouter["` + k + `"],
-        beego.ControllerComments{
+    asana.GlobalControllerRouter["` + k + `"] = append(asana.GlobalControllerRouter["` + k + `"],
+        asana.ControllerComments{
             Method: "` + strings.TrimSpace(c.Method) + `",
             ` + "Router: `" + c.Router + "`" + `,
             AllowHTTPMethods: ` + allmethod + `,

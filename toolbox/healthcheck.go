@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@
 //
 // AddHealthCheck("database",&DatabaseCheck{})
 //
-// more docs: http://beego.me/docs/module/toolbox.md
+// more docs: http://asana.me/docs/module/toolbox.md
 package toolbox
 
 // AdminCheckList holds health checker map

@@ -3,7 +3,7 @@ package hcl
 import (
 	"encoding/json"
 
-	"github.com/GNURub/beego/encoder"
+	"github.com/goasana/framework/encoder"
 	"github.com/hashicorp/hcl"
 )
 

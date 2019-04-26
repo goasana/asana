@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package beego
+package asana
 
 import (
 	"fmt"
@@ -23,8 +23,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/GNURub/beego/context"
-	"github.com/GNURub/beego/utils"
+	"github.com/goasana/framework/context"
+	"github.com/goasana/framework/utils"
 )
 
 const (
@@ -37,7 +37,7 @@ var tpl = `
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>beego application error</title>
+    <title>asana application error</title>
     <style>
         html, body, body * {padding: 0; margin: 0;}
         #header {background:#ffd; border-bottom:solid 2px #A31515; padding: 20px 10px;}
@@ -74,7 +74,7 @@ var tpl = `
         </div>
     </div>
     <div id="footer">
-        <p>beego {{ .BeegoVersion }} (beego framework)</p>
+        <p>asana {{ .BeegoVersion }} (asana framework)</p>
         <p>golang version: {{.GoVersion}}</p>
     </div>
 </body>
@@ -83,7 +83,7 @@ var tpl = `
 
 // render default application error page with error and stack string.
 func showErr(err interface{}, ctx *context.Context, stack string) {
-	t, _ := template.New("beegoerrortemp").Parse(tpl)
+	t, _ := template.New("asanaerrortemp").Parse(tpl)
 	data := map[string]string{
 		"AppError":      fmt.Sprintf("%s:%v", BConfig.AppName, err),
 		"RequestMethod": ctx.Input.Method(),
@@ -188,7 +188,7 @@ var errtpl = `
 					{{.Content}}
 					<a href="/" title="Home" class="button">Go Home</a><br />
 
-					<br>Powered by beego {{.BeegoVersion}}
+					<br>Powered by asana {{.BeegoVersion}}
 				</div>
 			</div>
 		</div>
@@ -360,7 +360,7 @@ func gatewayTimeout(rw http.ResponseWriter, r *http.Request) {
 }
 
 func responseError(rw http.ResponseWriter, r *http.Request, errCode int, errContent string) {
-	t, _ := template.New("beegoerrortemp").Parse(errtpl)
+	t, _ := template.New("asanaerrortemp").Parse(errtpl)
 	data := M{
 		"Title":        http.StatusText(errCode),
 		"BeegoVersion": VERSION,
@@ -371,8 +371,8 @@ func responseError(rw http.ResponseWriter, r *http.Request, errCode int, errCont
 
 // ErrorHandler registers http.HandlerFunc to each http err code string.
 // usage:
-// 	beego.ErrorHandler("404",NotFound)
-//	beego.ErrorHandler("500",InternalServerError)
+// 	asana.ErrorHandler("404",NotFound)
+//	asana.ErrorHandler("500",InternalServerError)
 func ErrorHandler(code string, h http.HandlerFunc) *App {
 	ErrorMaps[code] = &errorInfo{
 		errorType: errorTypeHandler,
@@ -384,7 +384,7 @@ func ErrorHandler(code string, h http.HandlerFunc) *App {
 
 // ErrorController registers ControllerInterface to each http err code string.
 // usage:
-// 	beego.ErrorController(&controllers.ErrorController{})
+// 	asana.ErrorController(&controllers.ErrorController{})
 func ErrorController(c ControllerInterface) *App {
 	reflectVal := reflect.ValueOf(c)
 	rt := reflectVal.Type()

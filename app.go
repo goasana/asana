@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package beego
+package asana
 
 import (
 	"crypto/tls"
@@ -27,9 +27,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/GNURub/beego/grace"
-	"github.com/GNURub/beego/logs"
-	"github.com/GNURub/beego/utils"
+	"github.com/goasana/framework/grace"
+	"github.com/goasana/framework/logs"
+	"github.com/goasana/framework/utils"
 	"golang.org/x/crypto/acme/autocert"
 )
 
@@ -39,17 +39,17 @@ var (
 )
 
 func init() {
-	// create beego application
+	// create asana application
 	BeeApp = NewApp()
 }
 
-// App defines beego application with a new PatternServeMux.
+// App defines asana application with a new PatternServeMux.
 type App struct {
 	Handlers *ControllerRegister
 	Server   *http.Server
 }
 
-// NewApp returns a new beego application.
+// NewApp returns a new asana application.
 func NewApp() *App {
 	cr := NewControllerRegister()
 	app := &App{Handlers: cr, Server: &http.Server{}}
@@ -59,7 +59,7 @@ func NewApp() *App {
 // MiddleWare function for http.Handler
 type MiddleWare func(http.Handler) http.Handler
 
-// Run beego application.
+// Run asana application.
 func (app *App) Run(mws ...MiddleWare) {
 	addr := BConfig.Listen.HTTPAddr
 
@@ -243,18 +243,18 @@ func (app *App) Run(mws ...MiddleWare) {
 // it's an alias method of App.Router.
 // usage:
 //  simple router
-//  beego.Router("/admin", &admin.UserController{})
-//  beego.Router("/admin/index", &admin.ArticleController{})
+//  asana.Router("/admin", &admin.UserController{})
+//  asana.Router("/admin/index", &admin.ArticleController{})
 //
 //  regex router
 //
-//  beego.Router("/api/:id([0-9]+)", &controllers.RController{})
+//  asana.Router("/api/:id([0-9]+)", &controllers.RController{})
 //
 //  custom rules
-//  beego.Router("/api/list",&RestController{},"*:ListFood")
-//  beego.Router("/api/create",&RestController{},"post:CreateFood")
-//  beego.Router("/api/update",&RestController{},"put:UpdateFood")
-//  beego.Router("/api/delete",&RestController{},"delete:DeleteFood")
+//  asana.Router("/api/list",&RestController{},"*:ListFood")
+//  asana.Router("/api/create",&RestController{},"post:CreateFood")
+//  asana.Router("/api/update",&RestController{},"put:UpdateFood")
+//  asana.Router("/api/delete",&RestController{},"delete:DeleteFood")
 func Router(rootpath string, c ControllerInterface, mappingMethods ...string) *App {
 	BeeApp.Handlers.Add(rootpath, c, mappingMethods...)
 	return BeeApp
@@ -267,8 +267,8 @@ func Router(rootpath string, c ControllerInterface, mappingMethods ...string) *A
 // method type (e.g. "GET" or "POST") for selective removal.
 //
 // Usage (replace "GET" with "*" for all methods):
-//  beego.UnregisterFixedRoute("/yourpreviouspath", "GET")
-//  beego.Router("/yourpreviouspath", yourControllerAddress, "get:GetNewPage")
+//  asana.UnregisterFixedRoute("/yourpreviouspath", "GET")
+//  asana.Router("/yourpreviouspath", yourControllerAddress, "get:GetNewPage")
 func UnregisterFixedRoute(fixedRoute string, method string) *App {
 	subPaths := splitPath(fixedRoute)
 	if method == "" || method == "*" {
@@ -340,9 +340,9 @@ func findAndRemoveSingleTree(entryPointTree *Tree) {
 
 // Include will generate router file in the router/xxx.go from the controller's comments
 // usage:
-// beego.Include(&BankAccount{}, &OrderController{},&RefundController{},&ReceiptController{})
+// asana.Include(&BankAccount{}, &OrderController{},&RefundController{},&ReceiptController{})
 // type BankAccount struct{
-//   beego.Controller
+//   asana.Controller
 // }
 //
 // register the function
@@ -371,7 +371,7 @@ func Include(cList ...ControllerInterface) *App {
 }
 
 // RESTRouter adds a restful controller handler to BeeApp.
-// its' controller implements beego.ControllerInterface and
+// its' controller implements asana.ControllerInterface and
 // defines a param "pattern/:objectId" to visit each resource.
 func RESTRouter(rootpath string, c ControllerInterface) *App {
 	Router(rootpath, c)
@@ -381,7 +381,7 @@ func RESTRouter(rootpath string, c ControllerInterface) *App {
 
 // AutoRouter adds defined controller handler to BeeApp.
 // it's same to App.AutoRouter.
-// if beego.AddAuto(&MainContorlller{}) and MainController has methods List and Page,
+// if asana.AddAuto(&MainContorlller{}) and MainController has methods List and Page,
 // visit the url /main/list to exec List function or /main/page to exec Page function.
 func AutoRouter(c ControllerInterface) *App {
 	BeeApp.Handlers.AddAuto(c)
@@ -390,7 +390,7 @@ func AutoRouter(c ControllerInterface) *App {
 
 // AutoPrefix adds controller handler to BeeApp with prefix.
 // it's same to App.AutoRouterWithPrefix.
-// if beego.AutoPrefix("/admin",&MainContorlller{}) and MainController has methods List and Page,
+// if asana.AutoPrefix("/admin",&MainContorlller{}) and MainController has methods List and Page,
 // visit the url /admin/main/list to exec List function or /admin/main/page to exec Page function.
 func AutoPrefix(prefix string, c ControllerInterface) *App {
 	BeeApp.Handlers.AddAutoPrefix(prefix, c)
@@ -399,7 +399,7 @@ func AutoPrefix(prefix string, c ControllerInterface) *App {
 
 // Get used to register router for Get method
 // usage:
-//    beego.Get("/", func(ctx *context.Context){
+//    asana.Get("/", func(ctx *context.Context){
 //          ctx.Output.Body("hello world")
 //    })
 func Get(rootpath string, f FilterFunc) *App {
@@ -409,7 +409,7 @@ func Get(rootpath string, f FilterFunc) *App {
 
 // Post used to register router for Post method
 // usage:
-//    beego.Post("/api", func(ctx *context.Context){
+//    asana.Post("/api", func(ctx *context.Context){
 //          ctx.Output.Body("hello world")
 //    })
 func Post(rootpath string, f FilterFunc) *App {
@@ -419,7 +419,7 @@ func Post(rootpath string, f FilterFunc) *App {
 
 // Delete used to register router for Delete method
 // usage:
-//    beego.Delete("/api", func(ctx *context.Context){
+//    asana.Delete("/api", func(ctx *context.Context){
 //          ctx.Output.Body("hello world")
 //    })
 func Delete(rootpath string, f FilterFunc) *App {
@@ -429,7 +429,7 @@ func Delete(rootpath string, f FilterFunc) *App {
 
 // Put used to register router for Put method
 // usage:
-//    beego.Put("/api", func(ctx *context.Context){
+//    asana.Put("/api", func(ctx *context.Context){
 //          ctx.Output.Body("hello world")
 //    })
 func Put(rootpath string, f FilterFunc) *App {
@@ -439,7 +439,7 @@ func Put(rootpath string, f FilterFunc) *App {
 
 // Head used to register router for Head method
 // usage:
-//    beego.Head("/api", func(ctx *context.Context){
+//    asana.Head("/api", func(ctx *context.Context){
 //          ctx.Output.Body("hello world")
 //    })
 func Head(rootpath string, f FilterFunc) *App {
@@ -449,7 +449,7 @@ func Head(rootpath string, f FilterFunc) *App {
 
 // Options used to register router for Options method
 // usage:
-//    beego.Options("/api", func(ctx *context.Context){
+//    asana.Options("/api", func(ctx *context.Context){
 //          ctx.Output.Body("hello world")
 //    })
 func Options(rootpath string, f FilterFunc) *App {
@@ -459,7 +459,7 @@ func Options(rootpath string, f FilterFunc) *App {
 
 // Patch used to register router for Patch method
 // usage:
-//    beego.Patch("/api", func(ctx *context.Context){
+//    asana.Patch("/api", func(ctx *context.Context){
 //          ctx.Output.Body("hello world")
 //    })
 func Patch(rootpath string, f FilterFunc) *App {
@@ -469,7 +469,7 @@ func Patch(rootpath string, f FilterFunc) *App {
 
 // Any used to register router for all methods
 // usage:
-//    beego.Any("/api", func(ctx *context.Context){
+//    asana.Any("/api", func(ctx *context.Context){
 //          ctx.Output.Body("hello world")
 //    })
 func Any(rootpath string, f FilterFunc) *App {
@@ -479,7 +479,7 @@ func Any(rootpath string, f FilterFunc) *App {
 
 // Handler used to register a Handler router
 // usage:
-//    beego.Handler("/api", http.HandlerFunc(func (w http.ResponseWriter, r *http.Request) {
+//    asana.Handler("/api", http.HandlerFunc(func (w http.ResponseWriter, r *http.Request) {
 //          fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path))
 //    }))
 func Handler(rootpath string, h http.Handler, options ...interface{}) *App {
@@ -489,7 +489,7 @@ func Handler(rootpath string, h http.Handler, options ...interface{}) *App {
 
 // InsertFilter adds a FilterFunc with pattern condition and action constant.
 // The pos means action constant including
-// beego.BeforeStatic, beego.BeforeRouter, beego.BeforeExec, beego.AfterExec and beego.FinishRouter.
+// asana.BeforeStatic, asana.BeforeRouter, asana.BeforeExec, asana.AfterExec and asana.FinishRouter.
 // The bool params is for setting the returnOnOutput value (false allows multiple filters to execute)
 func InsertFilter(pattern string, pos int, filter FilterFunc, params ...bool) *App {
 	BeeApp.Handlers.InsertFilter(pattern, pos, filter, params...)

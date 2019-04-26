@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
 //
 // Usage:
 // import(
-//   _ "github.com/GNURub/beego/session/couchbase"
-//   "github.com/GNURub/beego/session"
+//   _ "github.com/goasana/framework/session/couchbase"
+//   "github.com/goasana/framework/session"
 // )
 //
 //	func init() {
@@ -29,7 +29,7 @@
 //		go globalSessions.GC()
 //	}
 //
-// more docs: http://beego.me/docs/module/session.md
+// more docs: http://asana.me/docs/module/session.md
 package couchbase
 
 import (
@@ -39,7 +39,7 @@ import (
 
 	couchbase "github.com/couchbase/go-couchbase"
 
-	"github.com/GNURub/beego/session"
+	"github.com/goasana/framework/session"
 )
 
 var couchbpder = &Provider{}

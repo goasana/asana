@@ -1,27 +1,22 @@
-# Beego [![Build Status](https://travis-ci.org/GNURub/beego.svg?branch=master)](https://travis-ci.org/GNURub/beego) [![GoDoc](http://godoc.org/github.com/GNURub/beego?status.svg)](http://godoc.org/github.com/GNURub/beego) [![Foundation](https://img.shields.io/badge/Golang-Foundation-green.svg)](http://golangfoundation.org) [![Go Report Card](https://goreportcard.com/badge/github.com/GNURub/beego)](https://goreportcard.com/report/github.com/GNURub/beego)
+# Asana [![Build Status](https://travis-ci.org/goasana/framework.svg?branch=master)](https://travis-ci.org/goasana/framework) [![GoDoc](http://godoc.org/github.com/goasana/framework?status.svg)](http://godoc.org/github.com/goasana/framework) [![Go Report Card](https://goreportcard.com/badge/github.com/goasana/framework)](https://goreportcard.com/report/github.com/goasana/framework)
 
 
-beego is used for rapid development of RESTful APIs, web apps and backend services in Go.
-It is inspired by Tornado, Sinatra and Flask. beego has some Go-specific features such as interfaces and struct embedding.
-
- Response time ranking: [web-frameworks](https://github.com/the-benchmarker/web-frameworks).
-
-###### More info at [beego.me](http://beego.me).
+Asana is clone of [beego](http://beego.me).
 
 ## Quick Start
 
 #### Download and install
 
-    go get github.com/GNURub/beego
+    go get github.com/goasana/framework
 
 #### Create file `hello.go`
 ```go
 package main
 
-import "github.com/GNURub/beego"
+import "github.com/goasana/framework"
 
 func main(){
-    beego.Run()
+    asana.Run()
 }
 ```
 #### Build and run
@@ -31,9 +26,7 @@ func main(){
 
 #### Go to [http://localhost:8080](http://localhost:8080)
 
-Congratulations! You've just built your first **beego** app.
-
-###### Please see [Documentation](http://beego.me/docs) for more.
+Congratulations! You've just built your first **Asana** app.
 
 ## Features
 
@@ -46,18 +39,7 @@ Congratulations! You've just built your first **beego** app.
 * Powerful development tools
 * Full stack for Web & API
 
-## Documentation
-
-* [English](http://beego.me/docs/intro/)
-* [中文文档](http://beego.me/docs/intro/)
-* [Русский](http://beego.me/docs/intro/)
-
-## Community
-
-* [http://beego.me/community](http://beego.me/community)
-* Welcome to join us in Slack: [https://beego.slack.com](https://beego.slack.com), you can get invited from [here](https://github.com/beego/beedoc/issues/232)
-
 ## License
 
-beego source code is licensed under the Apache Licence, Version 2.0
+Asana source code is licensed under the Apache Licence, Version 2.0
 (http://www.apache.org/licenses/LICENSE-2.0.html).

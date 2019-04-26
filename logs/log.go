@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 // Package logs provide a general log interface
 // Usage:
 //
-// import "github.com/GNURub/beego/logs"
+// import "github.com/goasana/framework/logs"
 //
 //	log := NewLogger(10000)
 //	log.SetLogger("console", "")
@@ -30,7 +30,7 @@
 //	log.Debug("debug")
 //	log.Critical("critical")
 //
-//  more docs http://beego.me/docs/module/logs.md
+//  more docs http://asana.me/docs/module/logs.md
 package logs
 
 import (
@@ -61,7 +61,7 @@ const (
 // the real log level will be LevelEmergency
 const levelLoggerImpl = -1
 
-// Name for adapter with beego official support
+// Name for adapter with asana official support
 const (
 	AdapterConsole   = "console"
 	AdapterFile      = "file"
@@ -107,7 +107,7 @@ func Register(name string, log newLoggerFunc) {
 	adapters[name] = log
 }
 
-// BeeLogger is default logger in beego application.
+// BeeLogger is default logger in asana application.
 // it can contain several providers and log message into all providers.
 type BeeLogger struct {
 	lock                sync.Mutex
@@ -505,15 +505,15 @@ func (bl *BeeLogger) flush() {
 	}
 }
 
-// beeLogger references the used application logger.
-var beeLogger = NewLogger()
+// asanaLogger references the used application logger.
+var asanaLogger = NewLogger()
 
 // GetBeeLogger returns the default BeeLogger
 func GetBeeLogger() *BeeLogger {
-	return beeLogger
+	return asanaLogger
 }
 
-var beeLoggerMap = struct {
+var asanaLoggerMap = struct {
 	sync.RWMutex
 	logs map[string]*log.Logger
 }{
@@ -526,118 +526,118 @@ func GetLogger(prefixes ...string) *log.Logger {
 	if prefix != "" {
 		prefix = fmt.Sprintf(`[%s] `, strings.ToUpper(prefix))
 	}
-	beeLoggerMap.RLock()
-	l, ok := beeLoggerMap.logs[prefix]
+	asanaLoggerMap.RLock()
+	l, ok := asanaLoggerMap.logs[prefix]
 	if ok {
-		beeLoggerMap.RUnlock()
+		asanaLoggerMap.RUnlock()
 		return l
 	}
-	beeLoggerMap.RUnlock()
-	beeLoggerMap.Lock()
-	defer beeLoggerMap.Unlock()
-	l, ok = beeLoggerMap.logs[prefix]
+	asanaLoggerMap.RUnlock()
+	asanaLoggerMap.Lock()
+	defer asanaLoggerMap.Unlock()
+	l, ok = asanaLoggerMap.logs[prefix]
 	if !ok {
-		l = log.New(beeLogger, prefix, 0)
-		beeLoggerMap.logs[prefix] = l
+		l = log.New(asanaLogger, prefix, 0)
+		asanaLoggerMap.logs[prefix] = l
 	}
 	return l
 }
 
 // Reset will remove all the adapter
 func Reset() {
-	beeLogger.Reset()
+	asanaLogger.Reset()
 }
 
 // Async set the beelogger with Async mode and hold msglen messages
 func Async(msgLen ...int64) *BeeLogger {
-	return beeLogger.Async(msgLen...)
+	return asanaLogger.Async(msgLen...)
 }
 
 // SetLevel sets the global log level used by the simple logger.
 func SetLevel(l int) {
-	beeLogger.SetLevel(l)
+	asanaLogger.SetLevel(l)
 }
 
 // SetPrefix sets the prefix
 func SetPrefix(s string) {
-	beeLogger.SetPrefix(s)
+	asanaLogger.SetPrefix(s)
 }
 
 // EnableFuncCallDepth enable log funcCallDepth
 func EnableFuncCallDepth(b bool) {
-	beeLogger.enableFuncCallDepth = b
+	asanaLogger.enableFuncCallDepth = b
 }
 
 // SetLogFuncCall set the CallDepth, default is 4
 func SetLogFuncCall(b bool) {
-	beeLogger.EnableFuncCallDepth(b)
-	beeLogger.SetLogFuncCallDepth(4)
+	asanaLogger.EnableFuncCallDepth(b)
+	asanaLogger.SetLogFuncCallDepth(4)
 }
 
 // SetLogFuncCallDepth set log funcCallDepth
 func SetLogFuncCallDepth(d int) {
-	beeLogger.loggerFuncCallDepth = d
+	asanaLogger.loggerFuncCallDepth = d
 }
 
 // SetLogger sets a new logger.
 func SetLogger(adapter string, config ...string) error {
-	return beeLogger.SetLogger(adapter, config...)
+	return asanaLogger.SetLogger(adapter, config...)
 }
 
 // Emergency logs a message at emergency level.
 func Emergency(f interface{}, v ...interface{}) {
-	beeLogger.Emergency(formatLog(f, v...))
+	asanaLogger.Emergency(formatLog(f, v...))
 }
 
 // Alert logs a message at alert level.
 func Alert(f interface{}, v ...interface{}) {
-	beeLogger.Alert(formatLog(f, v...))
+	asanaLogger.Alert(formatLog(f, v...))
 }
 
 // Critical logs a message at critical level.
 func Critical(f interface{}, v ...interface{}) {
-	beeLogger.Critical(formatLog(f, v...))
+	asanaLogger.Critical(formatLog(f, v...))
 }
 
 // Error logs a message at error level.
 func Error(f interface{}, v ...interface{}) {
-	beeLogger.Error(formatLog(f, v...))
+	asanaLogger.Error(formatLog(f, v...))
 }
 
 // Warning logs a message at warning level.
 func Warning(f interface{}, v ...interface{}) {
-	beeLogger.Warn(formatLog(f, v...))
+	asanaLogger.Warn(formatLog(f, v...))
 }
 
 // Warn compatibility alias for Warning()
 func Warn(f interface{}, v ...interface{}) {
-	beeLogger.Warn(formatLog(f, v...))
+	asanaLogger.Warn(formatLog(f, v...))
 }
 
 // Notice logs a message at notice level.
 func Notice(f interface{}, v ...interface{}) {
-	beeLogger.Notice(formatLog(f, v...))
+	asanaLogger.Notice(formatLog(f, v...))
 }
 
 // Informational logs a message at info level.
 func Informational(f interface{}, v ...interface{}) {
-	beeLogger.Info(formatLog(f, v...))
+	asanaLogger.Info(formatLog(f, v...))
 }
 
 // Info compatibility alias for Warning()
 func Info(f interface{}, v ...interface{}) {
-	beeLogger.Info(formatLog(f, v...))
+	asanaLogger.Info(formatLog(f, v...))
 }
 
 // Debug logs a message at debug level.
 func Debug(f interface{}, v ...interface{}) {
-	beeLogger.Debug(formatLog(f, v...))
+	asanaLogger.Debug(formatLog(f, v...))
 }
 
 // Trace logs a message at trace level.
 // compatibility alias for Warning()
 func Trace(f interface{}, v ...interface{}) {
-	beeLogger.Trace(formatLog(f, v...))
+	asanaLogger.Trace(formatLog(f, v...))
 }
 
 func formatLog(f interface{}, v ...interface{}) string {

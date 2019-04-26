@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,12 +17,12 @@ package utils
 import "testing"
 
 func TestMail(t *testing.T) {
-	config := `{"username":"GNURub@gmail.com","password":"GNURub","host":"smtp.gmail.com","port":587}`
+	config := `{"username":"asana@gmail.com","password":"asana","host":"smtp.gmail.com","port":587}`
 	mail := NewEMail(config)
-	if mail.Username != "GNURub@gmail.com" {
+	if mail.Username != "asana@gmail.com" {
 		t.Fatal("email parse get username error")
 	}
-	if mail.Password != "GNURub" {
+	if mail.Password != "asana" {
 		t.Fatal("email parse get password error")
 	}
 	if mail.Host != "smtp.gmail.com" {
@@ -32,10 +32,10 @@ func TestMail(t *testing.T) {
 		t.Fatal("email parse get port error")
 	}
 	mail.To = []string{"xiemengjun@gmail.com"}
-	mail.From = "GNURub@gmail.com"
-	mail.Subject = "hi, just from beego!"
+	mail.From = "asana@gmail.com"
+	mail.Subject = "hi, just from asana!"
 	mail.Text = "Text Body is, of course, supported!"
 	mail.HTML = "<h1>Fancy Html is supported, too!</h1>"
-	mail.AttachFile("/Users/GNURub/github/beego/beego.go")
+	mail.AttachFile("/Users/asana/github/asana/asana.go")
 	mail.Send()
 }

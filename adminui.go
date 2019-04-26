@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package beego
+package asana
 
 var indexTpl = `
 {{define "content"}}
@@ -21,10 +21,10 @@ var indexTpl = `
 For detail usage please check our document:
 </p>
 <p>
-<a target="_blank" href="http://beego.me/docs/module/toolbox.md">Toolbox</a>
+<a target="_blank" href="http://asana.me/docs/module/toolbox.md">Toolbox</a>
 </p>
 <p>
-<a target="_blank" href="http://beego.me/docs/advantage/monitor.md">Live Monitor</a>
+<a target="_blank" href="http://asana.me/docs/advantage/monitor.md">Live Monitor</a>
 </p>
 {{.Content}}
 {{end}}`

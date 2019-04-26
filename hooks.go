@@ -1,4 +1,4 @@
-package beego
+package asana
 
 import (
 	"encoding/json"
@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"github.com/GNURub/beego/context"
-	"github.com/GNURub/beego/logs"
-	"github.com/GNURub/beego/session"
+	"github.com/goasana/framework/context"
+	"github.com/goasana/framework/logs"
+	"github.com/goasana/framework/session"
 )
 
 // register MIME type with content type
@@ -86,7 +86,7 @@ func registerTemplate() error {
 
 func registerAdmin() error {
 	if BConfig.Listen.EnableAdmin {
-		go beeAdminApp.Run()
+		go asanaAdminApp.Run()
 	}
 	return nil
 }

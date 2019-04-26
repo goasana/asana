@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package beego
+package asana
 
 import (
 	"errors"
@@ -248,7 +248,7 @@ func Htmlunquote(text string) string {
 //	/login?next=/
 //	/user/John%20Doe
 //
-//  more detail http://beego.me/docs/mvc/controller/urlbuilding.md
+//  more detail http://asana.me/docs/mvc/controller/urlbuilding.md
 func URLFor(endpoint string, values ...interface{}) string {
 	return BeeApp.Handlers.URLFor(endpoint, values...)
 }

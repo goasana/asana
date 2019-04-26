@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/GNURub/beego/session"
+	"github.com/goasana/framework/session"
 )
 
 func TestRedisSentinel(t *testing.T) {
@@ -36,12 +36,12 @@ func TestRedisSentinel(t *testing.T) {
 	defer sess.SessionRelease(w)
 
 	// SET AND GET
-	err = sess.Set("username", "GNURub")
+	err = sess.Set("username", "asana")
 	if err != nil {
 		t.Fatal("set username failed:", err)
 	}
 	username := sess.Get("username")
-	if username != "GNURub" {
+	if username != "asana" {
 		t.Fatal("get username failed")
 	}
 
@@ -56,7 +56,7 @@ func TestRedisSentinel(t *testing.T) {
 	}
 
 	// FLUSH
-	err = sess.Set("username", "GNURub")
+	err = sess.Set("username", "asana")
 	if err != nil {
 		t.Fatal("set failed:", err)
 	}
@@ -65,7 +65,7 @@ func TestRedisSentinel(t *testing.T) {
 		t.Fatal("set failed:", err)
 	}
 	username = sess.Get("username")
-	if username != "GNURub" {
+	if username != "asana" {
 		t.Fatal("get username failed")
 	}
 	password := sess.Get("password")

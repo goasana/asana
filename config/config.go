@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
 
 // Package config is used to parse config.
 // Usage:
-//  import "github.com/GNURub/beego/config"
+//  import "github.com/goasana/framework/config"
 //Examples.
 //
-//  cnf, err := config.NewConfig("configMap", "beego")
+//  cnf, err := config.NewConfig("configMap", "asana")
 //
 //  cnf APIS:
 //
@@ -37,7 +37,7 @@
 //  cnf.DIY(key string) (interface{}, error)
 //  cnf.GetSection(section string) (map[string]string, error)
 //  cnf.SaveConfigFile(filename string) error
-//More docs http://beego.me/docs/module/config.md
+//More docs http://asana.me/docs/module/config.md
 package config
 
 import (
@@ -47,8 +47,8 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/GNURub/beego/encoder"
-	"github.com/GNURub/beego/encoder/json"
+	"github.com/goasana/framework/encoder"
+	"github.com/goasana/framework/encoder/json"
 )
 
 type ConfigProvider string
@@ -204,7 +204,7 @@ func ExpandValueEnvForMap(m map[string]interface{}) map[string]interface{} {
 // Examples:
 //	v1 := config.ExpandValueEnv("${GOPATH}")			// return the GOPATH environment variable.
 //	v2 := config.ExpandValueEnv("${GOAsta||/usr/local/go}")	// return the default value "/usr/local/go/".
-//	v3 := config.ExpandValueEnv("GNURub")				// return the value "GNURub".
+//	v3 := config.ExpandValueEnv("asana")				// return the value "asana".
 func ExpandValueEnv(value string) (realValue string) {
 	realValue = value
 

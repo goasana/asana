@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package beego
+package asana
 
 import (
 	"bytes"
@@ -26,8 +26,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/GNURub/beego/context"
-	"github.com/GNURub/beego/logs"
+	"github.com/goasana/framework/context"
+	"github.com/goasana/framework/logs"
 )
 
 var errNotStaticRequest = errors.New("request not a static file request")

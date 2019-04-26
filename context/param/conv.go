@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"reflect"
 
-	beecontext "github.com/GNURub/beego/context"
-	"github.com/GNURub/beego/logs"
+	asanaContext "github.com/goasana/framework/context"
+	"github.com/goasana/framework/logs"
 )
 
 // ConvertParams converts http method params to values that will be passed to the method controller as arguments
-func ConvertParams(methodParams []*MethodParam, methodType reflect.Type, ctx *beecontext.Context) (result []reflect.Value) {
+func ConvertParams(methodParams []*MethodParam, methodType reflect.Type, ctx *asanaContext.Context) (result []reflect.Value) {
 	result = make([]reflect.Value, 0, len(methodParams))
 	for i := 0; i < len(methodParams); i++ {
 		reflectValue := convertParam(methodParams[i], methodType.In(i), ctx)
@@ -18,7 +18,7 @@ func ConvertParams(methodParams []*MethodParam, methodType reflect.Type, ctx *be
 	return
 }
 
-func convertParam(param *MethodParam, paramType reflect.Type, ctx *beecontext.Context) (result reflect.Value) {
+func convertParam(param *MethodParam, paramType reflect.Type, ctx *asanaContext.Context) (result reflect.Value) {
 	paramValue := getParamValue(param, ctx)
 	if paramValue == "" {
 		if param.required {
@@ -37,7 +37,7 @@ func convertParam(param *MethodParam, paramType reflect.Type, ctx *beecontext.Co
 	return reflectValue
 }
 
-func getParamValue(param *MethodParam, ctx *beecontext.Context) string {
+func getParamValue(param *MethodParam, ctx *asanaContext.Context) string {
 	switch param.in {
 	case body:
 		return string(ctx.Input.RequestBody)

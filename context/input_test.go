@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -69,35 +69,35 @@ func TestBind(t *testing.T) {
 
 		{"/?p[0]=true&p[1]=false&p[2]=true&p[5]=1&p[6]=ON&p[7]=other", []testItem{{"p", []bool{}, []bool{true, false, true, false, false, true, true, false}}}},
 
-		{"/?human.Nick=GNURub", []testItem{{"human", Human{}, Human{Nick: "GNURub"}}}},
-		{"/?human.ID=888&human.Nick=GNURub&human.Ms=true&human[Pwd]=pass", []testItem{{"human", Human{}, Human{ID: 888, Nick: "GNURub", Ms: true, Pwd: "pass"}}}},
-		{"/?human[0].ID=888&human[0].Nick=GNURub&human[0].Ms=true&human[0][Pwd]=pass01&human[1].ID=999&human[1].Nick=ysqi&human[1].Ms=On&human[1].Pwd=pass02",
+		{"/?human.Nick=asana", []testItem{{"human", Human{}, Human{Nick: "asana"}}}},
+		{"/?human.ID=888&human.Nick=asana&human.Ms=true&human[Pwd]=pass", []testItem{{"human", Human{}, Human{ID: 888, Nick: "asana", Ms: true, Pwd: "pass"}}}},
+		{"/?human[0].ID=888&human[0].Nick=asana&human[0].Ms=true&human[0][Pwd]=pass01&human[1].ID=999&human[1].Nick=ysqi&human[1].Ms=On&human[1].Pwd=pass02",
 			[]testItem{{"human", []Human{}, []Human{
-				{ID: 888, Nick: "GNURub", Ms: true, Pwd: "pass01"},
+				{ID: 888, Nick: "asana", Ms: true, Pwd: "pass01"},
 				{ID: 999, Nick: "ysqi", Ms: true, Pwd: "pass02"},
 			}}}},
 
 		{
-			"/?id=123&isok=true&ft=1.2&ol[0]=1&ol[1]=2&ul[]=str&ul[]=array&human.Nick=GNURub",
+			"/?id=123&isok=true&ft=1.2&ol[0]=1&ol[1]=2&ul[]=str&ul[]=array&human.Nick=asana",
 			[]testItem{
 				{"id", 0, 123},
 				{"isok", false, true},
 				{"ft", 0.0, 1.2},
 				{"ol", []int{}, []int{1, 2}},
 				{"ul", []string{}, []string{"str", "array"}},
-				{"human", Human{}, Human{Nick: "GNURub"}},
+				{"human", Human{}, Human{Nick: "asana"}},
 			},
 		},
 	}
 	for _, c := range cases {
 		r, _ := http.NewRequest("GET", c.request, nil)
-		beegoInput := NewInput()
-		beegoInput.Context = NewContext()
-		beegoInput.Context.Reset(httptest.NewRecorder(), r)
+		asanaInput := NewInput()
+		asanaInput.Context = NewContext()
+		asanaInput.Context.Reset(httptest.NewRecorder(), r)
 
 		for _, item := range c.valueGp {
 			got := item.empty
-			err := beegoInput.Bind(&got, item.field)
+			err := asanaInput.Bind(&got, item.field)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -110,46 +110,46 @@ func TestBind(t *testing.T) {
 }
 
 func TestSubDomain(t *testing.T) {
-	r, _ := http.NewRequest("GET", "http://www.example.com/?id=123&isok=true&ft=1.2&ol[0]=1&ol[1]=2&ul[]=str&ul[]=array&user.Name=GNURub", nil)
-	beegoInput := NewInput()
-	beegoInput.Context = NewContext()
-	beegoInput.Context.Reset(httptest.NewRecorder(), r)
+	r, _ := http.NewRequest("GET", "http://www.example.com/?id=123&isok=true&ft=1.2&ol[0]=1&ol[1]=2&ul[]=str&ul[]=array&user.Name=asana", nil)
+	asanaInput := NewInput()
+	asanaInput.Context = NewContext()
+	asanaInput.Context.Reset(httptest.NewRecorder(), r)
 
-	subdomain := beegoInput.SubDomains()
+	subdomain := asanaInput.SubDomains()
 	if subdomain != "www" {
 		t.Fatal("Subdomain parse error, got" + subdomain)
 	}
 
 	r, _ = http.NewRequest("GET", "http://localhost/", nil)
-	beegoInput.Context.Request = r
-	if beegoInput.SubDomains() != "" {
-		t.Fatal("Subdomain parse error, should be empty, got " + beegoInput.SubDomains())
+	asanaInput.Context.Request = r
+	if asanaInput.SubDomains() != "" {
+		t.Fatal("Subdomain parse error, should be empty, got " + asanaInput.SubDomains())
 	}
 
 	r, _ = http.NewRequest("GET", "http://aa.bb.example.com/", nil)
-	beegoInput.Context.Request = r
-	if beegoInput.SubDomains() != "aa.bb" {
-		t.Fatal("Subdomain parse error, got " + beegoInput.SubDomains())
+	asanaInput.Context.Request = r
+	if asanaInput.SubDomains() != "aa.bb" {
+		t.Fatal("Subdomain parse error, got " + asanaInput.SubDomains())
 	}
 
 	/* TODO Fix this
 	r, _ = http.NewRequest("GET", "http://127.0.0.1/", nil)
-	beegoInput.Context.Request = r
-	if beegoInput.SubDomains() != "" {
-		t.Fatal("Subdomain parse error, got " + beegoInput.SubDomains())
+	asanaInput.Context.Request = r
+	if asanaInput.SubDomains() != "" {
+		t.Fatal("Subdomain parse error, got " + asanaInput.SubDomains())
 	}
 	*/
 
 	r, _ = http.NewRequest("GET", "http://example.com/", nil)
-	beegoInput.Context.Request = r
-	if beegoInput.SubDomains() != "" {
-		t.Fatal("Subdomain parse error, got " + beegoInput.SubDomains())
+	asanaInput.Context.Request = r
+	if asanaInput.SubDomains() != "" {
+		t.Fatal("Subdomain parse error, got " + asanaInput.SubDomains())
 	}
 
 	r, _ = http.NewRequest("GET", "http://aa.bb.cc.dd.example.com/", nil)
-	beegoInput.Context.Request = r
-	if beegoInput.SubDomains() != "aa.bb.cc.dd" {
-		t.Fatal("Subdomain parse error, got " + beegoInput.SubDomains())
+	asanaInput.Context.Request = r
+	if asanaInput.SubDomains() != "aa.bb.cc.dd" {
+		t.Fatal("Subdomain parse error, got " + asanaInput.SubDomains())
 	}
 }
 

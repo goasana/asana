@@ -9,7 +9,7 @@ import (
 
 	"github.com/ssdb/gossdb/ssdb"
 
-	"github.com/GNURub/beego/cache"
+	"github.com/goasana/framework/cache"
 )
 
 // Cache SSDB adapter

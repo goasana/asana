@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package beego
+package asana
 
 import (
 	"bytes"
@@ -24,14 +24,14 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/GNURub/beego/grace"
-	"github.com/GNURub/beego/logs"
-	"github.com/GNURub/beego/toolbox"
-	"github.com/GNURub/beego/utils"
+	"github.com/goasana/framework/grace"
+	"github.com/goasana/framework/logs"
+	"github.com/goasana/framework/toolbox"
+	"github.com/goasana/framework/utils"
 )
 
 // BeeAdminApp is the default adminApp used by admin module.
-var beeAdminApp *adminApp
+var asanaAdminApp *adminApp
 
 // FilterMonitorFunc is default monitor filter when admin module is enable.
 // if this func returns, admin module records qps for this request by condition of this function logic.
@@ -43,24 +43,24 @@ var beeAdminApp *adminApp
 //	 	if t.Nanoseconds() < 100 {
 //			return false
 //	 	}
-//	 	if strings.HasPrefix(requestPath, "/GNURub") {
+//	 	if strings.HasPrefix(requestPath, "/asana") {
 //			return false
 //	 	}
 //	 	return true
 // 	}
-// 	beego.FilterMonitorFunc = MyFilterMonitor.
+// 	asana.FilterMonitorFunc = MyFilterMonitor.
 var FilterMonitorFunc func(string, string, time.Duration, string, int) bool
 
 func init() {
-	beeAdminApp = &adminApp{
+	asanaAdminApp = &adminApp{
 		routers: make(map[string]http.HandlerFunc),
 	}
-	beeAdminApp.Route("/", adminIndex)
-	beeAdminApp.Route("/qps", qpsIndex)
-	beeAdminApp.Route("/prof", profIndex)
-	beeAdminApp.Route("/healthcheck", healthcheck)
-	beeAdminApp.Route("/task", taskStatus)
-	beeAdminApp.Route("/listconf", listConf)
+	asanaAdminApp.Route("/", adminIndex)
+	asanaAdminApp.Route("/qps", qpsIndex)
+	asanaAdminApp.Route("/prof", profIndex)
+	asanaAdminApp.Route("/healthcheck", healthcheck)
+	asanaAdminApp.Route("/task", taskStatus)
+	asanaAdminApp.Route("/listconf", listConf)
 	FilterMonitorFunc = func(string, string, time.Duration, string, int) bool { return true }
 }
 
@@ -90,7 +90,7 @@ func qpsIndex(rw http.ResponseWriter, _ *http.Request) {
 	execTpl(rw, data, qpsTpl, defaultScriptsTpl)
 }
 
-// ListConf is the http.Handler of displaying all beego configuration values as key/value pair.
+// ListConf is the http.Handler of displaying all asana configuration values as key/value pair.
 // it's registered with url pattern "/listconf" in admin module.
 func listConf(rw http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
@@ -377,7 +377,7 @@ func execTpl(rw http.ResponseWriter, data map[interface{}]interface{}, tpls ...s
 	tmpl.Execute(rw, data)
 }
 
-// adminApp is an http.HandlerFunc map used as beeAdminApp.
+// adminApp is an http.HandlerFunc map used as asanaAdminApp.
 type adminApp struct {
 	routers map[string]http.HandlerFunc
 }

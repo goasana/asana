@@ -8,8 +8,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/GNURub/beego/config"
-	"github.com/GNURub/beego/encoder"
+	"github.com/goasana/framework/config"
+	"github.com/goasana/framework/encoder"
 )
 
 // ConfigBaseContainer A ConfigFile represents the json configuration.

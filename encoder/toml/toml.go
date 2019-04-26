@@ -4,7 +4,7 @@ import (
 	"bytes"
 
 	"github.com/BurntSushi/toml"
-	"github.com/GNURub/beego/encoder"
+	"github.com/goasana/framework/encoder"
 )
 
 func init() {

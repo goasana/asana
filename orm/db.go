@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -511,7 +511,7 @@ func (d *dbBase) InsertOrUpdate(q dbQuerier, mi *modelInfo, ind reflect.Value, a
 		args0 = strings.ToLower(args[0])
 		iouStr = fmt.Sprintf("ON CONFLICT (%s) DO UPDATE SET", args0)
 	default:
-		return 0, fmt.Errorf("`%s` nonsupport InsertOrUpdate in beego", a.DriverName)
+		return 0, fmt.Errorf("`%s` nonsupport InsertOrUpdate in asana", a.DriverName)
 	}
 
 	//Get on the key-value pairs

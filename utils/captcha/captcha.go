@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,21 +19,21 @@
 // package controllers
 //
 // import (
-// 	"github.com/GNURub/beego"
-// 	"github.com/GNURub/beego/cache"
-// 	"github.com/GNURub/beego/utils/captcha"
+// 	"github.com/goasana/framework"
+// 	"github.com/goasana/framework/cache"
+// 	"github.com/goasana/framework/utils/captcha"
 // )
 //
 // var cpt *captcha.Captcha
 //
 // func init() {
-// 	// use beego cache system store the captcha data
+// 	// use asana cache system store the captcha data
 // 	store := cache.NewMemoryCache()
 // 	cpt = captcha.NewWithFilter("/captcha/", store)
 // }
 //
 // type MainController struct {
-// 	beego.Controller
+// 	asana.Controller
 // }
 //
 // func (this *MainController) Get() {
@@ -66,11 +66,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/GNURub/beego"
-	"github.com/GNURub/beego/cache"
-	"github.com/GNURub/beego/context"
-	"github.com/GNURub/beego/logs"
-	"github.com/GNURub/beego/utils"
+	"github.com/goasana/framework"
+	"github.com/goasana/framework/cache"
+	"github.com/goasana/framework/context"
+	"github.com/goasana/framework/logs"
+	"github.com/goasana/framework/utils"
 )
 
 var (
@@ -89,7 +89,7 @@ const (
 
 // Captcha struct
 type Captcha struct {
-	// beego cache store
+	// asana cache store
 	store cache.Cache
 
 	// url prefix for captcha image
@@ -124,7 +124,7 @@ func (c *Captcha) genRandChars() []byte {
 	return utils.RandomCreateBytes(c.ChallengeNums, defaultChars...)
 }
 
-// Handler beego filter handler for serve captcha image
+// Handler asana filter handler for serve captcha image
 func (c *Captcha) Handler(ctx *context.Context) {
 	var chars []byte
 
@@ -261,10 +261,10 @@ func NewWithFilter(urlPrefix string, store cache.Cache) *Captcha {
 	cpt := NewCaptcha(urlPrefix, store)
 
 	// create filter for serve captcha image
-	beego.InsertFilter(cpt.URLPrefix+"*", beego.BeforeRouter, cpt.Handler)
+	asana.InsertFilter(cpt.URLPrefix+"*", asana.BeforeRouter, cpt.Handler)
 
 	// add to template func map
-	beego.AddFuncMap("create_captcha", cpt.CreateCaptchaHTML)
+	asana.AddFuncMap("create_captcha", cpt.CreateCaptchaHTML)
 
 	return cpt
 }

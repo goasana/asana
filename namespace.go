@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package beego
+package asana
 
 import (
 	"net/http"
 	"strings"
 
-	beecontext "github.com/GNURub/beego/context"
+	asanaContext "github.com/goasana/framework/context"
 )
 
-type namespaceCond func(*beecontext.Context) bool
+type namespaceCond func(*asanaContext.Context) bool
 
 // LinkNamespace used as link action
 type LinkNamespace func(*Namespace)
@@ -48,14 +48,14 @@ func NewNamespace(prefix string, params ...LinkNamespace) *Namespace {
 // if cond return true can run this namespace, else can't
 // usage:
 // ns.Cond(func (ctx *context.Context) bool{
-//       if ctx.Input.Domain() == "api.beego.me" {
+//       if ctx.Input.Domain() == "api.asana.me" {
 //         return true
 //       }
 //       return false
 //   })
 // Cond as the first filter
 func (n *Namespace) Cond(cond namespaceCond) *Namespace {
-	fn := func(ctx *beecontext.Context) {
+	fn := func(ctx *asanaContext.Context) {
 		if !cond(ctx) {
 			exception("405", ctx)
 		}
@@ -68,7 +68,7 @@ func (n *Namespace) Cond(cond namespaceCond) *Namespace {
 		mr.tree.AddRouter("*", true)
 		n.handlers.filters[BeforeRouter] = append([]*FilterRouter{mr}, v...)
 	} else {
-		n.handlers.InsertFilter("*", BeforeRouter, fn)
+		_ = n.handlers.InsertFilter("*", BeforeRouter, fn)
 	}
 	return n
 }
@@ -96,92 +96,92 @@ func (n *Namespace) Filter(action string, filter ...FilterFunc) *Namespace {
 	return n
 }
 
-// Router same as beego.Rourer
-// refer: https://godoc.org/github.com/GNURub/beego#Router
-func (n *Namespace) Router(rootpath string, c ControllerInterface, mappingMethods ...string) *Namespace {
-	n.handlers.Add(rootpath, c, mappingMethods...)
+// Router same as asana.Rourer
+// refer: https://godoc.org/github.com/goasana/framework#Router
+func (n *Namespace) Router(rootPath string, c ControllerInterface, mappingMethods ...string) *Namespace {
+	n.handlers.Add(rootPath, c, mappingMethods...)
 	return n
 }
 
-// AutoRouter same as beego.AutoRouter
-// refer: https://godoc.org/github.com/GNURub/beego#AutoRouter
+// AutoRouter same as asana.AutoRouter
+// refer: https://godoc.org/github.com/goasana/framework#AutoRouter
 func (n *Namespace) AutoRouter(c ControllerInterface) *Namespace {
 	n.handlers.AddAuto(c)
 	return n
 }
 
-// AutoPrefix same as beego.AutoPrefix
-// refer: https://godoc.org/github.com/GNURub/beego#AutoPrefix
+// AutoPrefix same as asana.AutoPrefix
+// refer: https://godoc.org/github.com/goasana/framework#AutoPrefix
 func (n *Namespace) AutoPrefix(prefix string, c ControllerInterface) *Namespace {
 	n.handlers.AddAutoPrefix(prefix, c)
 	return n
 }
 
-// Get same as beego.Get
-// refer: https://godoc.org/github.com/GNURub/beego#Get
-func (n *Namespace) Get(rootpath string, f FilterFunc) *Namespace {
-	n.handlers.Get(rootpath, f)
+// Get same as asana.Get
+// refer: https://godoc.org/github.com/goasana/framework#Get
+func (n *Namespace) Get(rootPath string, f FilterFunc) *Namespace {
+	n.handlers.Get(rootPath, f)
 	return n
 }
 
-// Post same as beego.Post
-// refer: https://godoc.org/github.com/GNURub/beego#Post
-func (n *Namespace) Post(rootpath string, f FilterFunc) *Namespace {
-	n.handlers.Post(rootpath, f)
+// Post same as asana.Post
+// refer: https://godoc.org/github.com/goasana/framework#Post
+func (n *Namespace) Post(rootPath string, f FilterFunc) *Namespace {
+	n.handlers.Post(rootPath, f)
 	return n
 }
 
-// Delete same as beego.Delete
-// refer: https://godoc.org/github.com/GNURub/beego#Delete
-func (n *Namespace) Delete(rootpath string, f FilterFunc) *Namespace {
-	n.handlers.Delete(rootpath, f)
+// Delete same as asana.Delete
+// refer: https://godoc.org/github.com/goasana/framework#Delete
+func (n *Namespace) Delete(rootPath string, f FilterFunc) *Namespace {
+	n.handlers.Delete(rootPath, f)
 	return n
 }
 
-// Put same as beego.Put
-// refer: https://godoc.org/github.com/GNURub/beego#Put
-func (n *Namespace) Put(rootpath string, f FilterFunc) *Namespace {
-	n.handlers.Put(rootpath, f)
+// Put same as asana.Put
+// refer: https://godoc.org/github.com/goasana/framework#Put
+func (n *Namespace) Put(rootPath string, f FilterFunc) *Namespace {
+	n.handlers.Put(rootPath, f)
 	return n
 }
 
-// Head same as beego.Head
-// refer: https://godoc.org/github.com/GNURub/beego#Head
-func (n *Namespace) Head(rootpath string, f FilterFunc) *Namespace {
-	n.handlers.Head(rootpath, f)
+// Head same as asana.Head
+// refer: https://godoc.org/github.com/goasana/framework#Head
+func (n *Namespace) Head(rootPath string, f FilterFunc) *Namespace {
+	n.handlers.Head(rootPath, f)
 	return n
 }
 
-// Options same as beego.Options
-// refer: https://godoc.org/github.com/GNURub/beego#Options
-func (n *Namespace) Options(rootpath string, f FilterFunc) *Namespace {
-	n.handlers.Options(rootpath, f)
+// Options same as asana.Options
+// refer: https://godoc.org/github.com/goasana/framework#Options
+func (n *Namespace) Options(rootPath string, f FilterFunc) *Namespace {
+	n.handlers.Options(rootPath, f)
 	return n
 }
 
-// Patch same as beego.Patch
-// refer: https://godoc.org/github.com/GNURub/beego#Patch
-func (n *Namespace) Patch(rootpath string, f FilterFunc) *Namespace {
-	n.handlers.Patch(rootpath, f)
+// Patch same as asana.Patch
+// refer: https://godoc.org/github.com/goasana/framework#Patch
+func (n *Namespace) Patch(rootPath string, f FilterFunc) *Namespace {
+	n.handlers.Patch(rootPath, f)
 	return n
 }
 
-// Any same as beego.Any
-// refer: https://godoc.org/github.com/GNURub/beego#Any
-func (n *Namespace) Any(rootpath string, f FilterFunc) *Namespace {
-	n.handlers.Any(rootpath, f)
+// Any same as asana.Any
+// refer: https://godoc.org/github.com/goasana/framework#Any
+func (n *Namespace) Any(rootPath string, f FilterFunc) *Namespace {
+	n.handlers.Any(rootPath, f)
 	return n
 }
 
-// Handler same as beego.Handler
-// refer: https://godoc.org/github.com/GNURub/beego#Handler
-func (n *Namespace) Handler(rootpath string, h http.Handler) *Namespace {
-	n.handlers.Handler(rootpath, h)
+// Handler same as asana.Handler
+// refer: https://godoc.org/github.com/goasana/framework#Handler
+func (n *Namespace) Handler(rootPath string, h http.Handler) *Namespace {
+	n.handlers.Handler(rootPath, h)
 	return n
 }
 
 // Include add include class
-// refer: https://godoc.org/github.com/GNURub/beego#Include
+// refer: https://godoc.org/github.com/goasana/framework#Include
 func (n *Namespace) Include(cList ...ControllerInterface) *Namespace {
 	n.handlers.Include(cList...)
 	return n
@@ -189,17 +189,17 @@ func (n *Namespace) Include(cList ...ControllerInterface) *Namespace {
 
 // Namespace add nest Namespace
 // usage:
-//ns := beego.NewNamespace(“/v1”).
+//ns := asana.NewNamespace(“/v1”).
 //Namespace(
-//    beego.NewNamespace("/shop").
+//    asana.NewNamespace("/shop").
 //        Get("/:id", func(ctx *context.Context) {
 //            ctx.Output.Body([]byte("shopinfo"))
 //    }),
-//    beego.NewNamespace("/order").
+//    asana.NewNamespace("/order").
 //        Get("/:id", func(ctx *context.Context) {
 //            ctx.Output.Body([]byte("orderinfo"))
 //    }),
-//    beego.NewNamespace("/crm").
+//    asana.NewNamespace("/crm").
 //        Get("/:id", func(ctx *context.Context) {
 //            ctx.Output.Body([]byte("crminfo"))
 //    }),
@@ -223,7 +223,7 @@ func (n *Namespace) Namespace(ns ...*Namespace) *Namespace {
 					t := NewTree()
 					t.AddTree(ni.prefix, mr.tree)
 					mr.tree = t
-					n.handlers.insertFilterRouter(pos, mr)
+					_ = n.handlers.insertFilterRouter(pos, mr)
 				}
 			}
 		}
@@ -231,7 +231,7 @@ func (n *Namespace) Namespace(ns ...*Namespace) *Namespace {
 	return n
 }
 
-// AddNamespace register Namespace into beego.Handler
+// AddNamespace register Namespace into asana.Handler
 // support multi Namespace
 func AddNamespace(nl ...*Namespace) {
 	for _, n := range nl {
@@ -252,7 +252,7 @@ func AddNamespace(nl ...*Namespace) {
 					t := NewTree()
 					t.AddTree(n.prefix, mr.tree)
 					mr.tree = t
-					BeeApp.Handlers.insertFilterRouter(pos, mr)
+					_ = BeeApp.Handlers.insertFilterRouter(pos, mr)
 				}
 			}
 		}
@@ -304,65 +304,65 @@ func NSInclude(cList ...ControllerInterface) LinkNamespace {
 }
 
 // NSRouter call Namespace Router
-func NSRouter(rootpath string, c ControllerInterface, mappingMethods ...string) LinkNamespace {
+func NSRouter(rootPath string, c ControllerInterface, mappingMethods ...string) LinkNamespace {
 	return func(ns *Namespace) {
-		ns.Router(rootpath, c, mappingMethods...)
+		ns.Router(rootPath, c, mappingMethods...)
 	}
 }
 
 // NSGet call Namespace Get
-func NSGet(rootpath string, f FilterFunc) LinkNamespace {
+func NSGet(rootPath string, f FilterFunc) LinkNamespace {
 	return func(ns *Namespace) {
-		ns.Get(rootpath, f)
+		ns.Get(rootPath, f)
 	}
 }
 
 // NSPost call Namespace Post
-func NSPost(rootpath string, f FilterFunc) LinkNamespace {
+func NSPost(rootPath string, f FilterFunc) LinkNamespace {
 	return func(ns *Namespace) {
-		ns.Post(rootpath, f)
+		ns.Post(rootPath, f)
 	}
 }
 
 // NSHead call Namespace Head
-func NSHead(rootpath string, f FilterFunc) LinkNamespace {
+func NSHead(rootPath string, f FilterFunc) LinkNamespace {
 	return func(ns *Namespace) {
-		ns.Head(rootpath, f)
+		ns.Head(rootPath, f)
 	}
 }
 
 // NSPut call Namespace Put
-func NSPut(rootpath string, f FilterFunc) LinkNamespace {
+func NSPut(rootPath string, f FilterFunc) LinkNamespace {
 	return func(ns *Namespace) {
-		ns.Put(rootpath, f)
+		ns.Put(rootPath, f)
 	}
 }
 
 // NSDelete call Namespace Delete
-func NSDelete(rootpath string, f FilterFunc) LinkNamespace {
+func NSDelete(rootPath string, f FilterFunc) LinkNamespace {
 	return func(ns *Namespace) {
-		ns.Delete(rootpath, f)
+		ns.Delete(rootPath, f)
 	}
 }
 
 // NSAny call Namespace Any
-func NSAny(rootpath string, f FilterFunc) LinkNamespace {
+func NSAny(rootPath string, f FilterFunc) LinkNamespace {
 	return func(ns *Namespace) {
-		ns.Any(rootpath, f)
+		ns.Any(rootPath, f)
 	}
 }
 
 // NSOptions call Namespace Options
-func NSOptions(rootpath string, f FilterFunc) LinkNamespace {
+func NSOptions(rootPath string, f FilterFunc) LinkNamespace {
 	return func(ns *Namespace) {
-		ns.Options(rootpath, f)
+		ns.Options(rootPath, f)
 	}
 }
 
 // NSPatch call Namespace Patch
-func NSPatch(rootpath string, f FilterFunc) LinkNamespace {
+func NSPatch(rootPath string, f FilterFunc) LinkNamespace {
 	return func(ns *Namespace) {
-		ns.Patch(rootpath, f)
+		ns.Patch(rootPath, f)
 	}
 }
 
@@ -389,8 +389,8 @@ func NSNamespace(prefix string, params ...LinkNamespace) LinkNamespace {
 }
 
 // NSHandler add handler
-func NSHandler(rootpath string, h http.Handler) LinkNamespace {
+func NSHandler(rootPath string, h http.Handler) LinkNamespace {
 	return func(ns *Namespace) {
-		ns.Handler(rootpath, h)
+		ns.Handler(rootPath, h)
 	}
 }

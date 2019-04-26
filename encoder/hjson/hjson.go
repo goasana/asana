@@ -1,7 +1,7 @@
 package hhjson
 
 import (
-	"github.com/GNURub/beego/encoder"
+	"github.com/goasana/framework/encoder"
 	"github.com/hjson/hjson-go"
 )
 

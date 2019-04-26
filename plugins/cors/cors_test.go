@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/GNURub/beego"
-	"github.com/GNURub/beego/context"
+	"github.com/goasana/framework"
+	"github.com/goasana/framework/context"
 )
 
 // HTTPHeaderGuardRecorder is httptest.ResponseRecorder with own http.Header
@@ -55,8 +55,8 @@ func (gr *HTTPHeaderGuardRecorder) Header() http.Header {
 
 func Test_AllowAll(t *testing.T) {
 	recorder := httptest.NewRecorder()
-	handler := beego.NewControllerRegister()
-	handler.InsertFilter("*", beego.BeforeRouter, Allow(&Options{
+	handler := asana.NewControllerRegister()
+	handler.InsertFilter("*", asana.BeforeRouter, Allow(&Options{
 		AllowAllOrigins: true,
 	}))
 	handler.Any("/foo", func(ctx *context.Context) {
@@ -72,8 +72,8 @@ func Test_AllowAll(t *testing.T) {
 
 func Test_AllowRegexMatch(t *testing.T) {
 	recorder := httptest.NewRecorder()
-	handler := beego.NewControllerRegister()
-	handler.InsertFilter("*", beego.BeforeRouter, Allow(&Options{
+	handler := asana.NewControllerRegister()
+	handler.InsertFilter("*", asana.BeforeRouter, Allow(&Options{
 		AllowOrigins: []string{"https://aaa.com", "https://*.foo.com"},
 	}))
 	handler.Any("/foo", func(ctx *context.Context) {
@@ -92,8 +92,8 @@ func Test_AllowRegexMatch(t *testing.T) {
 
 func Test_AllowRegexNoMatch(t *testing.T) {
 	recorder := httptest.NewRecorder()
-	handler := beego.NewControllerRegister()
-	handler.InsertFilter("*", beego.BeforeRouter, Allow(&Options{
+	handler := asana.NewControllerRegister()
+	handler.InsertFilter("*", asana.BeforeRouter, Allow(&Options{
 		AllowOrigins: []string{"https://*.foo.com"},
 	}))
 	handler.Any("/foo", func(ctx *context.Context) {
@@ -112,8 +112,8 @@ func Test_AllowRegexNoMatch(t *testing.T) {
 
 func Test_OtherHeaders(t *testing.T) {
 	recorder := httptest.NewRecorder()
-	handler := beego.NewControllerRegister()
-	handler.InsertFilter("*", beego.BeforeRouter, Allow(&Options{
+	handler := asana.NewControllerRegister()
+	handler.InsertFilter("*", asana.BeforeRouter, Allow(&Options{
 		AllowAllOrigins:  true,
 		AllowCredentials: true,
 		AllowMethods:     []string{"PATCH", "GET"},
@@ -156,8 +156,8 @@ func Test_OtherHeaders(t *testing.T) {
 
 func Test_DefaultAllowHeaders(t *testing.T) {
 	recorder := httptest.NewRecorder()
-	handler := beego.NewControllerRegister()
-	handler.InsertFilter("*", beego.BeforeRouter, Allow(&Options{
+	handler := asana.NewControllerRegister()
+	handler.InsertFilter("*", asana.BeforeRouter, Allow(&Options{
 		AllowAllOrigins: true,
 	}))
 	handler.Any("/foo", func(ctx *context.Context) {
@@ -175,8 +175,8 @@ func Test_DefaultAllowHeaders(t *testing.T) {
 
 func Test_Preflight(t *testing.T) {
 	recorder := NewRecorder()
-	handler := beego.NewControllerRegister()
-	handler.InsertFilter("*", beego.BeforeRouter, Allow(&Options{
+	handler := asana.NewControllerRegister()
+	handler.InsertFilter("*", asana.BeforeRouter, Allow(&Options{
 		AllowAllOrigins: true,
 		AllowMethods:    []string{"PUT", "PATCH"},
 		AllowHeaders:    []string{"Origin", "X-whatever", "X-CaseSensitive"},
@@ -219,8 +219,8 @@ func Test_Preflight(t *testing.T) {
 
 func Benchmark_WithoutCORS(b *testing.B) {
 	recorder := httptest.NewRecorder()
-	handler := beego.NewControllerRegister()
-	beego.BConfig.RunMode = beego.PROD
+	handler := asana.NewControllerRegister()
+	asana.BConfig.RunMode = asana.PROD
 	handler.Any("/foo", func(ctx *context.Context) {
 		ctx.Output.SetStatus(500)
 	})
@@ -233,9 +233,9 @@ func Benchmark_WithoutCORS(b *testing.B) {
 
 func Benchmark_WithCORS(b *testing.B) {
 	recorder := httptest.NewRecorder()
-	handler := beego.NewControllerRegister()
-	beego.BConfig.RunMode = beego.PROD
-	handler.InsertFilter("*", beego.BeforeRouter, Allow(&Options{
+	handler := asana.NewControllerRegister()
+	asana.BConfig.RunMode = asana.PROD
+	handler.InsertFilter("*", asana.BeforeRouter, Allow(&Options{
 		AllowAllOrigins:  true,
 		AllowCredentials: true,
 		AllowMethods:     []string{"PATCH", "GET"},

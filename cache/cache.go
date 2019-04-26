@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,19 +16,19 @@
 // Usage:
 //
 // import(
-//   "github.com/GNURub/beego/cache"
+//   "github.com/goasana/framework/cache"
 // )
 //
 // bm, err := cache.NewCache("memory", `{"interval":60}`)
 //
 // Use it like this:
 //
-//	bm.Put("GNURub", 1, 10 * time.Second)
-//	bm.Get("GNURub")
-//	bm.IsExist("GNURub")
-//	bm.Delete("GNURub")
+//	bm.Put("asana", 1, 10 * time.Second)
+//	bm.Get("asana")
+//	bm.IsExist("asana")
+//	bm.Delete("asana")
 //
-//  more docs http://beego.me/docs/module/cache.md
+//  more docs http://asana.me/docs/module/cache.md
 package cache
 
 import (

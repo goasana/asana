@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package beego
+package asana
 
 import (
 	"net/http"
@@ -20,7 +20,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/GNURub/beego/context"
+	"github.com/goasana/framework/context"
 )
 
 func TestNamespaceGet(t *testing.T) {
@@ -139,7 +139,7 @@ func TestNamespaceCond(t *testing.T) {
 
 	ns := NewNamespace("/v2")
 	ns.Cond(func(ctx *context.Context) bool {
-		return ctx.Input.Domain() == "beego.me"
+		return ctx.Input.Domain() == "asana.me"
 	}).
 		AutoRouter(&TestController{})
 	AddNamespace(ns)

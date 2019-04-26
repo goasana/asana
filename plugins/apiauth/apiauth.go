@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 //
 // Simple Usage:
 //	import(
-//		"github.com/GNURub/beego"
-//		"github.com/GNURub/beego/plugins/apiauth"
+//		"github.com/goasana/framework"
+//		"github.com/goasana/framework/plugins/apiauth"
 //	)
 //
 //	func main(){
 //		// apiauth every request
-//		beego.InsertFilter("*", beego.BeforeRouter,apiauth.APIBaiscAuth("appid","appkey"))
-//		beego.Run()
+//		asana.InsertFilter("*", asana.BeforeRouter,apiauth.APIBaiscAuth("appid","appkey"))
+//		asana.Run()
 //	}
 //
 // Advanced Usage:
@@ -33,7 +33,7 @@
 //		// maybe store in configure, maybe in database
 //	}
 //
-//	beego.InsertFilter("*", beego.BeforeRouter,apiauth.APISecretAuth(getAppSecret, 360))
+//	asana.InsertFilter("*", asana.BeforeRouter,apiauth.APISecretAuth(getAppSecret, 360))
 //
 // Information:
 //
@@ -65,15 +65,15 @@ import (
 	"sort"
 	"time"
 
-	"github.com/GNURub/beego"
-	"github.com/GNURub/beego/context"
+	"github.com/goasana/framework"
+	"github.com/goasana/framework/context"
 )
 
 // AppIDToAppSecret is used to get appsecret throw appid
 type AppIDToAppSecret func(string) string
 
 // APIBasicAuth use the basic appid/appkey as the AppIdToAppSecret
-func APIBasicAuth(appid, appkey string) beego.FilterFunc {
+func APIBasicAuth(appid, appkey string) asana.FilterFunc {
 	ft := func(aid string) string {
 		if aid == appid {
 			return appkey
@@ -84,12 +84,12 @@ func APIBasicAuth(appid, appkey string) beego.FilterFunc {
 }
 
 // APIBaiscAuth calls APIBasicAuth for previous callers
-func APIBaiscAuth(appid, appkey string) beego.FilterFunc {
+func APIBaiscAuth(appid, appkey string) asana.FilterFunc {
 	return APIBasicAuth(appid, appkey)
 }
 
 // APISecretAuth use AppIdToAppSecret verify and
-func APISecretAuth(f AppIDToAppSecret, timeout int) beego.FilterFunc {
+func APISecretAuth(f AppIDToAppSecret, timeout int) asana.FilterFunc {
 	return func(ctx *context.Context) {
 		if ctx.Input.Query("appid") == "" {
 			ctx.ResponseWriter.WriteHeader(403)

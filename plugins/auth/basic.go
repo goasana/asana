@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,24 +15,24 @@
 // Package auth provides handlers to enable basic auth support.
 // Simple Usage:
 //	import(
-//		"github.com/GNURub/beego"
-//		"github.com/GNURub/beego/plugins/auth"
+//		"github.com/goasana/framework"
+//		"github.com/goasana/framework/plugins/auth"
 //	)
 //
 //	func main(){
 //		// authenticate every request
-//		beego.InsertFilter("*", beego.BeforeRouter,auth.Basic("username","secretpassword"))
-//		beego.Run()
+//		asana.InsertFilter("*", asana.BeforeRouter,auth.Basic("username","secretpassword"))
+//		asana.Run()
 //	}
 //
 //
 // Advanced Usage:
 //
 //	func SecretAuth(username, password string) bool {
-//		return username == "GNURub" && password == "helloBeego"
+//		return username == "asana" && password == "helloBeego"
 //	}
 //	authPlugin := auth.NewBasicAuthenticator(SecretAuth, "Authorization Required")
-//	beego.InsertFilter("*", beego.BeforeRouter,authPlugin)
+//	asana.InsertFilter("*", asana.BeforeRouter,authPlugin)
 package auth
 
 import (
@@ -40,14 +40,14 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/GNURub/beego"
-	"github.com/GNURub/beego/context"
+	"github.com/goasana/framework"
+	"github.com/goasana/framework/context"
 )
 
 var defaultRealm = "Authorization Required"
 
 // Basic is the http basic auth
-func Basic(username string, password string) beego.FilterFunc {
+func Basic(username string, password string) asana.FilterFunc {
 	secrets := func(user, pass string) bool {
 		return user == username && pass == password
 	}
@@ -55,7 +55,7 @@ func Basic(username string, password string) beego.FilterFunc {
 }
 
 // NewBasicAuthenticator return the BasicAuth
-func NewBasicAuthenticator(secrets SecretProvider, Realm string) beego.FilterFunc {
+func NewBasicAuthenticator(secrets SecretProvider, Realm string) asana.FilterFunc {
 	return func(ctx *context.Context) {
 		a := &BasicAuth{Secrets: secrets, Realm: Realm}
 		if username := a.CheckAuth(ctx.Request); username == "" {

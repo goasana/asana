@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package beego
+package asana
 
-import "github.com/GNURub/beego/context"
+import "github.com/goasana/framework/context"
 
 // FilterFunc defines a filter function which is invoked before the controller handler is executed.
 type FilterFunc func(*context.Context)

@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import (
 
 func Test_gob(t *testing.T) {
 	a := make(map[interface{}]interface{})
-	a["username"] = "GNURub"
+	a["username"] = "asana"
 	a[12] = 234
 	a["user"] = User{"asta", "xie"}
 	b, err := EncodeGob(a)
@@ -36,7 +36,7 @@ func Test_gob(t *testing.T) {
 	if len(c) == 0 {
 		t.Error("decodeGob empty")
 	}
-	if c["username"] != "GNURub" {
+	if c["username"] != "asana" {
 		t.Error("decode string error")
 	}
 	if c[12] != 234 {
@@ -68,7 +68,7 @@ func TestCookieEncodeDecode(t *testing.T) {
 	}
 	securityName := string(generateRandomKey(20))
 	val := make(map[interface{}]interface{})
-	val["name"] = "GNURub"
+	val["name"] = "asana"
 	val["gender"] = "male"
 	str, err := encodeCookie(block, hashKey, securityName, val)
 	if err != nil {
@@ -78,7 +78,7 @@ func TestCookieEncodeDecode(t *testing.T) {
 	if err != nil {
 		t.Fatal("decodeCookie", err)
 	}
-	if dst["name"] != "GNURub" {
+	if dst["name"] != "asana" {
 		t.Fatal("dst get map error")
 	}
 	if dst["gender"] != "male" {
@@ -101,7 +101,7 @@ func TestParseConfig(t *testing.T) {
 		t.Fatal("parseconfig get gclifetime error")
 	}
 
-	cc := `{"cookieName":"gosessionid","enableSetCookie":false,"gclifetime":3600,"ProviderConfig":"{\"cookieName\":\"gosessionid\",\"securityKey\":\"beegocookiehashkey\"}"}`
+	cc := `{"cookieName":"gosessionid","enableSetCookie":false,"gclifetime":3600,"ProviderConfig":"{\"cookieName\":\"gosessionid\",\"securityKey\":\"asanacookiehashkey\"}"}`
 	cf2 := new(ManagerConfig)
 	cf2.EnableSetCookie = true
 	err = json.Unmarshal([]byte(cc), cf2)
@@ -125,7 +125,7 @@ func TestParseConfig(t *testing.T) {
 	if cconfig.CookieName != "gosessionid" {
 		t.Fatal("ProviderConfig get cookieName error")
 	}
-	if cconfig.SecurityKey != "beegocookiehashkey" {
+	if cconfig.SecurityKey != "asanacookiehashkey" {
 		t.Fatal("ProviderConfig get securityKey error")
 	}
 }

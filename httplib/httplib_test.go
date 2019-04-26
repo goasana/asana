@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -145,7 +145,7 @@ func TestWithBasicAuth(t *testing.T) {
 }
 
 func TestWithUserAgent(t *testing.T) {
-	v := "beego"
+	v := "asana"
 	str, err := Get("http://httpbin.org/headers").SetUserAgent(v).String()
 	if err != nil {
 		t.Fatal(err)
@@ -159,7 +159,7 @@ func TestWithUserAgent(t *testing.T) {
 }
 
 func TestWithSetting(t *testing.T) {
-	v := "beego"
+	v := "asana"
 	var setting BeegoHTTPSettings
 	setting.EnableCookie = true
 	setting.UserAgent = v
@@ -219,7 +219,7 @@ func TestToJson(t *testing.T) {
 }
 
 func TestToFile(t *testing.T) {
-	f := "beego_testfile"
+	f := "asana_testfile"
 	req := Get("http://httpbin.org/ip")
 	err := req.ToFile(f)
 	if err != nil {

@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package beego
+package asana
 
 import (
 	"os"
@@ -22,7 +22,7 @@ import (
 )
 
 const (
-	// VERSION represent beego web framework version.
+	// VERSION represent asana web framework version.
 	VERSION = "2.0.0"
 
 	// DEV is for develop
@@ -42,17 +42,17 @@ var (
 )
 
 // AddAPPStartHook is used to register the hookfunc
-// The hookfuncs will run in beego.Run()
+// The hookfuncs will run in asana.Run()
 // such as initiating session , starting middleware , building template, starting admin control and so on.
 func AddAPPStartHook(hf ...hookfunc) {
 	hooks = append(hooks, hf...)
 }
 
-// Run beego application.
-// beego.Run() default run on HttpPort
-// beego.Run("localhost")
-// beego.Run(":8089")
-// beego.Run("127.0.0.1:8089")
+// Run asana application.
+// asana.Run() default run on HttpPort
+// asana.Run("localhost")
+// asana.Run(":8089")
+// asana.Run("127.0.0.1:8089")
 func Run(params ...string) {
 
 	initBeforeHTTPRun()
@@ -72,7 +72,7 @@ func Run(params ...string) {
 	BeeApp.Run()
 }
 
-// RunWithMiddleWares Run beego application with middlewares.
+// RunWithMiddleWares Run asana application with middlewares.
 func RunWithMiddleWares(addr string, mws ...MiddleWare) {
 	initBeforeHTTPRun()
 

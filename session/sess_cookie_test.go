@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import (
 )
 
 func TestCookie(t *testing.T) {
-	config := `{"cookieName":"gosessionid","enableSetCookie":false,"gclifetime":3600,"ProviderConfig":"{\"cookieName\":\"gosessionid\",\"securityKey\":\"beegocookiehashkey\"}"}`
+	config := `{"cookieName":"gosessionid","enableSetCookie":false,"gclifetime":3600,"ProviderConfig":"{\"cookieName\":\"gosessionid\",\"securityKey\":\"asanacookiehashkey\"}"}`
 	conf := new(ManagerConfig)
 	if err := json.Unmarshal([]byte(config), conf); err != nil {
 		t.Fatal("json decode error", err)
@@ -38,11 +38,11 @@ func TestCookie(t *testing.T) {
 	if err != nil {
 		t.Fatal("set error,", err)
 	}
-	err = sess.Set("username", "GNURub")
+	err = sess.Set("username", "asana")
 	if err != nil {
 		t.Fatal("set error,", err)
 	}
-	if username := sess.Get("username"); username != "GNURub" {
+	if username := sess.Get("username"); username != "asana" {
 		t.Fatal("get username error")
 	}
 	sess.SessionRelease(w)
@@ -60,7 +60,7 @@ func TestCookie(t *testing.T) {
 }
 
 func TestDestorySessionCookie(t *testing.T) {
-	config := `{"cookieName":"gosessionid","enableSetCookie":true,"gclifetime":3600,"ProviderConfig":"{\"cookieName\":\"gosessionid\",\"securityKey\":\"beegocookiehashkey\"}"}`
+	config := `{"cookieName":"gosessionid","enableSetCookie":true,"gclifetime":3600,"ProviderConfig":"{\"cookieName\":\"gosessionid\",\"securityKey\":\"asanacookiehashkey\"}"}`
 	conf := new(ManagerConfig)
 	if err := json.Unmarshal([]byte(config), conf); err != nil {
 		t.Fatal("json decode error", err)

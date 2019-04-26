@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ type Ormer interface {
 	// 	u = &User{Id: user.Id}
 	// 	err = Ormer.Read(u)
 	//	this will find User by UserName field
-	// 	u = &User{UserName: "GNURub", Password: "pass"}
+	// 	u = &User{UserName: "asana", Password: "pass"}
 	//	err = Ormer.Read(u, "UserName")
 	Read(md interface{}, cols ...string) error
 	// Like Read(), but with "FOR UPDATE" clause, useful in transaction.
@@ -70,7 +70,7 @@ type Ormer interface {
 	// for example:
 	// user := User{Id: 2}
 	//	user.Langs = append(user.Langs, "zh-CN", "en-US")
-	//	user.Extra.Name = "beego"
+	//	user.Extra.Name = "asana"
 	//	user.Extra.Data = "orm"
 	//	num, err = Ormer.Update(&user, "Langs", "Extra")
 	Update(md interface{}, cols ...string) (int64, error)

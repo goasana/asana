@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// JLWriter implements beego LoggerInterface and is used to send jiaoliao webhook
+// JLWriter implements asana LoggerInterface and is used to send jiaoliao webhook
 type JLWriter struct {
 	AuthorName  string `json:"authorname"`
 	Title       string `json:"title"`
