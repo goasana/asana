@@ -28,7 +28,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/GNURub/beego/encoder/json"
+	"github.com/goasana/framework/encoder/json"
 )
 
 // FileCacheItem is basic unit of file cache adapter.

@@ -15,7 +15,7 @@
 package logs
 
 import (
-	"github.com/GNURub/beego/encoder/json"
+	"github.com/goasana/framework/encoder/json"
 	"os"
 	"strings"
 	"time"

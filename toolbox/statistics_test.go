@@ -18,7 +18,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/GNURub/beego/encoder/json"
+	"github.com/goasana/framework/encoder/json"
 )
 
 func TestStatics(t *testing.T) {

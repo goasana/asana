@@ -17,7 +17,7 @@ package session
 import (
 	"crypto/aes"
 	"crypto/cipher"
-	"github.com/GNURub/beego/encoder/json"
+	"github.com/goasana/framework/encoder/json"
 	"net/http"
 	"net/url"
 	"sync"

@@ -19,7 +19,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/GNURub/beego/encoder/json"
+	"github.com/goasana/framework/encoder/json"
 )
 
 // connWriter implements LoggerInterface.

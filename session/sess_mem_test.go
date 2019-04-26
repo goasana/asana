@@ -20,7 +20,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/GNURub/beego/encoder/json"
+	"github.com/goasana/framework/encoder/json"
 )
 
 func TestMem(t *testing.T) {

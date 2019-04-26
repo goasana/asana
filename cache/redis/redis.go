@@ -36,7 +36,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/GNURub/beego/cache"
+	"github.com/goasana/framework/cache"
 	"github.com/goasana/framework/encoder/json"
 	"github.com/gomodule/redigo/redis"
 )

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/GNURub/beego/encoder/json"
+	"github.com/goasana/framework/encoder/json"
 )
 
 type paramParser interface {

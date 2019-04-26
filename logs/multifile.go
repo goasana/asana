@@ -17,7 +17,7 @@ package logs
 import (
 	"time"
 
-	"github.com/GNURub/beego/encoder/json"
+	"github.com/goasana/framework/encoder/json"
 )
 
 // A filesLogWriter manages several fileLogWriter

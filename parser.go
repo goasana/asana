@@ -17,7 +17,6 @@ package asana
 import (
 	"errors"
 	"fmt"
-	"github.com/GNURub/beego/encoder/json"
 	"go/ast"
 	"go/parser"
 	"go/token"
@@ -31,6 +30,7 @@ import (
 	"unicode"
 
 	"github.com/goasana/framework/context/param"
+	"github.com/goasana/framework/encoder/json"
 	"github.com/goasana/framework/logs"
 	"github.com/goasana/framework/utils"
 )

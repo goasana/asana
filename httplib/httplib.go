@@ -36,7 +36,7 @@ import (
 	"compress/gzip"
 	"context"
 	"crypto/tls"
-	"github.com/GNURub/beego/encoder/yaml"
+	"github.com/goasana/framework/encoder/yaml"
 	"io"
 	"io/ioutil"
 	"log"
@@ -51,8 +51,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/GNURub/beego/encoder/json"
-	"github.com/GNURub/beego/encoder/xml"
+	"github.com/goasana/framework/encoder/json"
+	"github.com/goasana/framework/encoder/xml"
 )
 
 var defaultSetting = BeegoHTTPSettings{

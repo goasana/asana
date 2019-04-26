@@ -29,10 +29,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/GNURub/beego/encoder/json"
-	"github.com/GNURub/beego/encoder/proto"
-	"github.com/GNURub/beego/encoder/xml"
-	"github.com/GNURub/beego/encoder/yaml"
+	"github.com/goasana/framework/encoder/json"
+	"github.com/goasana/framework/encoder/proto"
+	"github.com/goasana/framework/encoder/xml"
+	"github.com/goasana/framework/encoder/yaml"
 )
 
 // BeegoOutput does work for sending response header.
