@@ -16,12 +16,13 @@ package asana
 
 import (
 	"bytes"
-	"github.com/goasana/framework/testdata"
-	"github.com/elazarl/go-bindata-assetfs"
 	"net/http"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/elazarl/go-bindata-assetfs"
+	"github.com/goasana/framework/testdata"
 )
 
 var header = `{{define "header"}}
@@ -46,7 +47,7 @@ var block = `{{define "block"}}
 {{end}}`
 
 func TestTemplate(t *testing.T) {
-	dir := "_beeTmp"
+	dir := "_asanaTmp"
 	files := []string{
 		"header.tpl",
 		"index.tpl",
@@ -68,7 +69,7 @@ func TestTemplate(t *testing.T) {
 				_, _ = f.WriteString(block)
 			}
 
-			f.Close()
+			_ = f.Close()
 		}
 	}
 	if err := AddViewPath(dir); err != nil {
@@ -98,7 +99,7 @@ var menu = `<div class="menu">
 var user = `<!DOCTYPE html>
 <html>
   <head>
-    <title>asana welcome template</title>
+    <title>beego welcome template</title>
   </head>
   <body>
 {{template "../public/menu.tpl"}}
@@ -107,7 +108,7 @@ var user = `<!DOCTYPE html>
 `
 
 func TestRelativeTemplate(t *testing.T) {
-	dir := "_beeTmp"
+	dir := "_asanaTmp"
 
 	//Just add dir to known viewPaths
 	if err := AddViewPath(dir); err != nil {
@@ -218,7 +219,7 @@ var output = `<!DOCTYPE html>
 `
 
 func TestTemplateLayout(t *testing.T) {
-	dir := "_beeTmp"
+	dir := "_asanaTmp"
 	files := []string{
 		"add.tpl",
 		"layout_blog.tpl",
@@ -236,7 +237,7 @@ func TestTemplateLayout(t *testing.T) {
 			} else if k == 1 {
 				_, _ = f.WriteString(layoutBlog)
 			}
-			f.Close()
+			_ = f.Close()
 		}
 	}
 	if err := AddViewPath(dir); err != nil {
@@ -271,7 +272,7 @@ func (d TestingFileSystem) Open(name string) (http.File, error) {
 var outputBinData = `<!DOCTYPE html>
 <html>
   <head>
-    <title>asana welcome template</title>
+    <title>beego welcome template</title>
   </head>
   <body>
 
@@ -279,7 +280,7 @@ var outputBinData = `<!DOCTYPE html>
 <h1>Hello, blocks!</h1>
 
 	
-<h1>Hello, asana!</h1>
+<h1>Hello, astaxie!</h1>
 
 	
 
