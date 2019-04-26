@@ -14,13 +14,16 @@ func init()  {
 type jsonEncoder struct{}
 
 
-func Encode(v interface{}) ([]byte, error) {
+func Encode(v interface{}, hasIndent bool) ([]byte, error) {
+	if hasIndent {
+		return json.MarshalIndent(v, "", " ")
+	}
+
 	return json.Marshal(v)
 }
 
-
-func (j jsonEncoder) Encode(v interface{}) ([]byte, error) {
-	return Encode(v)
+func (j jsonEncoder) Encode(v interface{}, hasIndent ...bool) ([]byte, error) {
+	return Encode(v, len(hasIndent) > 0 && hasIndent[0])
 }
 
 func Decode(d []byte, v interface{}) error {

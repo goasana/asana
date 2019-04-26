@@ -15,10 +15,11 @@
 package logs
 
 import (
-	"encoding/json"
 	"io"
 	"net"
 	"time"
+
+	"github.com/GNURub/beego/encoder/json"
 )
 
 // connWriter implements LoggerInterface.
@@ -43,7 +44,7 @@ func NewConn() Logger {
 // Init init connection writer with json config.
 // json config only need key "level".
 func (c *connWriter) Init(jsonConfig string) error {
-	return json.Unmarshal([]byte(jsonConfig), c)
+	return json.Decode([]byte(jsonConfig), c)
 }
 
 // WriteMsg write message in connection.

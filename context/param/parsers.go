@@ -1,11 +1,12 @@
 package param
 
 import (
-	"encoding/json"
 	"reflect"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/GNURub/beego/encoder/json"
 )
 
 type paramParser interface {
@@ -107,7 +108,7 @@ type jsonParser struct {
 func (p jsonParser) parse(value string, toType reflect.Type) (interface{}, error) {
 	pResult := reflect.New(toType)
 	v := pResult.Interface()
-	err := json.Unmarshal([]byte(value), v)
+	err := json.Decode([]byte(value), v)
 	if err != nil {
 		return nil, err
 	}

@@ -304,7 +304,7 @@ func assignConfig(ac config.Configer) error {
 
 	if sgz := ac.String("StaticExtensionsToGzip"); sgz != "" {
 		extensions := strings.Split(sgz, ",")
-		fileExts := []string{}
+		var fileExts []string
 		for _, ext := range extensions {
 			ext = strings.TrimSpace(ext)
 			if ext == "" {
@@ -340,7 +340,7 @@ func assignConfig(ac config.Configer) error {
 	for adaptor, conf := range BConfig.Log.Outputs {
 		err := logs.SetLogger(adaptor, conf)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, fmt.Sprintf("%s with the config %q got err:%s", adaptor, conf, err.Error()))
+			_, _ = fmt.Fprintln(os.Stderr, fmt.Sprintf("%s with the config %q got err:%s", adaptor, conf, err.Error()))
 		}
 	}
 	logs.SetLogFuncCall(BConfig.Log.FileLineNum)

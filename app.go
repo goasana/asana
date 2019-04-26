@@ -86,7 +86,7 @@ func (app *App) Run(mws ...MiddleWare) {
 		if BConfig.Listen.HTTPPort == 0 {
 			// remove the Socket file before start
 			if utils.FileExists(addr) {
-				os.Remove(addr)
+				_ = os.Remove(addr)
 			}
 			l, err = net.Listen("unix", addr)
 		} else {
@@ -255,8 +255,8 @@ func (app *App) Run(mws ...MiddleWare) {
 //  beego.Router("/api/create",&RestController{},"post:CreateFood")
 //  beego.Router("/api/update",&RestController{},"put:UpdateFood")
 //  beego.Router("/api/delete",&RestController{},"delete:DeleteFood")
-func Router(rootpath string, c ControllerInterface, mappingMethods ...string) *App {
-	BeeApp.Handlers.Add(rootpath, c, mappingMethods...)
+func Router(rootPath string, c ControllerInterface, mappingMethods ...string) *App {
+	BeeApp.Handlers.Add(rootPath, c, mappingMethods...)
 	return BeeApp
 }
 
@@ -373,9 +373,9 @@ func Include(cList ...ControllerInterface) *App {
 // RESTRouter adds a restful controller handler to BeeApp.
 // its' controller implements beego.ControllerInterface and
 // defines a param "pattern/:objectId" to visit each resource.
-func RESTRouter(rootpath string, c ControllerInterface) *App {
-	Router(rootpath, c)
-	Router(path.Join(rootpath, ":objectId"), c)
+func RESTRouter(rootPath string, c ControllerInterface) *App {
+	Router(rootPath, c)
+	Router(path.Join(rootPath, ":objectId"), c)
 	return BeeApp
 }
 
@@ -402,8 +402,8 @@ func AutoPrefix(prefix string, c ControllerInterface) *App {
 //    beego.Get("/", func(ctx *context.Context){
 //          ctx.Output.Body("hello world")
 //    })
-func Get(rootpath string, f FilterFunc) *App {
-	BeeApp.Handlers.Get(rootpath, f)
+func Get(rootPath string, f FilterFunc) *App {
+	BeeApp.Handlers.Get(rootPath, f)
 	return BeeApp
 }
 
@@ -412,8 +412,8 @@ func Get(rootpath string, f FilterFunc) *App {
 //    beego.Post("/api", func(ctx *context.Context){
 //          ctx.Output.Body("hello world")
 //    })
-func Post(rootpath string, f FilterFunc) *App {
-	BeeApp.Handlers.Post(rootpath, f)
+func Post(rootPath string, f FilterFunc) *App {
+	BeeApp.Handlers.Post(rootPath, f)
 	return BeeApp
 }
 
@@ -422,8 +422,8 @@ func Post(rootpath string, f FilterFunc) *App {
 //    beego.Delete("/api", func(ctx *context.Context){
 //          ctx.Output.Body("hello world")
 //    })
-func Delete(rootpath string, f FilterFunc) *App {
-	BeeApp.Handlers.Delete(rootpath, f)
+func Delete(rootPath string, f FilterFunc) *App {
+	BeeApp.Handlers.Delete(rootPath, f)
 	return BeeApp
 }
 
@@ -432,8 +432,8 @@ func Delete(rootpath string, f FilterFunc) *App {
 //    beego.Put("/api", func(ctx *context.Context){
 //          ctx.Output.Body("hello world")
 //    })
-func Put(rootpath string, f FilterFunc) *App {
-	BeeApp.Handlers.Put(rootpath, f)
+func Put(rootPath string, f FilterFunc) *App {
+	BeeApp.Handlers.Put(rootPath, f)
 	return BeeApp
 }
 
@@ -442,8 +442,8 @@ func Put(rootpath string, f FilterFunc) *App {
 //    beego.Head("/api", func(ctx *context.Context){
 //          ctx.Output.Body("hello world")
 //    })
-func Head(rootpath string, f FilterFunc) *App {
-	BeeApp.Handlers.Head(rootpath, f)
+func Head(rootPath string, f FilterFunc) *App {
+	BeeApp.Handlers.Head(rootPath, f)
 	return BeeApp
 }
 
@@ -452,8 +452,8 @@ func Head(rootpath string, f FilterFunc) *App {
 //    beego.Options("/api", func(ctx *context.Context){
 //          ctx.Output.Body("hello world")
 //    })
-func Options(rootpath string, f FilterFunc) *App {
-	BeeApp.Handlers.Options(rootpath, f)
+func Options(rootPath string, f FilterFunc) *App {
+	BeeApp.Handlers.Options(rootPath, f)
 	return BeeApp
 }
 
@@ -462,8 +462,8 @@ func Options(rootpath string, f FilterFunc) *App {
 //    beego.Patch("/api", func(ctx *context.Context){
 //          ctx.Output.Body("hello world")
 //    })
-func Patch(rootpath string, f FilterFunc) *App {
-	BeeApp.Handlers.Patch(rootpath, f)
+func Patch(rootPath string, f FilterFunc) *App {
+	BeeApp.Handlers.Patch(rootPath, f)
 	return BeeApp
 }
 
@@ -472,8 +472,8 @@ func Patch(rootpath string, f FilterFunc) *App {
 //    beego.Any("/api", func(ctx *context.Context){
 //          ctx.Output.Body("hello world")
 //    })
-func Any(rootpath string, f FilterFunc) *App {
-	BeeApp.Handlers.Any(rootpath, f)
+func Any(rootPath string, f FilterFunc) *App {
+	BeeApp.Handlers.Any(rootPath, f)
 	return BeeApp
 }
 
@@ -482,8 +482,8 @@ func Any(rootpath string, f FilterFunc) *App {
 //    beego.Handler("/api", http.HandlerFunc(func (w http.ResponseWriter, r *http.Request) {
 //          fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path))
 //    }))
-func Handler(rootpath string, h http.Handler, options ...interface{}) *App {
-	BeeApp.Handlers.Handler(rootpath, h, options...)
+func Handler(rootPath string, h http.Handler, options ...interface{}) *App {
+	BeeApp.Handlers.Handler(rootPath, h, options...)
 	return BeeApp
 }
 
@@ -492,6 +492,6 @@ func Handler(rootpath string, h http.Handler, options ...interface{}) *App {
 // beego.BeforeStatic, beego.BeforeRouter, beego.BeforeExec, beego.AfterExec and beego.FinishRouter.
 // The bool params is for setting the returnOnOutput value (false allows multiple filters to execute)
 func InsertFilter(pattern string, pos int, filter FilterFunc, params ...bool) *App {
-	BeeApp.Handlers.InsertFilter(pattern, pos, filter, params...)
+	_ = BeeApp.Handlers.InsertFilter(pattern, pos, filter, params...)
 	return BeeApp
 }

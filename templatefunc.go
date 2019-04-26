@@ -76,8 +76,8 @@ func HTML2str(html string) string {
 }
 
 // DateFormat takes a time and a layout string and returns a string with the formatted date. Used by the template parser as "dateformat"
-func DateFormat(t time.Time, layout string) (datestring string) {
-	datestring = t.Format(layout)
+func DateFormat(t time.Time, layout string) (dateString string) {
+	dateString = t.Format(layout)
 	return
 }
 

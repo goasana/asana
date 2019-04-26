@@ -15,17 +15,18 @@
 package session
 
 import (
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/GNURub/beego/encoder/json"
 )
 
 func TestCookie(t *testing.T) {
 	config := `{"cookieName":"gosessionid","enableSetCookie":false,"gclifetime":3600,"ProviderConfig":"{\"cookieName\":\"gosessionid\",\"securityKey\":\"beegocookiehashkey\"}"}`
 	conf := new(ManagerConfig)
-	if err := json.Unmarshal([]byte(config), conf); err != nil {
+	if err := json.Decode([]byte(config), conf); err != nil {
 		t.Fatal("json decode error", err)
 	}
 	globalSessions, err := NewManager("cookie", conf)

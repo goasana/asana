@@ -24,7 +24,7 @@ func Encode(v interface{}) ([]byte, error) {
 	return b.Bytes(), nil
 }
 
-func (t tomlEncoder) Encode(v interface{}) ([]byte, error) {
+func (t tomlEncoder) Encode(v interface{}, hasIndent ...bool) ([]byte, error) {
 	return Encode(v)
 }
 

@@ -1,15 +1,14 @@
 package ssdb
 
 import (
-	"encoding/json"
 	"errors"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/ssdb/gossdb/ssdb"
-
 	"github.com/GNURub/beego/cache"
+	"github.com/GNURub/beego/encoder/json"
+	"github.com/ssdb/gossdb/ssdb"
 )
 
 // Cache SSDB adapter
@@ -170,7 +169,7 @@ func (rc *Cache) ClearAll() error {
 		if size == 1 {
 			return nil
 		}
-		keys := []string{}
+		var keys []string
 		for i := 1; i < size; i += 2 {
 			keys = append(keys, resp[i])
 		}
@@ -203,7 +202,7 @@ func (rc *Cache) Scan(keyStart string, keyEnd string, limit int) ([]string, erro
 // if connecting error, return.
 func (rc *Cache) StartAndGC(config string) error {
 	var cf map[string]string
-	json.Unmarshal([]byte(config), &cf)
+	_ = json.Decode([]byte(config), &cf)
 	if _, ok := cf["conn"]; !ok {
 		return errors.New("config has no conn key")
 	}

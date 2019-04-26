@@ -26,7 +26,7 @@ const (
 	// ValidTag struct tag
 	ValidTag = "valid"
 
-	wordsize = 32 << (^uint(0) >> 32 & 1)
+	wordSize = 32 << (^uint(0) >> 32 & 1)
 )
 
 var (
@@ -103,7 +103,7 @@ func (f Funcs) Call(name string, params ...interface{}) (result []reflect.Value,
 		return
 	}
 	if len(params) != f[name].Type().NumIn() {
-		err = fmt.Errorf("The number of params is not adapted")
+		err = fmt.Errorf("the number of params is not adapted")
 		return
 	}
 	in := make([]reflect.Value, len(params))
@@ -254,7 +254,7 @@ func parseParam(t reflect.Type, s string) (i interface{}, err error) {
 	case reflect.Int:
 		i, err = strconv.Atoi(s)
 	case reflect.Int64:
-		if wordsize == 32 {
+		if wordSize == 32 {
 			return nil, ErrInt64On32
 		}
 		i, err = strconv.ParseInt(s, 10, 64)

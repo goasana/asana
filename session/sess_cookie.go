@@ -17,7 +17,7 @@ package session
 import (
 	"crypto/aes"
 	"crypto/cipher"
-	"encoding/json"
+	"github.com/GNURub/beego/encoder/json"
 	"net/http"
 	"net/url"
 	"sync"
@@ -112,7 +112,7 @@ type CookieProvider struct {
 // 	maxage - cookie max life time.
 func (pder *CookieProvider) SessionInit(maxlifetime int64, config string) error {
 	pder.config = &cookieConfig{}
-	err := json.Unmarshal([]byte(config), pder.config)
+	err := json.Decode([]byte(config), pder.config)
 	if err != nil {
 		return err
 	}

@@ -15,9 +15,10 @@
 package toolbox
 
 import (
-	"encoding/json"
 	"testing"
 	"time"
+
+	"github.com/GNURub/beego/encoder/json"
 )
 
 func TestStatics(t *testing.T) {
@@ -31,7 +32,7 @@ func TestStatics(t *testing.T) {
 	t.Log(StatisticsMap.GetMap())
 
 	data := StatisticsMap.GetMapData()
-	b, err := json.Marshal(data)
+	b, err := json.Encode(data, false)
 	if err != nil {
 		t.Errorf(err.Error())
 	}

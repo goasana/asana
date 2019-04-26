@@ -113,7 +113,7 @@ func (st *SessionStore) SessionRelease(w http.ResponseWriter) {
 	if err != nil {
 		return
 	}
-	st.c.Exec("UPDATE "+TableName+" set `session_data`=?, `session_expiry`=? where session_key=?",
+	_, _ = st.c.Exec("UPDATE "+TableName+" set `session_data`=?, `session_expiry`=? where session_key=?",
 		b, time.Now().Unix(), st.sid)
 }
 
@@ -144,17 +144,17 @@ func (mp *Provider) SessionInit(maxlifetime int64, savePath string) error {
 func (mp *Provider) SessionRead(sid string) (session.Store, error) {
 	c := mp.connectInit()
 	row := c.QueryRow("select session_data from "+TableName+" where session_key=?", sid)
-	var sessiondata []byte
-	err := row.Scan(&sessiondata)
+	var sessionData []byte
+	err := row.Scan(&sessionData)
 	if err == sql.ErrNoRows {
-		c.Exec("insert into "+TableName+"(`session_key`,`session_data`,`session_expiry`) values(?,?,?)",
+		_, _ = c.Exec("insert into "+TableName+"(`session_key`,`session_data`,`session_expiry`) values(?,?,?)",
 			sid, "", time.Now().Unix())
 	}
 	var kv map[interface{}]interface{}
-	if len(sessiondata) == 0 {
+	if len(sessionData) == 0 {
 		kv = make(map[interface{}]interface{})
 	} else {
-		kv, err = session.DecodeGob(sessiondata)
+		kv, err = session.DecodeGob(sessionData)
 		if err != nil {
 			return nil, err
 		}
@@ -168,8 +168,8 @@ func (mp *Provider) SessionExist(sid string) bool {
 	c := mp.connectInit()
 	defer c.Close()
 	row := c.QueryRow("select session_data from "+TableName+" where session_key=?", sid)
-	var sessiondata []byte
-	err := row.Scan(&sessiondata)
+	var sessionData []byte
+	err := row.Scan(&sessionData)
 	return err != sql.ErrNoRows
 }
 
@@ -177,17 +177,17 @@ func (mp *Provider) SessionExist(sid string) bool {
 func (mp *Provider) SessionRegenerate(oldsid, sid string) (session.Store, error) {
 	c := mp.connectInit()
 	row := c.QueryRow("select session_data from "+TableName+" where session_key=?", oldsid)
-	var sessiondata []byte
-	err := row.Scan(&sessiondata)
+	var sessionData []byte
+	err := row.Scan(&sessionData)
 	if err == sql.ErrNoRows {
-		c.Exec("insert into "+TableName+"(`session_key`,`session_data`,`session_expiry`) values(?,?,?)", oldsid, "", time.Now().Unix())
+		_, _ = c.Exec("insert into "+TableName+"(`session_key`,`session_data`,`session_expiry`) values(?,?,?)", oldsid, "", time.Now().Unix())
 	}
-	c.Exec("update "+TableName+" set `session_key`=? where session_key=?", sid, oldsid)
+	_, _ = c.Exec("update "+TableName+" set `session_key`=? where session_key=?", sid, oldsid)
 	var kv map[interface{}]interface{}
-	if len(sessiondata) == 0 {
+	if len(sessionData) == 0 {
 		kv = make(map[interface{}]interface{})
 	} else {
-		kv, err = session.DecodeGob(sessiondata)
+		kv, err = session.DecodeGob(sessionData)
 		if err != nil {
 			return nil, err
 		}
@@ -199,16 +199,16 @@ func (mp *Provider) SessionRegenerate(oldsid, sid string) (session.Store, error)
 // SessionDestroy delete mysql session by sid
 func (mp *Provider) SessionDestroy(sid string) error {
 	c := mp.connectInit()
-	c.Exec("DELETE FROM "+TableName+" where session_key=?", sid)
-	c.Close()
+	_, _ = c.Exec("DELETE FROM "+TableName+" where session_key=?", sid)
+	_ = c.Close()
 	return nil
 }
 
 // SessionGC delete expired values in mysql session
 func (mp *Provider) SessionGC() {
 	c := mp.connectInit()
-	c.Exec("DELETE from "+TableName+" where session_expiry < ?", time.Now().Unix()-mp.maxlifetime)
-	c.Close()
+	_, _ = c.Exec("DELETE from "+TableName+" where session_expiry < ?", time.Now().Unix()-mp.maxlifetime)
+	_ = c.Close()
 }
 
 // SessionAll count values in mysql session

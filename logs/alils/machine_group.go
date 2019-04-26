@@ -1,11 +1,13 @@
 package alils
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httputil"
+
+	"github.com/GNURub/beego/encoder/json"
+
 )
 
 // MachineGroupAttribute define the Attribute
@@ -61,7 +63,7 @@ func (m *MachineGroup) ListMachines() (ms []*Machine, total int, err error) {
 
 	if r.StatusCode != http.StatusOK {
 		errMsg := &errorMessage{}
-		err = json.Unmarshal(buf, errMsg)
+		err = json.Decode(buf, errMsg)
 		if err != nil {
 			err = fmt.Errorf("failed to remove config from machine group")
 			dump, _ := httputil.DumpResponse(r, true)
@@ -73,7 +75,7 @@ func (m *MachineGroup) ListMachines() (ms []*Machine, total int, err error) {
 	}
 
 	body := &MachineList{}
-	err = json.Unmarshal(buf, body)
+	err = json.Decode(buf, body)
 	if err != nil {
 		return
 	}

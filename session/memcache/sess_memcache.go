@@ -50,7 +50,7 @@ type SessionStore struct {
 	sid         string
 	lock        sync.RWMutex
 	values      map[interface{}]interface{}
-	maxlifetime int64
+	maxLifeTime int64
 }
 
 // Set value in memcache session
@@ -98,13 +98,13 @@ func (rs *SessionStore) SessionRelease(w http.ResponseWriter) {
 	if err != nil {
 		return
 	}
-	item := memcache.Item{Key: rs.sid, Value: b, Expiration: int32(rs.maxlifetime)}
+	item := memcache.Item{Key: rs.sid, Value: b, Expiration: int32(rs.maxLifeTime)}
 	client.Set(&item)
 }
 
 // MemProvider memcache session provider
 type MemProvider struct {
-	maxlifetime int64
+	maxLifeTime int64
 	conninfo    []string
 	poolsize    int
 	password    string
@@ -113,8 +113,8 @@ type MemProvider struct {
 // SessionInit init memcache session
 // savepath like
 // e.g. 127.0.0.1:9090
-func (rp *MemProvider) SessionInit(maxlifetime int64, savePath string) error {
-	rp.maxlifetime = maxlifetime
+func (rp *MemProvider) SessionInit(maxLifeTime int64, savePath string) error {
+	rp.maxLifeTime = maxLifeTime
 	rp.conninfo = strings.Split(savePath, ";")
 	client = memcache.New(rp.conninfo...)
 	return nil
@@ -130,7 +130,7 @@ func (rp *MemProvider) SessionRead(sid string) (session.Store, error) {
 	item, err := client.Get(sid)
 	if err != nil {
 		if err == memcache.ErrCacheMiss {
-			rs := &SessionStore{sid: sid, values: make(map[interface{}]interface{}), maxlifetime: rp.maxlifetime}
+			rs := &SessionStore{sid: sid, values: make(map[interface{}]interface{}), maxLifeTime: rp.maxLifeTime}
 			return rs, nil
 		}
 		return nil, err
@@ -144,7 +144,7 @@ func (rp *MemProvider) SessionRead(sid string) (session.Store, error) {
 			return nil, err
 		}
 	}
-	rs := &SessionStore{sid: sid, values: kv, maxlifetime: rp.maxlifetime}
+	rs := &SessionStore{sid: sid, values: kv, maxLifeTime: rp.maxLifeTime}
 	return rs, nil
 }
 
@@ -175,13 +175,13 @@ func (rp *MemProvider) SessionRegenerate(oldsid, sid string) (session.Store, err
 		// the existed value will be 0
 		item.Key = sid
 		item.Value = []byte("")
-		item.Expiration = int32(rp.maxlifetime)
+		item.Expiration = int32(rp.maxLifeTime)
 		client.Set(item)
 	} else {
-		client.Delete(oldsid)
+		_ = client.Delete(oldsid)
 		item.Key = sid
-		item.Expiration = int32(rp.maxlifetime)
-		client.Set(item)
+		item.Expiration = int32(rp.maxLifeTime)
+		_ = client.Set(item)
 		contain = item.Value
 	}
 
@@ -196,7 +196,7 @@ func (rp *MemProvider) SessionRegenerate(oldsid, sid string) (session.Store, err
 		}
 	}
 
-	rs := &SessionStore{sid: sid, values: kv, maxlifetime: rp.maxlifetime}
+	rs := &SessionStore{sid: sid, values: kv, maxLifeTime: rp.maxLifeTime}
 	return rs, nil
 }
 

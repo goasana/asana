@@ -7,11 +7,12 @@ http://gitlab.alibaba-inc.com/sls/doc.
 package alils
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httputil"
+
+	"github.com/GNURub/beego/encoder/json"
 )
 
 // Error message in SLS HTTP response.
@@ -58,7 +59,7 @@ func (p *LogProject) ListLogStore() (storeNames []string, err error) {
 
 	if r.StatusCode != http.StatusOK {
 		errMsg := &errorMessage{}
-		err = json.Unmarshal(buf, errMsg)
+		err = json.Decode(buf, errMsg)
 		if err != nil {
 			err = fmt.Errorf("failed to list logstore")
 			dump, _ := httputil.DumpResponse(r, true)
@@ -75,7 +76,7 @@ func (p *LogProject) ListLogStore() (storeNames []string, err error) {
 	}
 	body := &Body{}
 
-	err = json.Unmarshal(buf, body)
+	err = json.Decode(buf, body)
 	if err != nil {
 		return
 	}
@@ -103,7 +104,7 @@ func (p *LogProject) GetLogStore(name string) (s *LogStore, err error) {
 
 	if r.StatusCode != http.StatusOK {
 		errMsg := &errorMessage{}
-		err = json.Unmarshal(buf, errMsg)
+		err = json.Decode(buf, errMsg)
 		if err != nil {
 			err = fmt.Errorf("failed to get logstore")
 			dump, _ := httputil.DumpResponse(r, true)
@@ -115,7 +116,7 @@ func (p *LogProject) GetLogStore(name string) (s *LogStore, err error) {
 	}
 
 	s = &LogStore{}
-	err = json.Unmarshal(buf, s)
+	err = json.Decode(buf, s)
 	if err != nil {
 		return
 	}
@@ -141,7 +142,7 @@ func (p *LogProject) CreateLogStore(name string, ttl, shardCnt int) (err error) 
 		ShardCount: shardCnt,
 	}
 
-	body, err := json.Marshal(store)
+	body, err := json.Encode(store, false)
 	if err != nil {
 		return
 	}
@@ -164,7 +165,7 @@ func (p *LogProject) CreateLogStore(name string, ttl, shardCnt int) (err error) 
 
 	if r.StatusCode != http.StatusOK {
 		errMsg := &errorMessage{}
-		err = json.Unmarshal(body, errMsg)
+		err = json.Decode(body, errMsg)
 		if err != nil {
 			err = fmt.Errorf("failed to create logstore")
 			dump, _ := httputil.DumpResponse(r, true)
@@ -196,7 +197,7 @@ func (p *LogProject) DeleteLogStore(name string) (err error) {
 
 	if r.StatusCode != http.StatusOK {
 		errMsg := &errorMessage{}
-		err = json.Unmarshal(body, errMsg)
+		err = json.Decode(body, errMsg)
 		if err != nil {
 			err = fmt.Errorf("failed to delete logstore")
 			dump, _ := httputil.DumpResponse(r, true)
@@ -225,7 +226,7 @@ func (p *LogProject) UpdateLogStore(name string, ttl, shardCnt int) (err error) 
 		ShardCount: shardCnt,
 	}
 
-	body, err := json.Marshal(store)
+	body, err := json.Encode(store, false)
 	if err != nil {
 		return
 	}
@@ -248,7 +249,7 @@ func (p *LogProject) UpdateLogStore(name string, ttl, shardCnt int) (err error) 
 
 	if r.StatusCode != http.StatusOK {
 		errMsg := &errorMessage{}
-		err = json.Unmarshal(body, errMsg)
+		err = json.Decode(body, errMsg)
 		if err != nil {
 			err = fmt.Errorf("failed to update logstore")
 			dump, _ := httputil.DumpResponse(r, true)
@@ -286,7 +287,7 @@ func (p *LogProject) ListMachineGroup(offset, size int) (m []string, total int, 
 
 	if r.StatusCode != http.StatusOK {
 		errMsg := &errorMessage{}
-		err = json.Unmarshal(buf, errMsg)
+		err = json.Decode(buf, errMsg)
 		if err != nil {
 			err = fmt.Errorf("failed to list machine group")
 			dump, _ := httputil.DumpResponse(r, true)
@@ -304,7 +305,7 @@ func (p *LogProject) ListMachineGroup(offset, size int) (m []string, total int, 
 	}
 	body := &Body{}
 
-	err = json.Unmarshal(buf, body)
+	err = json.Decode(buf, body)
 	if err != nil {
 		return
 	}
@@ -333,7 +334,7 @@ func (p *LogProject) GetMachineGroup(name string) (m *MachineGroup, err error) {
 
 	if r.StatusCode != http.StatusOK {
 		errMsg := &errorMessage{}
-		err = json.Unmarshal(buf, errMsg)
+		err = json.Decode(buf, errMsg)
 		if err != nil {
 			err = fmt.Errorf("failed to get machine group:%v", name)
 			dump, _ := httputil.DumpResponse(r, true)
@@ -345,7 +346,7 @@ func (p *LogProject) GetMachineGroup(name string) (m *MachineGroup, err error) {
 	}
 
 	m = &MachineGroup{}
-	err = json.Unmarshal(buf, m)
+	err = json.Decode(buf, m)
 	if err != nil {
 		return
 	}
@@ -356,7 +357,7 @@ func (p *LogProject) GetMachineGroup(name string) (m *MachineGroup, err error) {
 // CreateMachineGroup creates a new machine group in SLS.
 func (p *LogProject) CreateMachineGroup(m *MachineGroup) (err error) {
 
-	body, err := json.Marshal(m)
+	body, err := json.Encode(m, false)
 	if err != nil {
 		return
 	}
@@ -379,7 +380,7 @@ func (p *LogProject) CreateMachineGroup(m *MachineGroup) (err error) {
 
 	if r.StatusCode != http.StatusOK {
 		errMsg := &errorMessage{}
-		err = json.Unmarshal(body, errMsg)
+		err = json.Decode(body, errMsg)
 		if err != nil {
 			err = fmt.Errorf("failed to create machine group")
 			dump, _ := httputil.DumpResponse(r, true)
@@ -396,7 +397,7 @@ func (p *LogProject) CreateMachineGroup(m *MachineGroup) (err error) {
 // UpdateMachineGroup updates a machine group.
 func (p *LogProject) UpdateMachineGroup(m *MachineGroup) (err error) {
 
-	body, err := json.Marshal(m)
+	body, err := json.Encode(m, false)
 	if err != nil {
 		return
 	}
@@ -419,7 +420,7 @@ func (p *LogProject) UpdateMachineGroup(m *MachineGroup) (err error) {
 
 	if r.StatusCode != http.StatusOK {
 		errMsg := &errorMessage{}
-		err = json.Unmarshal(body, errMsg)
+		err = json.Decode(body, errMsg)
 		if err != nil {
 			err = fmt.Errorf("failed to update machine group")
 			dump, _ := httputil.DumpResponse(r, true)
@@ -451,7 +452,7 @@ func (p *LogProject) DeleteMachineGroup(name string) (err error) {
 
 	if r.StatusCode != http.StatusOK {
 		errMsg := &errorMessage{}
-		err = json.Unmarshal(body, errMsg)
+		err = json.Decode(body, errMsg)
 		if err != nil {
 			err = fmt.Errorf("failed to delete machine group")
 			dump, _ := httputil.DumpResponse(r, true)
@@ -488,7 +489,7 @@ func (p *LogProject) ListConfig(offset, size int) (cfgNames []string, total int,
 
 	if r.StatusCode != http.StatusOK {
 		errMsg := &errorMessage{}
-		err = json.Unmarshal(buf, errMsg)
+		err = json.Decode(buf, errMsg)
 		if err != nil {
 			err = fmt.Errorf("failed to delete machine group")
 			dump, _ := httputil.DumpResponse(r, true)
@@ -505,7 +506,7 @@ func (p *LogProject) ListConfig(offset, size int) (cfgNames []string, total int,
 	}
 	body := &Body{}
 
-	err = json.Unmarshal(buf, body)
+	err = json.Decode(buf, body)
 	if err != nil {
 		return
 	}
@@ -533,7 +534,7 @@ func (p *LogProject) GetConfig(name string) (c *LogConfig, err error) {
 
 	if r.StatusCode != http.StatusOK {
 		errMsg := &errorMessage{}
-		err = json.Unmarshal(buf, errMsg)
+		err = json.Decode(buf, errMsg)
 		if err != nil {
 			err = fmt.Errorf("failed to delete config")
 			dump, _ := httputil.DumpResponse(r, true)
@@ -545,7 +546,7 @@ func (p *LogProject) GetConfig(name string) (c *LogConfig, err error) {
 	}
 
 	c = &LogConfig{}
-	err = json.Unmarshal(buf, c)
+	err = json.Decode(buf, c)
 	if err != nil {
 		return
 	}
@@ -556,7 +557,7 @@ func (p *LogProject) GetConfig(name string) (c *LogConfig, err error) {
 // UpdateConfig updates a config.
 func (p *LogProject) UpdateConfig(c *LogConfig) (err error) {
 
-	body, err := json.Marshal(c)
+	body, err := json.Encode(c, false)
 	if err != nil {
 		return
 	}
@@ -579,7 +580,7 @@ func (p *LogProject) UpdateConfig(c *LogConfig) (err error) {
 
 	if r.StatusCode != http.StatusOK {
 		errMsg := &errorMessage{}
-		err = json.Unmarshal(body, errMsg)
+		err = json.Decode(body, errMsg)
 		if err != nil {
 			err = fmt.Errorf("failed to update config")
 			dump, _ := httputil.DumpResponse(r, true)
@@ -596,7 +597,7 @@ func (p *LogProject) UpdateConfig(c *LogConfig) (err error) {
 // CreateConfig creates a new config in SLS.
 func (p *LogProject) CreateConfig(c *LogConfig) (err error) {
 
-	body, err := json.Marshal(c)
+	body, err := json.Encode(c, false)
 	if err != nil {
 		return
 	}
@@ -619,7 +620,7 @@ func (p *LogProject) CreateConfig(c *LogConfig) (err error) {
 
 	if r.StatusCode != http.StatusOK {
 		errMsg := &errorMessage{}
-		err = json.Unmarshal(body, errMsg)
+		err = json.Decode(body, errMsg)
 		if err != nil {
 			err = fmt.Errorf("failed to update config")
 			dump, _ := httputil.DumpResponse(r, true)
@@ -651,7 +652,7 @@ func (p *LogProject) DeleteConfig(name string) (err error) {
 
 	if r.StatusCode != http.StatusOK {
 		errMsg := &errorMessage{}
-		err = json.Unmarshal(body, errMsg)
+		err = json.Decode(body, errMsg)
 		if err != nil {
 			err = fmt.Errorf("failed to delete config")
 			dump, _ := httputil.DumpResponse(r, true)
@@ -683,7 +684,7 @@ func (p *LogProject) GetAppliedMachineGroups(confName string) (groupNames []stri
 
 	if r.StatusCode != http.StatusOK {
 		errMsg := &errorMessage{}
-		err = json.Unmarshal(buf, errMsg)
+		err = json.Decode(buf, errMsg)
 		if err != nil {
 			err = fmt.Errorf("failed to get applied machine groups")
 			dump, _ := httputil.DumpResponse(r, true)
@@ -700,7 +701,7 @@ func (p *LogProject) GetAppliedMachineGroups(confName string) (groupNames []stri
 	}
 
 	body := &Body{}
-	err = json.Unmarshal(buf, body)
+	err = json.Decode(buf, body)
 	if err != nil {
 		return
 	}
@@ -728,7 +729,7 @@ func (p *LogProject) GetAppliedConfigs(groupName string) (confNames []string, er
 
 	if r.StatusCode != http.StatusOK {
 		errMsg := &errorMessage{}
-		err = json.Unmarshal(buf, errMsg)
+		err = json.Decode(buf, errMsg)
 		if err != nil {
 			err = fmt.Errorf("failed to applied configs")
 			dump, _ := httputil.DumpResponse(r, true)
@@ -745,7 +746,7 @@ func (p *LogProject) GetAppliedConfigs(groupName string) (confNames []string, er
 	}
 
 	body := &Cfg{}
-	err = json.Unmarshal(buf, body)
+	err = json.Decode(buf, body)
 	if err != nil {
 		return
 	}
@@ -773,7 +774,7 @@ func (p *LogProject) ApplyConfigToMachineGroup(confName, groupName string) (err 
 
 	if r.StatusCode != http.StatusOK {
 		errMsg := &errorMessage{}
-		err = json.Unmarshal(buf, errMsg)
+		err = json.Decode(buf, errMsg)
 		if err != nil {
 			err = fmt.Errorf("failed to apply config to machine group")
 			dump, _ := httputil.DumpResponse(r, true)
@@ -805,7 +806,7 @@ func (p *LogProject) RemoveConfigFromMachineGroup(confName, groupName string) (e
 
 	if r.StatusCode != http.StatusOK {
 		errMsg := &errorMessage{}
-		err = json.Unmarshal(buf, errMsg)
+		err = json.Decode(buf, errMsg)
 		if err != nil {
 			err = fmt.Errorf("failed to remove config from machine group")
 			dump, _ := httputil.DumpResponse(r, true)

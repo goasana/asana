@@ -64,16 +64,16 @@ type RenameColumn struct {
 }
 
 // CreateTable creates the table on system
-func (m *Migration) CreateTable(tablename, engine, charset string, p ...func()) {
-	m.TableName = tablename
+func (m *Migration) CreateTable(tableName, engine, charset string, p ...func()) {
+	m.TableName = tableName
 	m.Engine = engine
 	m.Charset = charset
 	m.ModifyType = "create"
 }
 
 // AlterTable set the ModifyType to alter
-func (m *Migration) AlterTable(tablename string) {
-	m.TableName = tablename
+func (m *Migration) AlterTable(tableName string) {
+	m.TableName = tableName
 	m.ModifyType = "alter"
 }
 

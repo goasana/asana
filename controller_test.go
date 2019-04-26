@@ -134,12 +134,12 @@ func TestAdditionalViewPaths(t *testing.T) {
 	dir2file := "file2.tpl"
 
 	genFile := func(dir string, name string, content string) {
-		os.MkdirAll(filepath.Dir(filepath.Join(dir, name)), 0777)
+		_ = os.MkdirAll(filepath.Dir(filepath.Join(dir, name)), 0777)
 		if f, err := os.Create(filepath.Join(dir, name)); err != nil {
 			t.Fatal(err)
 		} else {
 			defer f.Close()
-			f.WriteString(content)
+			_, _ = f.WriteString(content)
 			f.Close()
 		}
 
@@ -147,8 +147,8 @@ func TestAdditionalViewPaths(t *testing.T) {
 	genFile(dir1, dir1file, `<div>{{.Content}}</div>`)
 	genFile(dir2, dir2file, `<html>{{.Content}}</html>`)
 
-	AddViewPath(dir1)
-	AddViewPath(dir2)
+	_ = AddViewPath(dir1)
+	_ = AddViewPath(dir2)
 
 	ctrl := Controller{
 		TplName:  "file1.tpl",
@@ -177,5 +177,5 @@ func TestAdditionalViewPaths(t *testing.T) {
 
 	ctrl.TplName = "file2.tpl"
 	ctrl.ViewPath = dir2
-	ctrl.RenderString()
+	_, _ = ctrl.RenderString()
 }

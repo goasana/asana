@@ -1,11 +1,11 @@
 package alils
 
 import (
-	"encoding/json"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/GNURub/beego/encoder/json"
 	"github.com/GNURub/beego/logs"
 	"github.com/gogo/protobuf/proto"
 )
@@ -51,7 +51,7 @@ func NewAliLS() logs.Logger {
 // Init parse config and init struct
 func (c *aliLSWriter) Init(jsonConfig string) (err error) {
 
-	json.Unmarshal([]byte(jsonConfig), c)
+	_ = json.Unmarshal([]byte(jsonConfig), c)
 
 	if c.FlushWhen > CacheSize {
 		c.FlushWhen = CacheSize

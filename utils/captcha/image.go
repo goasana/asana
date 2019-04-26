@@ -271,10 +271,10 @@ func randomPalette() color.Palette {
 	p[0] = color.RGBA{0xFF, 0xFF, 0xFF, 0x00}
 	// Primary color.
 	prim := color.RGBA{
-		uint8(randIntn(129)),
-		uint8(randIntn(129)),
-		uint8(randIntn(129)),
-		0xFF,
+		R: uint8(randIntn(129)),
+		G: uint8(randIntn(129)),
+		B: uint8(randIntn(129)),
+		A: 0xFF,
 	}
 	p[1] = prim
 	// Circle colors.

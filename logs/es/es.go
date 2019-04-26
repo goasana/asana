@@ -1,15 +1,15 @@
 package es
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net"
 	"net/url"
 	"time"
 
-	"github.com/OwnLocal/goes"
+	"github.com/GNURub/beego/encoder/json"
 	"github.com/GNURub/beego/logs"
+	"github.com/OwnLocal/goes"
 )
 
 // NewES return a LoggerInterface
@@ -27,8 +27,8 @@ type esLogger struct {
 }
 
 // {"dsn":"http://localhost:9200/","level":1}
-func (el *esLogger) Init(jsonconfig string) error {
-	err := json.Unmarshal([]byte(jsonconfig), el)
+func (el *esLogger) Init(jsonConfig string) error {
+	err := json.Decode([]byte(jsonConfig), el)
 	if err != nil {
 		return err
 	}

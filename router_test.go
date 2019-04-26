@@ -22,6 +22,8 @@ import (
 
 	"github.com/GNURub/beego/context"
 	"github.com/GNURub/beego/logs"
+	"github.com/GNURub/beego/testdata/proto"
+	"github.com/golang/protobuf/proto"
 )
 
 type TestController struct {
@@ -70,7 +72,6 @@ func (tc *TestController) GetEmptyBody() {
 	var res []byte
 	tc.Ctx.Output.Body(res)
 }
-
 
 type JSONController struct {
 	Controller
@@ -656,16 +657,13 @@ func beegoBeforeRouter1(ctx *context.Context) {
 	ctx.WriteString("|BeforeRouter1")
 }
 
-
 func beegoBeforeExec1(ctx *context.Context) {
 	ctx.WriteString("|BeforeExec1")
 }
 
-
 func beegoAfterExec1(ctx *context.Context) {
 	ctx.WriteString("|AfterExec1")
 }
-
 
 func beegoFinishRouter1(ctx *context.Context) {
 	ctx.WriteString("|FinishRouter1")
@@ -707,5 +705,35 @@ func TestYAMLPrepare(t *testing.T) {
 	handler.ServeHTTP(w, r)
 	if strings.TrimSpace(w.Body.String()) != "prepare" {
 		t.Errorf(w.Body.String())
+	}
+}
+
+// ProtoBuf
+type ProtoBufController struct {
+	Controller
+}
+
+var expectedProtoObject = &protoexample.Test{
+	Name: "beego protobuf",
+}
+
+func (jc *ProtoBufController) Prepare() {
+	jc.Data["protobuf"] = expectedProtoObject
+	jc.ServeProtoBuf()
+}
+
+func TestProtoBufPrepare(t *testing.T) {
+	r, _ := http.NewRequest("GET", "/protobuf/list", nil)
+	w := httptest.NewRecorder()
+
+	handler := NewControllerRegister()
+	handler.Add("/protobuf/list", &ProtoBufController{})
+	handler.ServeHTTP(w, r)
+	res := strings.TrimSpace(w.Body.String())
+
+	expectedBytes, _ := proto.Marshal(expectedProtoObject)
+
+	if res != strings.TrimSpace(string(expectedBytes)) {
+		t.Errorf(res)
 	}
 }

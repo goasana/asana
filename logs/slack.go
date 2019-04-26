@@ -1,11 +1,12 @@
 package logs
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
 	"time"
+
+	"github.com/GNURub/beego/encoder/json"
 )
 
 // SLACKWriter implements beego LoggerInterface and is used to send jiaoliao webhook
@@ -20,8 +21,8 @@ func newSLACKWriter() Logger {
 }
 
 // Init SLACKWriter with json config string
-func (s *SLACKWriter) Init(jsonconfig string) error {
-	return json.Unmarshal([]byte(jsonconfig), s)
+func (s *SLACKWriter) Init(jsonConfig string) error {
+	return json.Decode([]byte(jsonConfig), s)
 }
 
 // WriteMsg write message in smtp writer.
@@ -42,7 +43,7 @@ func (s *SLACKWriter) WriteMsg(when time.Time, msg string, level int) error {
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("Post webhook failed %s %d", resp.Status, resp.StatusCode)
+		return fmt.Errorf("post webhook failed %s %d", resp.Status, resp.StatusCode)
 	}
 	return nil
 }

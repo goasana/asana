@@ -58,7 +58,7 @@ type dbBaseOracle struct {
 var _ dbBaser = new(dbBaseOracle)
 
 // create oracle dbBaser.
-func newdbBaseOracle() dbBaser {
+func newDBBaseOracle() dbBaser {
 	b := new(dbBaseOracle)
 	b.ins = b
 	return b
@@ -92,7 +92,7 @@ func (d *dbBaseOracle) IndexExists(db dbQuerier, table string, name string) bool
 		"AND  USER_IND_COLUMNS.TABLE_NAME = ? AND USER_IND_COLUMNS.INDEX_NAME = ?", strings.ToUpper(table), strings.ToUpper(name))
 
 	var cnt int
-	row.Scan(&cnt)
+	_ = row.Scan(&cnt)
 	return cnt > 0
 }
 

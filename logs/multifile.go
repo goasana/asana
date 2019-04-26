@@ -15,8 +15,9 @@
 package logs
 
 import (
-	"encoding/json"
 	"time"
+
+	"github.com/GNURub/beego/encoder/json"
 )
 
 // A filesLogWriter manages several fileLogWriter
@@ -55,17 +56,17 @@ func (f *multiFileLogWriter) Init(config string) error {
 	f.writers[LevelDebug+1] = writer
 
 	//unmarshal "separate" field to f.Separate
-	json.Unmarshal([]byte(config), f)
+	_ = json.Decode([]byte(config), f)
 
 	jsonMap := map[string]interface{}{}
-	json.Unmarshal([]byte(config), &jsonMap)
+	_ = json.Decode([]byte(config), &jsonMap)
 
 	for i := LevelEmergency; i < LevelDebug+1; i++ {
 		for _, v := range f.Separate {
 			if v == levelNames[i] {
 				jsonMap["filename"] = f.fullLogWriter.fileNameOnly + "." + levelNames[i] + f.fullLogWriter.suffix
 				jsonMap["level"] = i
-				bs, _ := json.Marshal(jsonMap)
+				bs, _ := json.Encode(jsonMap, false)
 				writer = newFileWriter().(*fileLogWriter)
 				err := writer.Init(string(bs))
 				if err != nil {

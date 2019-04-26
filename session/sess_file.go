@@ -29,7 +29,7 @@ import (
 
 var (
 	filepder      = &FileProvider{}
-	gcmaxlifetime int64
+	gcMaxLifeTime int64
 )
 
 // FileSessionStore File session store
@@ -104,23 +104,23 @@ func (fs *FileSessionStore) SessionRelease(w http.ResponseWriter) {
 	} else {
 		return
 	}
-	f.Truncate(0)
-	f.Seek(0, 0)
-	f.Write(b)
+	_ = f.Truncate(0)
+	_, _ = f.Seek(0, 0)
+	_, _ = f.Write(b)
 	f.Close()
 }
 
 // FileProvider File session provider
 type FileProvider struct {
 	lock        sync.RWMutex
-	maxlifetime int64
+	maxLifeTime int64
 	savePath    string
 }
 
 // SessionInit Init file session provider.
 // savePath sets the session files path.
-func (fp *FileProvider) SessionInit(maxlifetime int64, savePath string) error {
-	fp.maxlifetime = maxlifetime
+func (fp *FileProvider) SessionInit(maxLifeTime int64, savePath string) error {
+	fp.maxLifeTime = maxLifeTime
 	fp.savePath = savePath
 	return nil
 }
@@ -154,7 +154,7 @@ func (fp *FileProvider) SessionRead(sid string) (Store, error) {
 
 	defer f.Close()
 
-	os.Chtimes(path.Join(fp.savePath, string(sid[0]), string(sid[1]), sid), time.Now(), time.Now())
+	_ = os.Chtimes(path.Join(fp.savePath, string(sid[0]), string(sid[1]), sid), time.Now(), time.Now())
 	var kv map[interface{}]interface{}
 	b, err := ioutil.ReadAll(f)
 	if err != nil {
@@ -187,7 +187,7 @@ func (fp *FileProvider) SessionExist(sid string) bool {
 func (fp *FileProvider) SessionDestroy(sid string) error {
 	filepder.lock.Lock()
 	defer filepder.lock.Unlock()
-	os.Remove(path.Join(fp.savePath, string(sid[0]), string(sid[1]), sid))
+	_ = os.Remove(path.Join(fp.savePath, string(sid[0]), string(sid[1]), sid))
 	return nil
 }
 
@@ -196,8 +196,8 @@ func (fp *FileProvider) SessionGC() {
 	filepder.lock.Lock()
 	defer filepder.lock.Unlock()
 
-	gcmaxlifetime = fp.maxlifetime
-	filepath.Walk(fp.savePath, gcpath)
+	gcMaxLifeTime = fp.maxLifeTime
+	_ = filepath.Walk(fp.savePath, gcpath)
 }
 
 // SessionAll Get active file session number.
@@ -258,9 +258,9 @@ func (fp *FileProvider) SessionRegenerate(oldsid, sid string) (Store, error) {
 			}
 		}
 
-		ioutil.WriteFile(newSidFile, b, 0777)
-		os.Remove(oldSidFile)
-		os.Chtimes(newSidFile, time.Now(), time.Now())
+		_ = ioutil.WriteFile(newSidFile, b, 0777)
+		_ = os.Remove(oldSidFile)
+		_ = os.Chtimes(newSidFile, time.Now(), time.Now())
 		ss := &FileSessionStore{sid: sid, values: kv}
 		return ss, nil
 	}
@@ -283,8 +283,8 @@ func gcpath(path string, info os.FileInfo, err error) error {
 	if info.IsDir() {
 		return nil
 	}
-	if (info.ModTime().Unix() + gcmaxlifetime) < time.Now().Unix() {
-		os.Remove(path)
+	if (info.ModTime().Unix() + gcMaxLifeTime) < time.Now().Unix() {
+		_ = os.Remove(path)
 	}
 	return nil
 }

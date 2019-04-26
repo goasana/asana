@@ -192,7 +192,7 @@ func (c *Captcha) CreateCaptcha() (string, error) {
 
 // VerifyReq verify from a request
 func (c *Captcha) VerifyReq(req *http.Request) bool {
-	req.ParseForm()
+	_ = req.ParseForm()
 	return c.Verify(req.Form.Get(c.FieldIDName), req.Form.Get(c.FieldCaptchaName))
 }
 
@@ -214,7 +214,7 @@ func (c *Captcha) Verify(id string, challenge string) (success bool) {
 
 	defer func() {
 		// finally remove it
-		c.store.Delete(key)
+		_ = c.store.Delete(key)
 	}()
 
 	if len(chars) != len(challenge) {
@@ -264,7 +264,7 @@ func NewWithFilter(urlPrefix string, store cache.Cache) *Captcha {
 	beego.InsertFilter(cpt.URLPrefix+"*", beego.BeforeRouter, cpt.Handler)
 
 	// add to template func map
-	beego.AddFuncMap("create_captcha", cpt.CreateCaptchaHTML)
+	_ = beego.AddFuncMap("create_captcha", cpt.CreateCaptchaHTML)
 
 	return cpt
 }

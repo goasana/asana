@@ -16,12 +16,13 @@ package logs
 
 import (
 	"crypto/tls"
-	"encoding/json"
 	"fmt"
 	"net"
 	"net/smtp"
 	"strings"
 	"time"
+
+	"github.com/GNURub/beego/encoder/json"
 )
 
 // SMTPWriter implements LoggerInterface and is used to send emails via given SMTP-server.
@@ -52,7 +53,7 @@ func newSMTPWriter() Logger {
 //		"level":LevelError
 //	}
 func (s *SMTPWriter) Init(jsonconfig string) error {
-	return json.Unmarshal([]byte(jsonconfig), s)
+	return json.Decode([]byte(jsonconfig), s)
 }
 
 func (s *SMTPWriter) getSMTPAuth(host string) smtp.Auth {

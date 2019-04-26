@@ -55,7 +55,7 @@ type SessionStore struct {
 	sid         string
 	lock        sync.RWMutex
 	values      map[interface{}]interface{}
-	maxlifetime int64
+	maxLifeTime int64
 }
 
 // Set value in redis session
@@ -105,12 +105,12 @@ func (rs *SessionStore) SessionRelease(w http.ResponseWriter) {
 	}
 	c := rs.p.Get()
 	defer c.Close()
-	c.Do("SETEX", rs.sid, rs.maxlifetime, string(b))
+	_, _ = c.Do("SETEX", rs.sid, rs.maxLifeTime, string(b))
 }
 
 // Provider redis session provider
 type Provider struct {
-	maxlifetime int64
+	maxLifeTime int64
 	savePath    string
 	poolsize    int
 	password    string
@@ -121,8 +121,8 @@ type Provider struct {
 // SessionInit init redis session
 // savepath like redis server addr,pool size,password,dbnum,IdleTimeout second
 // e.g. 127.0.0.1:6379,100,GNURub,0,30
-func (rp *Provider) SessionInit(maxlifetime int64, savePath string) error {
-	rp.maxlifetime = maxlifetime
+func (rp *Provider) SessionInit(maxLifeTime int64, savePath string) error {
+	rp.maxLifeTime = maxLifeTime
 	configs := strings.Split(savePath, ",")
 	if len(configs) > 0 {
 		rp.savePath = configs[0]
@@ -165,7 +165,7 @@ func (rp *Provider) SessionInit(maxlifetime int64, savePath string) error {
 			}
 			if rp.password != "" {
 				if _, err = c.Do("AUTH", rp.password); err != nil {
-					c.Close()
+					_ = c.Close()
 					return nil, err
 				}
 			}
@@ -173,7 +173,7 @@ func (rp *Provider) SessionInit(maxlifetime int64, savePath string) error {
 			if rp.dbNum > 0 {
 				_, err = c.Do("SELECT", rp.dbNum)
 				if err != nil {
-					c.Close()
+					_ = c.Close()
 					return nil, err
 				}
 			}
@@ -206,7 +206,7 @@ func (rp *Provider) SessionRead(sid string) (session.Store, error) {
 		}
 	}
 
-	rs := &SessionStore{p: rp.poollist, sid: sid, values: kv, maxlifetime: rp.maxlifetime}
+	rs := &SessionStore{p: rp.poollist, sid: sid, values: kv, maxLifeTime: rp.maxLifeTime}
 	return rs, nil
 }
 
@@ -230,10 +230,10 @@ func (rp *Provider) SessionRegenerate(oldsid, sid string) (session.Store, error)
 		// oldsid doesn't exists, set the new sid directly
 		// ignore error here, since if it return error
 		// the existed value will be 0
-		c.Do("SET", sid, "", "EX", rp.maxlifetime)
+		_, _ = c.Do("SET", sid, "", "EX", rp.maxLifeTime)
 	} else {
-		c.Do("RENAME", oldsid, sid)
-		c.Do("EXPIRE", sid, rp.maxlifetime)
+		_, _ = c.Do("RENAME", oldsid, sid)
+		_, _ = c.Do("EXPIRE", sid, rp.maxLifeTime)
 	}
 	return rp.SessionRead(sid)
 }
@@ -243,7 +243,7 @@ func (rp *Provider) SessionDestroy(sid string) error {
 	c := rp.poollist.Get()
 	defer c.Close()
 
-	c.Do("DEL", sid)
+	_, _ = c.Do("DEL", sid)
 	return nil
 }
 

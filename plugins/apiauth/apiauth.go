@@ -73,10 +73,10 @@ import (
 type AppIDToAppSecret func(string) string
 
 // APIBasicAuth use the basic appid/appkey as the AppIdToAppSecret
-func APIBasicAuth(appid, appkey string) beego.FilterFunc {
+func APIBasicAuth(appId, appKey string) beego.FilterFunc {
 	ft := func(aid string) string {
-		if aid == appid {
-			return appkey
+		if aid == appId {
+			return appKey
 		}
 		return ""
 	}
@@ -84,8 +84,8 @@ func APIBasicAuth(appid, appkey string) beego.FilterFunc {
 }
 
 // APIBaiscAuth calls APIBasicAuth for previous callers
-func APIBaiscAuth(appid, appkey string) beego.FilterFunc {
-	return APIBasicAuth(appid, appkey)
+func APIBaiscAuth(appId, appKey string) beego.FilterFunc {
+	return APIBasicAuth(appId, appKey)
 }
 
 // APISecretAuth use AppIdToAppSecret verify and
@@ -96,8 +96,8 @@ func APISecretAuth(f AppIDToAppSecret, timeout int) beego.FilterFunc {
 			ctx.WriteString("miss query param: appid")
 			return
 		}
-		appsecret := f(ctx.Input.Query("appid"))
-		if appsecret == "" {
+		appSecret := f(ctx.Input.Query("appid"))
+		if appSecret == "" {
 			ctx.ResponseWriter.WriteHeader(403)
 			ctx.WriteString("not exist this appid")
 			return
@@ -125,7 +125,7 @@ func APISecretAuth(f AppIDToAppSecret, timeout int) beego.FilterFunc {
 			return
 		}
 		if ctx.Input.Query("signature") !=
-			Signature(appsecret, ctx.Input.Method(), ctx.Request.Form, ctx.Input.URL()) {
+			Signature(appSecret, ctx.Input.Method(), ctx.Request.Form, ctx.Input.URL()) {
 			ctx.ResponseWriter.WriteHeader(403)
 			ctx.WriteString("auth failed")
 		}
@@ -133,7 +133,7 @@ func APISecretAuth(f AppIDToAppSecret, timeout int) beego.FilterFunc {
 }
 
 // Signature used to generate signature with the appsecret/method/params/RequestURI
-func Signature(appsecret, method string, params url.Values, RequestURL string) (result string) {
+func Signature(appSecret, method string, params url.Values, RequestURL string) (result string) {
 	var b bytes.Buffer
 	keys := make([]string, len(params))
 	pa := make(map[string]string)
@@ -158,8 +158,8 @@ func Signature(appsecret, method string, params url.Values, RequestURL string) (
 
 	stringToSign := fmt.Sprintf("%v\n%v\n%v\n", method, b.String(), RequestURL)
 
-	sha256 := sha256.New
-	hash := hmac.New(sha256, []byte(appsecret))
+	sha256hash := sha256.New
+	hash := hmac.New(sha256hash, []byte(appSecret))
 	hash.Write([]byte(stringToSign))
 	return base64.StdEncoding.EncodeToString(hash.Sum(nil))
 }

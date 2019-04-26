@@ -30,12 +30,12 @@
 package memcache
 
 import (
-	"encoding/json"
 	"errors"
 	"strings"
 	"time"
 
 	"github.com/GNURub/beego/cache"
+	"github.com/GNURub/beego/encoder/json"
 	"github.com/bradfitz/gomemcache/memcache"
 )
 
@@ -170,7 +170,7 @@ func (rc *Cache) ClearAll() error {
 // if connecting error, return.
 func (rc *Cache) StartAndGC(config string) error {
 	var cf map[string]string
-	json.Unmarshal([]byte(config), &cf)
+	_ = json.Decode([]byte(config), &cf)
 	if _, ok := cf["conn"]; !ok {
 		return errors.New("config has no conn key")
 	}

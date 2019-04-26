@@ -1,10 +1,10 @@
 package cache
 
 import (
-	"encoding/json"
 	"errors"
 	"time"
 
+	"github.com/GNURub/beego/encoder/json"
 	"github.com/bluele/gcache"
 )
 
@@ -39,7 +39,7 @@ func (rc *gCache) GetMulti(keys []string) []interface{} {
 // DelMulti get value from memcache.
 func (rc *gCache) DelMulti(keys []string) error {
 	for _, key := range keys {
-		rc.Delete(key)
+		_ = rc.Delete(key)
 	}
 	return nil
 }
@@ -151,7 +151,7 @@ func (rc *gCache) ClearAll() error {
 // if connecting error, return.
 func (rc *gCache) StartAndGC(config string) error {
 	var cf map[string]interface{}
-	json.Unmarshal([]byte(config), &cf)
+	_ = json.Decode([]byte(config), &cf)
 	if _, ok := cf["size"]; !ok {
 		cf["size"] = 30
 	}

@@ -16,9 +16,9 @@ package logs
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/GNURub/beego/encoder/json"
 	"io"
 	"os"
 	"path"
@@ -101,7 +101,7 @@ func newFileWriter() Logger {
 //      "perm":"0600"
 //  }
 func (w *fileLogWriter) Init(jsonConfig string) error {
-	err := json.Unmarshal([]byte(jsonConfig), w)
+	err := json.Decode([]byte(jsonConfig), w)
 	if err != nil {
 		return err
 	}

@@ -1,9 +1,8 @@
 package hcl
 
 import (
-	"encoding/json"
-
 	"github.com/GNURub/beego/encoder"
+	"github.com/GNURub/beego/encoder/json"
 	"github.com/hashicorp/hcl"
 )
 
@@ -14,12 +13,12 @@ func init()  {
 
 type hclEncoder struct{}
 
-func Encode(v interface{}) ([]byte, error) {
-	return json.Marshal(v)
+func Encode(v interface{}, hasIndent bool) ([]byte, error) {
+	return json.Encode(v, hasIndent)
 }
 
-func (h hclEncoder) Encode(v interface{}) ([]byte, error) {
-	return Encode(v)
+func (h hclEncoder) Encode(v interface{}, hasIndent ...bool) ([]byte, error) {
+	return Encode(v, len(hasIndent) > 0 && hasIndent[0])
 }
 
 func Decode(d []byte, v interface{}) error {

@@ -36,8 +36,8 @@ func TestOpenStaticFileGzip_1(t *testing.T) {
 	file, _ := os.Open(licenseFile)
 	var zipBuf bytes.Buffer
 	fileWriter, _ := gzip.NewWriterLevel(&zipBuf, gzip.BestCompression)
-	io.Copy(fileWriter, file)
-	fileWriter.Close()
+	_, _ = io.Copy(fileWriter, file)
+	_ = fileWriter.Close()
 	content, _ := ioutil.ReadAll(&zipBuf)
 
 	testOpenFile("gzip", content, t)
@@ -46,8 +46,8 @@ func TestOpenStaticFileDeflate_1(t *testing.T) {
 	file, _ := os.Open(licenseFile)
 	var zipBuf bytes.Buffer
 	fileWriter, _ := zlib.NewWriterLevel(&zipBuf, zlib.BestCompression)
-	io.Copy(fileWriter, file)
-	fileWriter.Close()
+	_, _ = io.Copy(fileWriter, file)
+	_ = fileWriter.Close()
 	content, _ := ioutil.ReadAll(&zipBuf)
 
 	testOpenFile("deflate", content, t)

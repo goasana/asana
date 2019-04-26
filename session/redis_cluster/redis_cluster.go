@@ -31,14 +31,16 @@
 //
 // more docs: http://beego.me/docs/module/session.md
 package redis_cluster
+
 import (
 	"net/http"
 	"strconv"
 	"strings"
 	"sync"
-	"github.com/GNURub/beego/session"
-	rediss "github.com/go-redis/redis"
 	"time"
+
+	"github.com/GNURub/beego/session"
+	"github.com/go-redis/redis"
 )
 
 var redispder = &Provider{}
@@ -48,11 +50,11 @@ var MaxPoolSize = 1000
 
 // SessionStore redis_cluster session store
 type SessionStore struct {
-	p           *rediss.ClusterClient
+	p           *redis.ClusterClient
 	sid         string
 	lock        sync.RWMutex
 	values      map[interface{}]interface{}
-	maxlifetime int64
+	maxLifeTime int64
 }
 
 // Set value in redis_cluster session
@@ -101,24 +103,24 @@ func (rs *SessionStore) SessionRelease(w http.ResponseWriter) {
 		return
 	}
 	c := rs.p
-	c.Set(rs.sid, string(b), time.Duration(rs.maxlifetime) * time.Second)
+	c.Set(rs.sid, string(b), time.Duration(rs.maxLifeTime)*time.Second)
 }
 
 // Provider redis_cluster session provider
 type Provider struct {
-	maxlifetime int64
+	maxLifeTime int64
 	savePath    string
 	poolsize    int
 	password    string
 	dbNum       int
-	poollist    *rediss.ClusterClient
+	poollist    *redis.ClusterClient
 }
 
 // SessionInit init redis_cluster session
 // savepath like redis server addr,pool size,password,dbnum
 // e.g. 127.0.0.1:6379;127.0.0.1:6380,100,test,0
-func (rp *Provider) SessionInit(maxlifetime int64, savePath string) error {
-	rp.maxlifetime = maxlifetime
+func (rp *Provider) SessionInit(maxLifeTime int64, savePath string) error {
+	rp.maxLifeTime = maxLifeTime
 	configs := strings.Split(savePath, ",")
 	if len(configs) > 0 {
 		rp.savePath = configs[0]
@@ -146,10 +148,10 @@ func (rp *Provider) SessionInit(maxlifetime int64, savePath string) error {
 	} else {
 		rp.dbNum = 0
 	}
-	
-	rp.poollist = rediss.NewClusterClient(&rediss.ClusterOptions{
+
+	rp.poollist = redis.NewClusterClient(&redis.ClusterOptions{
 		Addrs:    strings.Split(rp.savePath, ";"),
-		Password:  rp.password,
+		Password: rp.password,
 		PoolSize: rp.poolsize,
 	})
 	return rp.poollist.Ping().Err()
@@ -159,7 +161,7 @@ func (rp *Provider) SessionInit(maxlifetime int64, savePath string) error {
 func (rp *Provider) SessionRead(sid string) (session.Store, error) {
 	var kv map[interface{}]interface{}
 	kvs, err := rp.poollist.Get(sid).Result()
-	if err != nil && err != rediss.Nil {
+	if err != nil && err != redis.Nil {
 		return nil, err
 	}
 	if len(kvs) == 0 {
@@ -170,7 +172,7 @@ func (rp *Provider) SessionRead(sid string) (session.Store, error) {
 		}
 	}
 
-	rs := &SessionStore{p: rp.poollist, sid: sid, values: kv, maxlifetime: rp.maxlifetime}
+	rs := &SessionStore{p: rp.poollist, sid: sid, values: kv, maxLifeTime: rp.maxLifeTime}
 	return rs, nil
 }
 
@@ -186,15 +188,15 @@ func (rp *Provider) SessionExist(sid string) bool {
 // SessionRegenerate generate new sid for redis_cluster session
 func (rp *Provider) SessionRegenerate(oldsid, sid string) (session.Store, error) {
 	c := rp.poollist
-	
+
 	if existed, err := c.Exists(oldsid).Result(); err != nil || existed == 0 {
 		// oldsid doesn't exists, set the new sid directly
 		// ignore error here, since if it return error
 		// the existed value will be 0
-		c.Set(sid, "", time.Duration(rp.maxlifetime) * time.Second)
+		c.Set(sid, "", time.Duration(rp.maxLifeTime)*time.Second)
 	} else {
 		c.Rename(oldsid, sid)
-		c.Expire(sid, time.Duration(rp.maxlifetime) * time.Second)
+		c.Expire(sid, time.Duration(rp.maxLifeTime)*time.Second)
 	}
 	return rp.SessionRead(sid)
 }

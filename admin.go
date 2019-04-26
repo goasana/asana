@@ -16,7 +16,6 @@ package beego
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -24,6 +23,7 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/GNURub/beego/encoder/json"
 	"github.com/GNURub/beego/grace"
 	"github.com/GNURub/beego/logs"
 	"github.com/GNURub/beego/toolbox"
@@ -269,7 +269,7 @@ func profIndex(rw http.ResponseWriter, r *http.Request) {
 	data["Content"] = result.String()
 
 	if format == "json" && command == "gc summary" {
-		dataJSON, err := json.Marshal(data)
+		dataJSON, err := json.Encode(data, false)
 		if err != nil {
 			http.Error(rw, err.Error(), http.StatusInternalServerError)
 			return

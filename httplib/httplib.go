@@ -34,9 +34,9 @@ package httplib
 import (
 	"bytes"
 	"compress/gzip"
+	"context"
 	"crypto/tls"
-	"encoding/json"
-	"encoding/xml"
+	"github.com/GNURub/beego/encoder/yaml"
 	"io"
 	"io/ioutil"
 	"log"
@@ -50,7 +50,9 @@ import (
 	"strings"
 	"sync"
 	"time"
-	"gopkg.in/yaml.v2"
+
+	"github.com/GNURub/beego/encoder/json"
+	"github.com/GNURub/beego/encoder/xml"
 )
 
 var defaultSetting = BeegoHTTPSettings{
@@ -322,7 +324,7 @@ func (b *BeegoHTTPRequest) Body(data interface{}) *BeegoHTTPRequest {
 // XMLBody adds request raw body encoding by XML.
 func (b *BeegoHTTPRequest) XMLBody(obj interface{}) (*BeegoHTTPRequest, error) {
 	if b.req.Body == nil && obj != nil {
-		byts, err := xml.Marshal(obj)
+		byts, err := xml.Encode(obj, false)
 		if err != nil {
 			return b, err
 		}
@@ -336,7 +338,7 @@ func (b *BeegoHTTPRequest) XMLBody(obj interface{}) (*BeegoHTTPRequest, error) {
 // YAMLBody adds request raw body encoding by YAML.
 func (b *BeegoHTTPRequest) YAMLBody(obj interface{}) (*BeegoHTTPRequest, error) {
 	if b.req.Body == nil && obj != nil {
-		byts, err := yaml.Marshal(obj)
+		byts, err := yaml.Encode(obj)
 		if err != nil {
 			return b, err
 		}
@@ -350,7 +352,7 @@ func (b *BeegoHTTPRequest) YAMLBody(obj interface{}) (*BeegoHTTPRequest, error) 
 // JSONBody adds request raw body encoding by JSON.
 func (b *BeegoHTTPRequest) JSONBody(obj interface{}) (*BeegoHTTPRequest, error) {
 	if b.req.Body == nil && obj != nil {
-		byts, err := json.Marshal(obj)
+		byts, err := json.Encode(obj, false)
 		if err != nil {
 			return b, err
 		}
@@ -388,7 +390,7 @@ func (b *BeegoHTTPRequest) buildURL(paramBody string) {
 					if err != nil {
 						log.Println("Httplib:", err)
 					}
-					//iocopy
+					// iocopy
 					_, err = io.Copy(fileWriter, fh)
 					fh.Close()
 					if err != nil {
@@ -397,11 +399,11 @@ func (b *BeegoHTTPRequest) buildURL(paramBody string) {
 				}
 				for k, v := range b.params {
 					for _, vv := range v {
-						bodyWriter.WriteField(k, vv)
+						_ = bodyWriter.WriteField(k, vv)
 					}
 				}
-				bodyWriter.Close()
-				pw.Close()
+				_ = bodyWriter.Close()
+				_ = pw.Close()
 			}()
 			b.Header("Content-Type", bodyWriter.FormDataContentType())
 			b.req.Body = ioutil.NopCloser(pr)
@@ -460,7 +462,7 @@ func (b *BeegoHTTPRequest) DoRequest() (resp *http.Response, err error) {
 		trans = &http.Transport{
 			TLSClientConfig:     b.setting.TLSClientConfig,
 			Proxy:               b.setting.Proxy,
-			Dial:                TimeoutDialer(b.setting.ConnectTimeout, b.setting.ReadWriteTimeout),
+			DialContext:         TimeoutDialer(b.setting.ConnectTimeout, b.setting.ReadWriteTimeout),
 			MaxIdleConnsPerHost: 100,
 		}
 	} else {
@@ -472,8 +474,8 @@ func (b *BeegoHTTPRequest) DoRequest() (resp *http.Response, err error) {
 			if t.Proxy == nil {
 				t.Proxy = b.setting.Proxy
 			}
-			if t.Dial == nil {
-				t.Dial = TimeoutDialer(b.setting.ConnectTimeout, b.setting.ReadWriteTimeout)
+			if t.DialContext == nil {
+				t.DialContext = TimeoutDialer(b.setting.ConnectTimeout, b.setting.ReadWriteTimeout)
 			}
 		}
 	}
@@ -583,7 +585,7 @@ func (b *BeegoHTTPRequest) ToJSON(v interface{}) error {
 	if err != nil {
 		return err
 	}
-	return json.Unmarshal(data, v)
+	return json.Decode(data, v)
 }
 
 // ToXML returns the map that marshals from the body bytes as xml in response .
@@ -593,7 +595,7 @@ func (b *BeegoHTTPRequest) ToXML(v interface{}) error {
 	if err != nil {
 		return err
 	}
-	return xml.Unmarshal(data, v)
+	return xml.Decode(data, v)
 }
 
 // ToYAML returns the map that marshals from the body bytes as yaml in response .
@@ -603,7 +605,7 @@ func (b *BeegoHTTPRequest) ToYAML(v interface{}) error {
 	if err != nil {
 		return err
 	}
-	return yaml.Unmarshal(data, v)
+	return yaml.Decode(data, v)
 }
 
 // Response executes request client gets response mannually.
@@ -612,9 +614,9 @@ func (b *BeegoHTTPRequest) Response() (*http.Response, error) {
 }
 
 // TimeoutDialer returns functions of connection dialer with timeout settings for http.Transport Dial field.
-func TimeoutDialer(cTimeout time.Duration, rwTimeout time.Duration) func(net, addr string) (c net.Conn, err error) {
-	return func(netw, addr string) (net.Conn, error) {
-		conn, err := net.DialTimeout(netw, addr, cTimeout)
+func TimeoutDialer(cTimeout time.Duration, rwTimeout time.Duration) func(context context.Context, net, addr string) (c net.Conn, err error) {
+	return func(context context.Context, network, addr string) (net.Conn, error) {
+		conn, err := net.DialTimeout(network, addr, cTimeout)
 		if err != nil {
 			return nil, err
 		}

@@ -448,17 +448,17 @@ func StopTask() {
 }
 
 // AddTask add task with name
-func AddTask(taskname string, t Tasker) {
+func AddTask(taskName string, t Tasker) {
 	t.SetNext(time.Now().Local())
-	AdminTaskList[taskname] = t
+	AdminTaskList[taskName] = t
 	if isstart {
 		changed <- true
 	}
 }
 
 // DeleteTask delete task with name
-func DeleteTask(taskname string) {
-	delete(AdminTaskList, taskname)
+func DeleteTask(taskName string) {
+	delete(AdminTaskList, taskName)
 	if isstart {
 		changed <- true
 	}

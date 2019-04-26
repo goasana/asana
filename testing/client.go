@@ -29,11 +29,11 @@ type TestHTTPRequest struct {
 
 func getPort() string {
 	if port == "" {
-		config, err := config.NewConfig("ini", "../conf/app.conf")
+		conf, err := config.NewConfig("ini", "../conf/app.conf")
 		if err != nil {
 			return "8080"
 		}
-		port = config.String("httpport")
+		port = conf.String("httpport")
 		return port
 	}
 	return port

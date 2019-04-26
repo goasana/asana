@@ -15,9 +15,9 @@
 package beego
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/GNURub/beego/encoder/json"
 	"go/ast"
 	"go/parser"
 	"go/token"
@@ -531,8 +531,8 @@ func compareFile(pkgRealpath string) bool {
 		if err != nil {
 			return true
 		}
-		json.Unmarshal(content, &pkgLastupdate)
-		lastupdate, err := getpathTime(pkgRealpath)
+		_ = json.Decode(content, &pkgLastupdate)
+		lastupdate, err := getPathTime(pkgRealpath)
 		if err != nil {
 			return true
 		}
@@ -546,19 +546,19 @@ func compareFile(pkgRealpath string) bool {
 }
 
 func savetoFile(pkgRealpath string) {
-	lastupdate, err := getpathTime(pkgRealpath)
+	lastUpdate, err := getPathTime(pkgRealpath)
 	if err != nil {
 		return
 	}
-	pkgLastupdate[pkgRealpath] = lastupdate
-	d, err := json.Marshal(pkgLastupdate)
+	pkgLastupdate[pkgRealpath] = lastUpdate
+	d, err := json.Encode(pkgLastupdate, false)
 	if err != nil {
 		return
 	}
-	ioutil.WriteFile(lastupdateFilename, d, os.ModePerm)
+	_ = ioutil.WriteFile(lastupdateFilename, d, os.ModePerm)
 }
 
-func getpathTime(pkgRealpath string) (lastupdate int64, err error) {
+func getPathTime(pkgRealpath string) (lastupdate int64, err error) {
 	fl, err := ioutil.ReadDir(pkgRealpath)
 	if err != nil {
 		return lastupdate, err

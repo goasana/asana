@@ -56,7 +56,7 @@ func (d *dbBaseTidb) IndexExists(db dbQuerier, table string, name string) bool {
 }
 
 // create new mysql dbBaser.
-func newdbBaseTidb() dbBaser {
+func newDBBaseTidb() dbBaser {
 	b := new(dbBaseTidb)
 	b.ins = b
 	return b

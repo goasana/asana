@@ -52,7 +52,7 @@ func TestAssignConfig_01(t *testing.T) {
 
 func TestAssignConfig_02(t *testing.T) {
 	_BConfig := &Config{}
-	bs, _ := json.Encode(newBConfig())
+	bs, _ := json.Encode(newBConfig(), false)
 
 	jsonMap := M{}
 	_ = json.Decode(bs, &jsonMap)
@@ -83,7 +83,7 @@ func TestAssignConfig_02(t *testing.T) {
 		Encoder: encoder.GetEncoder("json"),
 		SeparatorKeys: "::",
 	})
-	bs, _ = json.Encode(configMap)
+	bs, _ = json.Encode(configMap, false)
 	ac, _ := jcf.ParseData(bs)
 
 	for _, i := range []interface{}{_BConfig, &_BConfig.Listen, &_BConfig.WebConfig, &_BConfig.Log, &_BConfig.WebConfig.Session} {
@@ -123,11 +123,11 @@ func TestAssignConfig_03(t *testing.T) {
 		SeparatorKeys: "::",
 	})
 	ac, _ := jcf.ParseData([]byte(`{"AppName":"beego"}`))
-	ac.Set("AppName", "test_app")
-	ac.Set("RunMode", "online")
-	ac.Set("StaticDir", "download:down download2:down2")
-	ac.Set("StaticExtensionsToGzip", ".css,.js,.html,.jpg,.png")
-	assignConfig(ac)
+	_ = ac.Set("AppName", "test_app")
+	_ = ac.Set("RunMode", "online")
+	_ = ac.Set("StaticDir", "download:down download2:down2")
+	_ = ac.Set("StaticExtensionsToGzip", ".css,.js,.html,.jpg,.png")
+	_ = assignConfig(ac)
 
 	//t.Logf("%#v", BConfig)
 

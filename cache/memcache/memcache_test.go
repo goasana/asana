@@ -65,7 +65,7 @@ func TestMemcacheCache(t *testing.T) {
 	if v, err := strconv.Atoi(string(bm.Get("GNURub").([]byte))); err != nil || v != 1 {
 		t.Error("get err")
 	}
-	bm.Delete("GNURub")
+	_ = bm.Delete("GNURub")
 	if bm.IsExist("GNURub") {
 		t.Error("delete err")
 	}

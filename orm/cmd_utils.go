@@ -155,7 +155,7 @@ func getDbCreateSQL(al *alias) (sqls []string, tableIndexes map[string][]dbIndex
 
 		columns := make([]string, 0, len(mi.fields.fieldsDB))
 
-		sqlIndexes := [][]string{}
+		var sqlIndexes [][]string
 
 		for _, fi := range mi.fields.fieldsDB {
 

@@ -19,7 +19,6 @@ import (
 	"crypto/md5"
 	"encoding/gob"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -28,6 +27,8 @@ import (
 	"reflect"
 	"strconv"
 	"time"
+
+	"github.com/GNURub/beego/encoder/json"
 )
 
 // FileCacheItem is basic unit of file cache adapter.
@@ -66,7 +67,7 @@ func NewFileCache() Cache {
 func (fc *FileCache) StartAndGC(config string) error {
 
 	cfg := make(map[string]string)
-	json.Unmarshal([]byte(config), &cfg)
+	_ = json.Decode([]byte(config), &cfg)
 	if _, ok := cfg["CachePath"]; !ok {
 		cfg["CachePath"] = FileCachePath
 	}
@@ -98,7 +99,7 @@ func (fc *FileCache) Init() {
 // get cached file name. it's md5 encoded.
 func (fc *FileCache) getCacheFileName(key string) string {
 	m := md5.New()
-	io.WriteString(m, key)
+	_, _ = io.WriteString(m, key)
 	keyMd5 := hex.EncodeToString(m.Sum(nil))
 	cachePath := fc.CachePath
 	switch fc.DirectoryLevel {
@@ -123,7 +124,7 @@ func (fc *FileCache) Get(key string) interface{} {
 		return ""
 	}
 	var to FileCacheItem
-	GobDecode(fileData, &to)
+	_ = GobDecode(fileData, &to)
 	if to.Expired.Before(time.Now()) {
 		return ""
 	}
@@ -179,7 +180,7 @@ func (fc *FileCache) Incr(key string) error {
 	} else {
 		incr = data.(int) + 1
 	}
-	fc.Put(key, incr, FileCacheEmbedExpiry)
+	_ = fc.Put(key, incr, FileCacheEmbedExpiry)
 	return nil
 }
 
@@ -192,7 +193,7 @@ func (fc *FileCache) Decr(key string) error {
 	} else {
 		decr = data.(int) - 1
 	}
-	fc.Put(key, decr, FileCacheEmbedExpiry)
+	_ = fc.Put(key, decr, FileCacheEmbedExpiry)
 	return nil
 }
 

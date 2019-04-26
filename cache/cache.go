@@ -71,7 +71,7 @@ type CacheProvider string
 
 const (
 	RedisProvider     CacheProvider = "redis"
-	MemCachedProvider CacheProvider = "memcached"
+	MemCachedProvider CacheProvider = "memcache"
 	SSDBProvider      CacheProvider = "ssdb"
 	GCacheProvider    CacheProvider = "gCache"
 	MemoryProvider    CacheProvider = "memory"

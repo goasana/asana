@@ -303,6 +303,10 @@ func (c *Controller) SetData(data interface{}) {
 		c.Data["yaml"] = data
 	case context.ApplicationXML, context.TextXML:
 		c.Data["xml"] = data
+	case context.ApplicationProtoBuf:
+		c.Data["protobuf"] = data
+	case context.ApplicationJSONP:
+		c.Data["jsonp"] = data
 	default:
 		c.Data["json"] = data
 	}
@@ -349,7 +353,7 @@ func (c *Controller) URLFor(endpoint string, values ...interface{}) string {
 
 // ServeJSON sends a json response with encoding charset.
 func (c *Controller) ServeJSON(encoding ...bool) {
-	hasIndent   := BConfig.RunMode != PROD
+	hasIndent := BConfig.RunMode != PROD
 	hasEncoding := len(encoding) > 0 && encoding[0]
 	c.Ctx.Output.JSON(c.Data["json"], hasIndent, hasEncoding)
 }
@@ -371,6 +375,11 @@ func (c *Controller) ServeYAML() {
 	c.Ctx.Output.YAML(c.Data["yaml"])
 }
 
+// ServeProtoBuf sends protobuf response.
+func (c *Controller) ServeProtoBuf() {
+	c.Ctx.Output.ProtoBuf(c.Data["protobuf"])
+}
+
 // ServeFormatted serve YAML, XML OR JSON, depending on the value of the Accept header
 func (c *Controller) ServeFormatted(encoding ...bool) {
 	accept := c.Ctx.Input.Header("Accept")
@@ -379,6 +388,10 @@ func (c *Controller) ServeFormatted(encoding ...bool) {
 		c.ServeXML()
 	case context.ApplicationYAML:
 		c.ServeYAML()
+	case context.ApplicationJSONP:
+		c.ServeJSONP()
+	case context.ApplicationProtoBuf:
+		c.ServeProtoBuf()
 	default:
 		c.ServeJSON(encoding...)
 	}

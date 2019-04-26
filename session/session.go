@@ -263,7 +263,7 @@ func (manager *Manager) SessionDestroy(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sid, _ := url.QueryUnescape(cookie.Value)
-	manager.provider.SessionDestroy(sid)
+	_ = manager.provider.SessionDestroy(sid)
 	if manager.config.EnableSetCookie {
 		expiration := time.Now()
 		cookie = &http.Cookie{Name: manager.config.CookieName,
@@ -344,7 +344,7 @@ func (manager *Manager) sessionID() (string, error) {
 	b := make([]byte, manager.config.SessionIDLength)
 	n, err := rand.Read(b)
 	if n != len(b) || err != nil {
-		return "", fmt.Errorf("Could not successfully read from the system CSPRNG")
+		return "", fmt.Errorf("could not successfully read from the system CSPRNG")
 	}
 	return manager.config.SessionIDPrefix + hex.EncodeToString(b), nil
 }

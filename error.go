@@ -93,7 +93,7 @@ func showErr(err interface{}, ctx *context.Context, stack string) {
 		"BeegoVersion":  VERSION,
 		"GoVersion":     runtime.Version(),
 	}
-	t.Execute(ctx.ResponseWriter, data)
+	_ = t.Execute(ctx.ResponseWriter, data)
 }
 
 var errtpl = `
@@ -359,14 +359,14 @@ func gatewayTimeout(rw http.ResponseWriter, r *http.Request) {
 	)
 }
 
-func responseError(rw http.ResponseWriter, r *http.Request, errCode int, errContent string) {
+func responseError(rw http.ResponseWriter, _ *http.Request, errCode int, errContent string) {
 	t, _ := template.New("beegoerrortemp").Parse(errtpl)
 	data := M{
 		"Title":        http.StatusText(errCode),
 		"BeegoVersion": VERSION,
 		"Content":      template.HTML(errContent),
 	}
-	t.Execute(rw, data)
+	_ = t.Execute(rw, data)
 }
 
 // ErrorHandler registers http.HandlerFunc to each http err code string.

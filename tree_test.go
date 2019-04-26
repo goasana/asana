@@ -23,7 +23,7 @@ import (
 
 type testinfo struct {
 	url        string
-	requesturl string
+	requestUrl string
 	params     map[string]string
 }
 
@@ -81,16 +81,16 @@ func TestTreeRouters(t *testing.T) {
 		tr := NewTree()
 		tr.AddRouter(r.url, "GNURub")
 		ctx := context.NewContext()
-		obj := tr.Match(r.requesturl, ctx)
+		obj := tr.Match(r.requestUrl, ctx)
 		if obj == nil || obj.(string) != "GNURub" {
-			t.Fatal(r.url+" can't get obj, Expect ", r.requesturl)
+			t.Fatal(r.url+" can't get obj, Expect ", r.requestUrl)
 		}
 		if r.params != nil {
 			for k, v := range r.params {
 				if vv := ctx.Input.Param(k); vv != v {
-					t.Fatal("The Rule: " + r.url + "\nThe RequestURL:" + r.requesturl + "\nThe Key is " + k + ", The Value should be: " + v + ", but get: " + vv)
+					t.Fatal("The Rule: " + r.url + "\nThe RequestURL:" + r.requestUrl + "\nThe Key is " + k + ", The Value should be: " + v + ", but get: " + vv)
 				} else if vv == "" && v != "" {
-					t.Fatal(r.url + "    " + r.requesturl + " get param empty:" + k)
+					t.Fatal(r.url + "    " + r.requestUrl + " get param empty:" + k)
 				}
 			}
 		}

@@ -1,13 +1,13 @@
 package alils
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httputil"
 	"strconv"
 
+	"github.com/GNURub/beego/encoder/json"
 	lz4 "github.com/cloudflare/golz4"
 	"github.com/gogo/protobuf/proto"
 )
@@ -48,7 +48,7 @@ func (s *LogStore) ListShards() (shardIDs []int, err error) {
 
 	if r.StatusCode != http.StatusOK {
 		errMsg := &errorMessage{}
-		err = json.Unmarshal(buf, errMsg)
+		err = json.Decode(buf, errMsg)
 		if err != nil {
 			err = fmt.Errorf("failed to list logstore")
 			dump, _ := httputil.DumpResponse(r, true)
@@ -60,7 +60,7 @@ func (s *LogStore) ListShards() (shardIDs []int, err error) {
 	}
 
 	var shards []*Shard
-	err = json.Unmarshal(buf, &shards)
+	err = json.Decode(buf, &shards)
 	if err != nil {
 		return
 	}

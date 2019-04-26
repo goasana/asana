@@ -191,7 +191,7 @@ func (s *SessionStore) SessionRelease(w http.ResponseWriter) {
 	if err != nil {
 		return
 	}
-	s.client.Do("setx", s.sid, string(b), s.maxLifetime)
+	_, _ = s.client.Do("setx", s.sid, string(b), s.maxLifetime)
 }
 
 func init() {

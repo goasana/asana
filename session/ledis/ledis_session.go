@@ -70,8 +70,8 @@ func (ls *SessionStore) SessionRelease(w http.ResponseWriter) {
 	if err != nil {
 		return
 	}
-	c.Set([]byte(ls.sid), b)
-	c.Expire([]byte(ls.sid), ls.maxlifetime)
+	_ = c.Set([]byte(ls.sid), b)
+	_, _ = c.Expire([]byte(ls.sid), ls.maxlifetime)
 }
 
 // Provider ledis session provider
@@ -143,19 +143,19 @@ func (lp *Provider) SessionRegenerate(oldsid, sid string) (session.Store, error)
 		// oldsid doesn't exists, set the new sid directly
 		// ignore error here, since if it return error
 		// the existed value will be 0
-		c.Set([]byte(sid), []byte(""))
-		c.Expire([]byte(sid), lp.maxlifetime)
+		_ = c.Set([]byte(sid), []byte(""))
+		_, _ = c.Expire([]byte(sid), lp.maxlifetime)
 	} else {
 		data, _ := c.Get([]byte(oldsid))
-		c.Set([]byte(sid), data)
-		c.Expire([]byte(sid), lp.maxlifetime)
+		_ = c.Set([]byte(sid), data)
+		_, _ = c.Expire([]byte(sid), lp.maxlifetime)
 	}
 	return lp.SessionRead(sid)
 }
 
 // SessionDestroy delete ledis session by id
 func (lp *Provider) SessionDestroy(sid string) error {
-	c.Del([]byte(sid))
+	_, _ = c.Del([]byte(sid))
 	return nil
 }
 

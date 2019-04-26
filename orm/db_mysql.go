@@ -95,7 +95,7 @@ func (d *dbBaseMysql) IndexExists(db dbQuerier, table string, name string) bool 
 	row := db.QueryRow("SELECT count(*) FROM information_schema.statistics "+
 		"WHERE table_schema = DATABASE() AND table_name = ? AND index_name = ?", table, name)
 	var cnt int
-	row.Scan(&cnt)
+	_ = row.Scan(&cnt)
 	return cnt > 0
 }
 
@@ -153,7 +153,7 @@ func (d *dbBaseMysql) InsertOrUpdate(q dbQuerier, mi *modelInfo, ind reflect.Val
 	if isMulti {
 		qmarks = strings.Repeat(qmarks+"), (", multi-1) + qmarks
 	}
-	//conflitValue maybe is a int,can`t use fmt.Sprintf
+	// conflitValue maybe is a int,can`t use fmt.Sprintf
 	query := fmt.Sprintf("INSERT INTO %s%s%s (%s%s%s) VALUES (%s) %s "+qupdates, Q, mi.table, Q, Q, columns, Q, qmarks, iouStr)
 
 	d.ins.ReplaceMarks(&query)
@@ -176,7 +176,7 @@ func (d *dbBaseMysql) InsertOrUpdate(q dbQuerier, mi *modelInfo, ind reflect.Val
 }
 
 // create new mysql dbBaser.
-func newdbBaseMysql() dbBaser {
+func newDBBaseMysql() dbBaser {
 	b := new(dbBaseMysql)
 	b.ins = b
 	return b

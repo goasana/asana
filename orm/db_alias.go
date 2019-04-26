@@ -64,11 +64,11 @@ var (
 		"ora":      DROracle, //https://github.com/rana/ora
 	}
 	dbBasers = map[DriverType]dbBaser{
-		DRMySQL:    newdbBaseMysql(),
-		DRSqlite:   newdbBaseSqlite(),
-		DROracle:   newdbBaseOracle(),
-		DRPostgres: newdbBasePostgres(),
-		DRTiDB:     newdbBaseTidb(),
+		DRMySQL:    newDBBaseMysql(),
+		DRSqlite:   newDBBaseSqlite(),
+		DROracle:   newDBBaseOracle(),
+		DRPostgres: newDBBasePostgres(),
+		DRTiDB:     newDBBaseTidb(),
 	}
 )
 

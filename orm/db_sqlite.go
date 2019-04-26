@@ -135,7 +135,7 @@ func (d *dbBaseSqlite) IndexExists(db dbQuerier, table string, name string) bool
 	defer rows.Close()
 	for rows.Next() {
 		var tmp, index sql.NullString
-		rows.Scan(&tmp, &index, &tmp, &tmp, &tmp)
+		_ = rows.Scan(&tmp, &index, &tmp, &tmp, &tmp)
 		if name == index.String {
 			return true
 		}
@@ -144,7 +144,7 @@ func (d *dbBaseSqlite) IndexExists(db dbQuerier, table string, name string) bool
 }
 
 // create new sqlite dbBaser.
-func newdbBaseSqlite() dbBaser {
+func newDBBaseSqlite() dbBaser {
 	b := new(dbBaseSqlite)
 	b.ins = b
 	return b

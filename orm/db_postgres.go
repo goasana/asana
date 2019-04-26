@@ -182,7 +182,7 @@ func (d *dbBasePostgres) IndexExists(db dbQuerier, table string, name string) bo
 }
 
 // create new postgresql dbBaser.
-func newdbBasePostgres() dbBaser {
+func newDBBasePostgres() dbBaser {
 	b := new(dbBasePostgres)
 	b.ins = b
 	return b

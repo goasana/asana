@@ -91,7 +91,7 @@ func (d *commandSyncDb) Parse(args []string) {
 	flagSet.StringVar(&name, "db", "default", "DataBase alias name")
 	flagSet.BoolVar(&d.force, "force", false, "drop tables before create")
 	flagSet.BoolVar(&d.verbose, "v", false, "verbose info")
-	flagSet.Parse(args)
+	_ = flagSet.Parse(args)
 
 	d.al = getDbAlias(name)
 }

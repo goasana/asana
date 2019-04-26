@@ -33,7 +33,6 @@ package configmap
 import (
 	"context"
 	"fmt"
-	"github.com/GNURub/beego/encoder/json"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -42,6 +41,7 @@ import (
 
 	"github.com/GNURub/beego/config"
 	"github.com/GNURub/beego/config/base"
+	"github.com/GNURub/beego/encoder/json"
 )
 
 func getClient() (*kubernetes.Clientset, error) {

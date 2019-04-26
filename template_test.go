@@ -56,16 +56,16 @@ func TestTemplate(t *testing.T) {
 		t.Fatal(err)
 	}
 	for k, name := range files {
-		os.MkdirAll(filepath.Dir(filepath.Join(dir, name)), 0777)
+		_ = os.MkdirAll(filepath.Dir(filepath.Join(dir, name)), 0777)
 		if f, err := os.Create(filepath.Join(dir, name)); err != nil {
 			t.Fatal(err)
 		} else {
 			if k == 0 {
-				f.WriteString(header)
+				_, _ = f.WriteString(header)
 			} else if k == 1 {
-				f.WriteString(index)
+				_, _ = f.WriteString(index)
 			} else if k == 2 {
-				f.WriteString(block)
+				_, _ = f.WriteString(block)
 			}
 
 			f.Close()
@@ -82,9 +82,9 @@ func TestTemplate(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, name := range files {
-		os.RemoveAll(filepath.Join(dir, name))
+		_ = os.RemoveAll(filepath.Join(dir, name))
 	}
-	os.RemoveAll(dir)
+	_ = os.RemoveAll(dir)
 }
 
 var menu = `<div class="menu">
@@ -122,14 +122,14 @@ func TestRelativeTemplate(t *testing.T) {
 		t.Fatal(err)
 	}
 	for k, name := range files {
-		os.MkdirAll(filepath.Dir(filepath.Join(dir, name)), 0777)
+		_ = os.MkdirAll(filepath.Dir(filepath.Join(dir, name)), 0777)
 		if f, err := os.Create(filepath.Join(dir, name)); err != nil {
 			t.Fatal(err)
 		} else {
 			if k == 0 {
-				f.WriteString(menu)
+				_, _ = f.WriteString(menu)
 			} else if k == 1 {
-				f.WriteString(user)
+				_, _ = f.WriteString(user)
 			}
 			f.Close()
 		}
@@ -142,9 +142,9 @@ func TestRelativeTemplate(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, name := range files {
-		os.RemoveAll(filepath.Join(dir, name))
+		_ = os.RemoveAll(filepath.Join(dir, name))
 	}
-	os.RemoveAll(dir)
+	_ = os.RemoveAll(dir)
 }
 
 var add = `{{ template "layout_blog.tpl" . }}
@@ -227,14 +227,14 @@ func TestTemplateLayout(t *testing.T) {
 		t.Fatal(err)
 	}
 	for k, name := range files {
-		os.MkdirAll(filepath.Dir(filepath.Join(dir, name)), 0777)
+		_ = os.MkdirAll(filepath.Dir(filepath.Join(dir, name)), 0777)
 		if f, err := os.Create(filepath.Join(dir, name)); err != nil {
 			t.Fatal(err)
 		} else {
 			if k == 0 {
-				f.WriteString(add)
+				_, _ = f.WriteString(add)
 			} else if k == 1 {
-				f.WriteString(layoutBlog)
+				_, _ = f.WriteString(layoutBlog)
 			}
 			f.Close()
 		}
@@ -255,9 +255,9 @@ func TestTemplateLayout(t *testing.T) {
 		t.Fatal("Compare failed")
 	}
 	for _, name := range files {
-		os.RemoveAll(filepath.Join(dir, name))
+		_ = os.RemoveAll(filepath.Join(dir, name))
 	}
-	os.RemoveAll(dir)
+	_ = os.RemoveAll(dir)
 }
 
 type TestingFileSystem struct {
@@ -279,7 +279,7 @@ var outputBinData = `<!DOCTYPE html>
 <h1>Hello, blocks!</h1>
 
 	
-<h1>Hello, GNURub!</h1>
+<h1>Hello, astaxie!</h1>
 
 	
 

@@ -80,13 +80,13 @@ type MemProvider struct {
 	lock        sync.RWMutex             // locker
 	sessions    map[string]*list.Element // map in memory
 	list        *list.List               // for gc
-	maxlifetime int64
+	maxLifeTime int64
 	savePath    string
 }
 
 // SessionInit init memory session
-func (pder *MemProvider) SessionInit(maxlifetime int64, savePath string) error {
-	pder.maxlifetime = maxlifetime
+func (pder *MemProvider) SessionInit(maxLifeTime int64, savePath string) error {
+	pder.maxLifeTime = maxLifeTime
 	pder.savePath = savePath
 	return nil
 }
@@ -160,7 +160,7 @@ func (pder *MemProvider) SessionGC() {
 		if element == nil {
 			break
 		}
-		if (element.Value.(*MemSessionStore).timeAccessed.Unix() + pder.maxlifetime) < time.Now().Unix() {
+		if (element.Value.(*MemSessionStore).timeAccessed.Unix() + pder.maxLifeTime) < time.Now().Unix() {
 			pder.lock.RUnlock()
 			pder.lock.Lock()
 			pder.list.Remove(element)

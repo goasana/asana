@@ -117,12 +117,10 @@ func TestGetFloat64(t *testing.T) {
 }
 
 func TestGetBool(t *testing.T) {
-	var t1 = true
-	if !GetBool(t1) {
+	if !GetBool(true) {
 		t.Error("get bool from bool error")
 	}
-	var t2 = "true"
-	if !GetBool(t2) {
+	if !GetBool("true") {
 		t.Error("get bool from string error")
 	}
 	if GetBool(nil) {
@@ -130,14 +128,3 @@ func TestGetBool(t *testing.T) {
 	}
 }
 
-func byteArrayEquals(a []byte, b []byte) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i, v := range a {
-		if v != b[i] {
-			return false
-		}
-	}
-	return true
-}

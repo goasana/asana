@@ -103,5 +103,5 @@ func (a *BasicAuth) CheckAuth(r *http.Request) string {
 func (a *BasicAuth) RequireAuth(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("WWW-Authenticate", `Basic realm="`+a.Realm+`"`)
 	w.WriteHeader(401)
-	w.Write([]byte("401 Unauthorized\n"))
+	_, _ = w.Write([]byte("401 Unauthorized\n"))
 }

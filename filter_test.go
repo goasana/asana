@@ -23,23 +23,24 @@ import (
 )
 
 var FilterUser = func(ctx *context.Context) {
-	ctx.Output.Body([]byte("i am " + ctx.Input.Param(":last") + ctx.Input.Param(":first")))
+	_ = ctx.Output.Body([]byte("i am " + ctx.Input.Param(":last") + ctx.Input.Param(":first")))
 }
 
 func TestFilter(t *testing.T) {
 	r, _ := http.NewRequest("GET", "/person/asta/Xie", nil)
 	w := httptest.NewRecorder()
 	handler := NewControllerRegister()
-	handler.InsertFilter("/person/:last/:first", BeforeRouter, FilterUser)
+	_ = handler.InsertFilter("/person/:last/:first", BeforeRouter, FilterUser)
 	handler.Add("/person/:last/:first", &TestController{})
 	handler.ServeHTTP(w, r)
-	if w.Body.String() != "i am GNURub" {
+	str := w.Body.String()
+	if str != "i am astaXie" {
 		t.Errorf("user define func can't run")
 	}
 }
 
 var FilterAdminUser = func(ctx *context.Context) {
-	ctx.Output.Body([]byte("i am admin"))
+	_ = ctx.Output.Body([]byte("i am admin"))
 }
 
 // Filter pattern /admin/:all
@@ -49,7 +50,7 @@ func TestPatternTwo(t *testing.T) {
 	r, _ := http.NewRequest("GET", "/admin/", nil)
 	w := httptest.NewRecorder()
 	handler := NewControllerRegister()
-	handler.InsertFilter("/admin/?:all", BeforeRouter, FilterAdminUser)
+	_ = handler.InsertFilter("/admin/?:all", BeforeRouter, FilterAdminUser)
 	handler.ServeHTTP(w, r)
 	if w.Body.String() != "i am admin" {
 		t.Errorf("filter /admin/ can't run")
@@ -60,7 +61,7 @@ func TestPatternThree(t *testing.T) {
 	r, _ := http.NewRequest("GET", "/admin/GNURub", nil)
 	w := httptest.NewRecorder()
 	handler := NewControllerRegister()
-	handler.InsertFilter("/admin/:all", BeforeRouter, FilterAdminUser)
+	_ = handler.InsertFilter("/admin/:all", BeforeRouter, FilterAdminUser)
 	handler.ServeHTTP(w, r)
 	if w.Body.String() != "i am admin" {
 		t.Errorf("filter /admin/GNURub can't run")

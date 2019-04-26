@@ -40,7 +40,7 @@ func (ec *errorTestController) Get() {
 }
 
 func TestErrorCode_01(t *testing.T) {
-	registerDefaultErrorHandler()
+	_ = registerDefaultErrorHandler()
 	for k := range ErrorMaps {
 		r, _ := http.NewRequest("GET", "/error?code="+k, nil)
 		w := httptest.NewRecorder()
@@ -59,7 +59,7 @@ func TestErrorCode_01(t *testing.T) {
 }
 
 func TestErrorCode_02(t *testing.T) {
-	registerDefaultErrorHandler()
+	_ = registerDefaultErrorHandler()
 	r, _ := http.NewRequest("GET", "/error?code=0", nil)
 	w := httptest.NewRecorder()
 
@@ -72,7 +72,7 @@ func TestErrorCode_02(t *testing.T) {
 }
 
 func TestErrorCode_03(t *testing.T) {
-	registerDefaultErrorHandler()
+	_ = registerDefaultErrorHandler()
 	r, _ := http.NewRequest("GET", "/error?code=panic", nil)
 	w := httptest.NewRecorder()
 

@@ -40,10 +40,11 @@
 package authz
 
 import (
+	"net/http"
+
 	"github.com/GNURub/beego"
 	"github.com/GNURub/beego/context"
 	"github.com/casbin/casbin"
-	"net/http"
 )
 
 // NewAuthorizer returns the authorizer.
@@ -82,5 +83,5 @@ func (a *BasicAuthorizer) CheckPermission(r *http.Request) bool {
 // RequirePermission returns the 403 Forbidden to the client
 func (a *BasicAuthorizer) RequirePermission(w http.ResponseWriter) {
 	w.WriteHeader(403)
-	w.Write([]byte("403 Forbidden\n"))
+	_, _ = w.Write([]byte("403 Forbidden\n"))
 }

@@ -16,8 +16,6 @@ package context
 
 import (
 	"bytes"
-	"encoding/json"
-	"encoding/xml"
 	"errors"
 	"fmt"
 	"html/template"
@@ -31,7 +29,10 @@ import (
 	"strings"
 	"time"
 
-	yaml "gopkg.in/yaml.v2"
+	"github.com/GNURub/beego/encoder/json"
+	"github.com/GNURub/beego/encoder/proto"
+	"github.com/GNURub/beego/encoder/xml"
+	"github.com/GNURub/beego/encoder/yaml"
 )
 
 // BeegoOutput does work for sending response header.
@@ -81,7 +82,7 @@ func (output *BeegoOutput) Body(content []byte) error {
 	} else {
 		output.Context.ResponseWriter.Started = true
 	}
-	io.Copy(output.Context.ResponseWriter, buf)
+	_, _ = io.Copy(output.Context.ResponseWriter, buf)
 	return nil
 }
 
@@ -89,7 +90,7 @@ func (output *BeegoOutput) Body(content []byte) error {
 // others are ordered as cookie's max age time, path,domain, secure and httponly.
 func (output *BeegoOutput) Cookie(name string, value string, others ...interface{}) {
 	var b bytes.Buffer
-	fmt.Fprintf(&b, "%s=%s", sanitizeName(name), sanitizeValue(value))
+	_, _ = fmt.Fprintf(&b, "%s=%s", sanitizeName(name), sanitizeValue(value))
 
 	//fix cookie not work in IE
 	if len(others) > 0 {
@@ -106,9 +107,9 @@ func (output *BeegoOutput) Cookie(name string, value string, others ...interface
 
 		switch {
 		case maxAge > 0:
-			fmt.Fprintf(&b, "; Expires=%s; Max-Age=%d", time.Now().Add(time.Duration(maxAge) * time.Second).UTC().Format(time.RFC1123), maxAge)
+			_, _ = fmt.Fprintf(&b, "; Expires=%s; Max-Age=%d", time.Now().Add(time.Duration(maxAge) * time.Second).UTC().Format(time.RFC1123), maxAge)
 		case maxAge < 0:
-			fmt.Fprintf(&b, "; Max-Age=0")
+			_, _ = fmt.Fprintf(&b, "; Max-Age=0")
 		}
 	}
 
@@ -119,16 +120,16 @@ func (output *BeegoOutput) Cookie(name string, value string, others ...interface
 	// default "/"
 	if len(others) > 1 {
 		if v, ok := others[1].(string); ok && len(v) > 0 {
-			fmt.Fprintf(&b, "; Path=%s", sanitizeValue(v))
+			_, _ = fmt.Fprintf(&b, "; Path=%s", sanitizeValue(v))
 		}
 	} else {
-		fmt.Fprintf(&b, "; Path=%s", "/")
+		_, _ = fmt.Fprintf(&b, "; Path=%s", "/")
 	}
 
 	// default empty
 	if len(others) > 2 {
 		if v, ok := others[2].(string); ok && len(v) > 0 {
-			fmt.Fprintf(&b, "; Domain=%s", sanitizeValue(v))
+			_, _ = fmt.Fprintf(&b, "; Domain=%s", sanitizeValue(v))
 		}
 	}
 
@@ -144,14 +145,14 @@ func (output *BeegoOutput) Cookie(name string, value string, others ...interface
 			}
 		}
 		if secure {
-			fmt.Fprintf(&b, "; Secure")
+			_, _ = fmt.Fprintf(&b, "; Secure")
 		}
 	}
 
 	// default false. for session cookie default true
 	if len(others) > 4 {
 		if v, ok := others[4].(bool); ok && v {
-			fmt.Fprintf(&b, "; HttpOnly")
+			_, _ = fmt.Fprintf(&b, "; HttpOnly")
 		}
 	}
 
@@ -172,28 +173,26 @@ func sanitizeValue(v string) string {
 
 func jsonRenderer(value interface{}) Renderer {
 	return rendererFunc(func(ctx *Context) {
-		ctx.Output.JSON(value, false, false)
+		_ = ctx.Output.JSON(value, false, false)
 	})
 }
 
 func errorRenderer(err error) Renderer {
 	return rendererFunc(func(ctx *Context) {
 		ctx.Output.SetStatus(500)
-		ctx.Output.Body([]byte(err.Error()))
+		_ = ctx.Output.Body([]byte(err.Error()))
 	})
+}
+
+func getContentTypeHead(contentType string) string {
+	return fmt.Sprintf("%s; charset=utf-8", contentType)
 }
 
 // JSON writes json to response body.
 // if encoding is true, it converts utf-8 to \u0000 type.
 func (output *BeegoOutput) JSON(data interface{}, hasIndent bool, encoding bool) error {
-	output.Header("Content-Type", "application/json; charset=utf-8")
-	var content []byte
-	var err error
-	if hasIndent {
-		content, err = json.MarshalIndent(data, "", "  ")
-	} else {
-		content, err = json.Marshal(data)
-	}
+	output.Header("Content-Type", getContentTypeHead(ApplicationJSON))
+	content, err := json.Encode(data, hasIndent)
 	if err != nil {
 		http.Error(output.Context.ResponseWriter, err.Error(), http.StatusInternalServerError)
 		return err
@@ -204,12 +203,21 @@ func (output *BeegoOutput) JSON(data interface{}, hasIndent bool, encoding bool)
 	return output.Body(content)
 }
 
+// ProtoBuf writes protobuf to response body.
+func (output *BeegoOutput) ProtoBuf(data interface{}) error {
+	output.Header("Content-Type", getContentTypeHead(ApplicationProtoBuf))
+	content, err := proto.Encode(data)
+	if err != nil {
+		http.Error(output.Context.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		return err
+	}
+	return output.Body(content)
+}
+
 // YAML writes yaml to response body.
 func (output *BeegoOutput) YAML(data interface{}) error {
-	output.Header("Content-Type", "application/x-yaml; charset=utf-8")
-	var content []byte
-	var err error
-	content, err = yaml.Marshal(data)
+	output.Header("Content-Type", getContentTypeHead(ApplicationYAML))
+	content, err := yaml.Encode(data)
 	if err != nil {
 		http.Error(output.Context.ResponseWriter, err.Error(), http.StatusInternalServerError)
 		return err
@@ -219,14 +227,8 @@ func (output *BeegoOutput) YAML(data interface{}) error {
 
 // JSONP writes jsonp to response body.
 func (output *BeegoOutput) JSONP(data interface{}, hasIndent bool) error {
-	output.Header("Content-Type", "application/javascript; charset=utf-8")
-	var content []byte
-	var err error
-	if hasIndent {
-		content, err = json.MarshalIndent(data, "", "  ")
-	} else {
-		content, err = json.Marshal(data)
-	}
+	output.Header("Content-Type", getContentTypeHead(ApplicationJSONP))
+	content, err := json.Encode(data, hasIndent)
 	if err != nil {
 		http.Error(output.Context.ResponseWriter, err.Error(), http.StatusInternalServerError)
 		return err
@@ -245,14 +247,8 @@ func (output *BeegoOutput) JSONP(data interface{}, hasIndent bool) error {
 
 // XML writes xml string to response body.
 func (output *BeegoOutput) XML(data interface{}, hasIndent bool) error {
-	output.Header("Content-Type", "application/xml; charset=utf-8")
-	var content []byte
-	var err error
-	if hasIndent {
-		content, err = xml.MarshalIndent(data, "", "  ")
-	} else {
-		content, err = xml.Marshal(data)
-	}
+	output.Header("Content-Type", getContentTypeHead(ApplicationXML))
+	content, err := xml.Encode(data, hasIndent)
 	if err != nil {
 		http.Error(output.Context.ResponseWriter, err.Error(), http.StatusInternalServerError)
 		return err
@@ -265,11 +261,15 @@ func (output *BeegoOutput) ServeFormatted(data interface{}, hasIndent bool, hasE
 	accept := output.Context.Input.Header("Accept")
 	switch accept {
 	case ApplicationYAML:
-		output.YAML(data)
+		_ = output.YAML(data)
 	case ApplicationXML, TextXML:
-		output.XML(data, hasIndent)
+		_ = output.XML(data, hasIndent)
+	case ApplicationProtoBuf:
+		_ = output.ProtoBuf(data)
+	case ApplicationJSONP:
+		_ = output.JSONP(data, hasIndent)
 	default:
-		output.JSON(data, hasIndent, len(hasEncode) > 0 && hasEncode[0])
+		_ = output.JSON(data, hasIndent, len(hasEncode) > 0 && hasEncode[0])
 	}
 }
 
@@ -288,7 +288,7 @@ func (output *BeegoOutput) Download(file string, filename ...string) {
 	} else {
 		fName = filepath.Base(file)
 	}
-	//https://tools.ietf.org/html/rfc6266#section-4.3
+	// https://tools.ietf.org/html/rfc6266#section-4.3
 	fn := url.PathEscape(fName)
 	if fName == fn {
 		fn = "filename=" + fn
@@ -404,5 +404,5 @@ func stringsToJSON(str string) string {
 
 // Session sets session item value with given key.
 func (output *BeegoOutput) Session(name interface{}, value interface{}) {
-	output.Context.Input.CruSession.Set(name, value)
+	_ = output.Context.Input.CruSession.Set(name, value)
 }

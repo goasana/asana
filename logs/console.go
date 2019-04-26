@@ -15,7 +15,7 @@
 package logs
 
 import (
-	"encoding/json"
+	"github.com/GNURub/beego/encoder/json"
 	"os"
 	"strings"
 	"time"
@@ -69,7 +69,7 @@ func (c *consoleWriter) Init(jsonConfig string) error {
 	if len(jsonConfig) == 0 {
 		return nil
 	}
-	return json.Unmarshal([]byte(jsonConfig), c)
+	return json.Decode([]byte(jsonConfig), c)
 }
 
 // WriteMsg write message in console.

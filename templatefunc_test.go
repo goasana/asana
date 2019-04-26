@@ -101,7 +101,7 @@ func TestHtmlquote(t *testing.T) {
 	}
 }
 
-func TestHtmlunquote(t *testing.T) {
+func TestHtmlUnquote(t *testing.T) {
 	h := `&lt;&#39;&nbsp;&rdquo;&ldquo;&amp;&#34;&gt;`
 	s := `<' ”“&">`
 	if Htmlunquote(h) != s {

@@ -13,12 +13,15 @@ func init() {
 
 type xmlEncoder struct{}
 
-func Encode(v interface{}) ([]byte, error) {
+func Encode(v interface{}, hasIndent bool) ([]byte, error) {
+	if hasIndent {
+		return xml.MarshalIndent(v, "", " ")
+	}
 	return xml.Marshal(v)
 }
 
-func (j xmlEncoder) Encode(v interface{}) ([]byte, error) {
-	return Encode(v)
+func (j xmlEncoder) Encode(v interface{}, hasIndent ...bool) ([]byte, error) {
+	return Encode(v, len(hasIndent) > 0 && hasIndent[0])
 }
 
 func Decode(d []byte, v interface{}) error {

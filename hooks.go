@@ -1,12 +1,12 @@
 package beego
 
 import (
-	"encoding/json"
 	"mime"
 	"net/http"
 	"path/filepath"
 
 	"github.com/GNURub/beego/context"
+	"github.com/GNURub/beego/encoder/json"
 	"github.com/GNURub/beego/logs"
 	"github.com/GNURub/beego/session"
 )
@@ -61,7 +61,7 @@ func registerSession() error {
 			conf.SessionNameInHTTPHeader = BConfig.WebConfig.Session.SessionNameInHTTPHeader
 			conf.EnableSidInURLQuery = BConfig.WebConfig.Session.SessionEnableSidInURLQuery
 		} else {
-			if err = json.Unmarshal([]byte(sessionConfig), conf); err != nil {
+			if err = json.Decode([]byte(sessionConfig), conf); err != nil {
 				return err
 			}
 		}

@@ -119,7 +119,7 @@ func (st *SessionStore) SessionRelease(w http.ResponseWriter) {
 	if err != nil {
 		return
 	}
-	st.c.Exec("UPDATE session set session_data=$1, session_expiry=$2 where session_key=$3",
+	_, _ = st.c.Exec("UPDATE session set session_data=$1, session_expiry=$2 where session_key=$3",
 		b, time.Now().Format(time.RFC3339), st.sid)
 
 }
@@ -151,8 +151,8 @@ func (mp *Provider) SessionInit(maxlifetime int64, savePath string) error {
 func (mp *Provider) SessionRead(sid string) (session.Store, error) {
 	c := mp.connectInit()
 	row := c.QueryRow("select session_data from session where session_key=$1", sid)
-	var sessiondata []byte
-	err := row.Scan(&sessiondata)
+	var sessionData []byte
+	err := row.Scan(&sessionData)
 	if err == sql.ErrNoRows {
 		_, err = c.Exec("insert into session(session_key,session_data,session_expiry) values($1,$2,$3)",
 			sid, "", time.Now().Format(time.RFC3339))
@@ -165,10 +165,10 @@ func (mp *Provider) SessionRead(sid string) (session.Store, error) {
 	}
 
 	var kv map[interface{}]interface{}
-	if len(sessiondata) == 0 {
+	if len(sessionData) == 0 {
 		kv = make(map[interface{}]interface{})
 	} else {
-		kv, err = session.DecodeGob(sessiondata)
+		kv, err = session.DecodeGob(sessionData)
 		if err != nil {
 			return nil, err
 		}
@@ -182,8 +182,8 @@ func (mp *Provider) SessionExist(sid string) bool {
 	c := mp.connectInit()
 	defer c.Close()
 	row := c.QueryRow("select session_data from session where session_key=$1", sid)
-	var sessiondata []byte
-	err := row.Scan(&sessiondata)
+	var sessionData []byte
+	err := row.Scan(&sessionData)
 	return err != sql.ErrNoRows
 }
 
@@ -191,18 +191,18 @@ func (mp *Provider) SessionExist(sid string) bool {
 func (mp *Provider) SessionRegenerate(oldsid, sid string) (session.Store, error) {
 	c := mp.connectInit()
 	row := c.QueryRow("select session_data from session where session_key=$1", oldsid)
-	var sessiondata []byte
-	err := row.Scan(&sessiondata)
+	var sessionData []byte
+	err := row.Scan(&sessionData)
 	if err == sql.ErrNoRows {
-		c.Exec("insert into session(session_key,session_data,session_expiry) values($1,$2,$3)",
+		_, _ = c.Exec("insert into session(session_key,session_data,session_expiry) values($1,$2,$3)",
 			oldsid, "", time.Now().Format(time.RFC3339))
 	}
-	c.Exec("update session set session_key=$1 where session_key=$2", sid, oldsid)
+	_, _ = c.Exec("update session set session_key=$1 where session_key=$2", sid, oldsid)
 	var kv map[interface{}]interface{}
-	if len(sessiondata) == 0 {
+	if len(sessionData) == 0 {
 		kv = make(map[interface{}]interface{})
 	} else {
-		kv, err = session.DecodeGob(sessiondata)
+		kv, err = session.DecodeGob(sessionData)
 		if err != nil {
 			return nil, err
 		}
@@ -214,16 +214,16 @@ func (mp *Provider) SessionRegenerate(oldsid, sid string) (session.Store, error)
 // SessionDestroy delete postgresql session by sid
 func (mp *Provider) SessionDestroy(sid string) error {
 	c := mp.connectInit()
-	c.Exec("DELETE FROM session where session_key=$1", sid)
-	c.Close()
+	_, _ = c.Exec("DELETE FROM session where session_key=$1", sid)
+	_ = c.Close()
 	return nil
 }
 
 // SessionGC delete expired values in postgresql session
 func (mp *Provider) SessionGC() {
 	c := mp.connectInit()
-	c.Exec("DELETE from session where EXTRACT(EPOCH FROM (current_timestamp - session_expiry)) > $1", mp.maxlifetime)
-	c.Close()
+	_, _ = c.Exec("DELETE from session where EXTRACT(EPOCH FROM (current_timestamp - session_expiry)) > $1", mp.maxlifetime)
+	_ = c.Close()
 }
 
 // SessionAll count values in postgresql session

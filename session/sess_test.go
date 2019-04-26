@@ -16,8 +16,10 @@ package session
 
 import (
 	"crypto/aes"
-	"encoding/json"
 	"testing"
+
+	"github.com/GNURub/beego/encoder/json"
+
 )
 
 func Test_gob(t *testing.T) {
@@ -90,7 +92,7 @@ func TestParseConfig(t *testing.T) {
 	s := `{"cookieName":"gosessionid","gclifetime":3600}`
 	cf := new(ManagerConfig)
 	cf.EnableSetCookie = true
-	err := json.Unmarshal([]byte(s), cf)
+	err := json.Decode([]byte(s), cf)
 	if err != nil {
 		t.Fatal("parse json error,", err)
 	}
@@ -104,7 +106,7 @@ func TestParseConfig(t *testing.T) {
 	cc := `{"cookieName":"gosessionid","enableSetCookie":false,"gclifetime":3600,"ProviderConfig":"{\"cookieName\":\"gosessionid\",\"securityKey\":\"beegocookiehashkey\"}"}`
 	cf2 := new(ManagerConfig)
 	cf2.EnableSetCookie = true
-	err = json.Unmarshal([]byte(cc), cf2)
+	err = json.Decode([]byte(cc), cf2)
 	if err != nil {
 		t.Fatal("parse json error,", err)
 	}
@@ -118,7 +120,7 @@ func TestParseConfig(t *testing.T) {
 		t.Fatal("parseconfig get enableSetCookie error")
 	}
 	cconfig := new(cookieConfig)
-	err = json.Unmarshal([]byte(cf2.ProviderConfig), cconfig)
+	err = json.Decode([]byte(cf2.ProviderConfig), cconfig)
 	if err != nil {
 		t.Fatal("parse ProviderConfig err,", err)
 	}

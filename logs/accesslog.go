@@ -16,9 +16,9 @@ package logs
 
 import (
 	"bytes"
-	"strings"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -79,5 +79,5 @@ func AccessLog(r *AccessLogRecord, format string) {
 			msg = string(jsonData)
 		}
 	}
-	beeLogger.writeMsg(levelLoggerImpl, strings.TrimSpace(msg))
+	_ = beeLogger.writeMsg(levelLoggerImpl, strings.TrimSpace(msg))
 }

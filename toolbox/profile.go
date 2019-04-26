@@ -39,16 +39,16 @@ func ProcessInput(input string, w io.Writer) {
 	switch input {
 	case "lookup goroutine":
 		p := pprof.Lookup("goroutine")
-		p.WriteTo(w, 2)
+		_ = p.WriteTo(w, 2)
 	case "lookup heap":
 		p := pprof.Lookup("heap")
-		p.WriteTo(w, 2)
+		_ = p.WriteTo(w, 2)
 	case "lookup threadcreate":
 		p := pprof.Lookup("threadcreate")
-		p.WriteTo(w, 2)
+		_ = p.WriteTo(w, 2)
 	case "lookup block":
 		p := pprof.Lookup("block")
-		p.WriteTo(w, 2)
+		_ = p.WriteTo(w, 2)
 	case "get cpuprof":
 		GetCPUProfile(w)
 	case "get memprof":
@@ -62,15 +62,15 @@ func ProcessInput(input string, w io.Writer) {
 func MemProf(w io.Writer) {
 	filename := "mem-" + strconv.Itoa(pid) + ".memprof"
 	if f, err := os.Create(filename); err != nil {
-		fmt.Fprintf(w, "create file %s error %s\n", filename, err.Error())
+		_, _ = fmt.Fprintf(w, "create file %s error %s\n", filename, err.Error())
 		log.Fatal("record heap profile failed: ", err)
 	} else {
 		runtime.GC()
-		pprof.WriteHeapProfile(f)
+		_ = pprof.WriteHeapProfile(f)
 		f.Close()
-		fmt.Fprintf(w, "create heap profile %s \n", filename)
+		_, _ = fmt.Fprintf(w, "create heap profile %s \n", filename)
 		_, fl := path.Split(os.Args[0])
-		fmt.Fprintf(w, "Now you can use this to check it: go tool pprof %s %s\n", fl, filename)
+		_, _ = fmt.Fprintf(w, "Now you can use this to check it: go tool pprof %s %s\n", fl, filename)
 	}
 }
 
@@ -80,16 +80,16 @@ func GetCPUProfile(w io.Writer) {
 	filename := "cpu-" + strconv.Itoa(pid) + ".pprof"
 	f, err := os.Create(filename)
 	if err != nil {
-		fmt.Fprintf(w, "Could not enable CPU profiling: %s\n", err)
+		_, _ = fmt.Fprintf(w, "Could not enable CPU profiling: %s\n", err)
 		log.Fatal("record cpu profile failed: ", err)
 	}
-	pprof.StartCPUProfile(f)
+	_ = pprof.StartCPUProfile(f)
 	time.Sleep(time.Duration(sec) * time.Second)
 	pprof.StopCPUProfile()
 
-	fmt.Fprintf(w, "create cpu profile %s \n", filename)
+	_, _ = fmt.Fprintf(w, "create cpu profile %s \n", filename)
 	_, fl := path.Split(os.Args[0])
-	fmt.Fprintf(w, "Now you can use this to check it: go tool pprof %s %s\n", fl, filename)
+	_, _ = fmt.Fprintf(w, "Now you can use this to check it: go tool pprof %s %s\n", fl, filename)
 }
 
 // PrintGCSummary print gc information to io.Writer
@@ -110,7 +110,7 @@ func printGC(memStats *runtime.MemStats, gcstats *debug.GCStats, w io.Writer) {
 		overhead := float64(gcstats.PauseTotal) / float64(elapsed) * 100
 		allocatedRate := float64(memStats.TotalAlloc) / elapsed.Seconds()
 
-		fmt.Fprintf(w, "NumGC:%d Pause:%s Pause(Avg):%s Overhead:%3.2f%% Alloc:%s Sys:%s Alloc(Rate):%s/s Histogram:%s %s %s \n",
+		_, _ = fmt.Fprintf(w, "NumGC:%d Pause:%s Pause(Avg):%s Overhead:%3.2f%% Alloc:%s Sys:%s Alloc(Rate):%s/s Histogram:%s %s %s \n",
 			gcstats.NumGC,
 			toS(lastPause),
 			toS(avg(gcstats.Pause)),
@@ -126,7 +126,7 @@ func printGC(memStats *runtime.MemStats, gcstats *debug.GCStats, w io.Writer) {
 		elapsed := time.Now().Sub(startTime)
 		allocatedRate := float64(memStats.TotalAlloc) / elapsed.Seconds()
 
-		fmt.Fprintf(w, "Alloc:%s Sys:%s Alloc(Rate):%s/s\n",
+		_, _ = fmt.Fprintf(w, "Alloc:%s Sys:%s Alloc(Rate):%s/s\n",
 			toH(memStats.Alloc),
 			toH(memStats.Sys),
 			toH(uint64(allocatedRate)))

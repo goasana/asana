@@ -42,13 +42,13 @@ type TestPreUnregController struct {
 }
 
 func (tc *TestPreUnregController) GetFixedRoot() {
-	tc.Ctx.Output.Body([]byte(contentRootOriginal))
+	_ = tc.Ctx.Output.Body([]byte(contentRootOriginal))
 }
 func (tc *TestPreUnregController) GetFixedLevel1() {
-	tc.Ctx.Output.Body([]byte(contentLevel1Original))
+	_ = tc.Ctx.Output.Body([]byte(contentLevel1Original))
 }
 func (tc *TestPreUnregController) GetFixedLevel2() {
-	tc.Ctx.Output.Body([]byte(contentLevel2Original))
+	_ = tc.Ctx.Output.Body([]byte(contentLevel2Original))
 }
 
 // TestPostUnregController will supply content for the overriding routes,
@@ -58,13 +58,13 @@ type TestPostUnregController struct {
 }
 
 func (tc *TestPostUnregController) GetFixedRoot() {
-	tc.Ctx.Output.Body([]byte(contentRootReplacement))
+	_ = tc.Ctx.Output.Body([]byte(contentRootReplacement))
 }
 func (tc *TestPostUnregController) GetFixedLevel1() {
-	tc.Ctx.Output.Body([]byte(contentLevel1Replacement))
+	_ = tc.Ctx.Output.Body([]byte(contentLevel1Replacement))
 }
 func (tc *TestPostUnregController) GetFixedLevel2() {
-	tc.Ctx.Output.Body([]byte(contentLevel2Replacement))
+	_ = tc.Ctx.Output.Body([]byte(contentLevel2Replacement))
 }
 
 // TestUnregisterFixedRouteRoot replaces just the root fixed route path.

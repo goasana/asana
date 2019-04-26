@@ -50,12 +50,12 @@ type SessionStore struct {
 	sid         string
 	lock        sync.RWMutex
 	values      map[interface{}]interface{}
-	maxlifetime int64
+	maxLifeTime int64
 }
 
 // Provider couchabse provided
 type Provider struct {
-	maxlifetime int64
+	maxLifeTime int64
 	savePath    string
 	pool        string
 	bucket      string
@@ -110,7 +110,7 @@ func (cs *SessionStore) SessionRelease(w http.ResponseWriter) {
 		return
 	}
 
-	cs.b.Set(cs.sid, int(cs.maxlifetime), bo)
+	_ = cs.b.Set(cs.sid, int(cs.maxLifeTime), bo)
 }
 
 func (cp *Provider) getBucket() *couchbase.Bucket {
@@ -136,7 +136,7 @@ func (cp *Provider) getBucket() *couchbase.Bucket {
 // savepath like couchbase server REST/JSON URL
 // e.g. http://host:port/, Pool, Bucket
 func (cp *Provider) SessionInit(maxlifetime int64, savePath string) error {
-	cp.maxlifetime = maxlifetime
+	cp.maxLifeTime = maxlifetime
 	configs := strings.Split(savePath, ",")
 	if len(configs) > 0 {
 		cp.savePath = configs[0]
@@ -173,7 +173,7 @@ func (cp *Provider) SessionRead(sid string) (session.Store, error) {
 		}
 	}
 
-	cs := &SessionStore{b: cp.b, sid: sid, values: kv, maxlifetime: cp.maxlifetime}
+	cs := &SessionStore{b: cp.b, sid: sid, values: kv, maxLifeTime: cp.maxLifeTime}
 	return cs, nil
 }
 
@@ -197,13 +197,13 @@ func (cp *Provider) SessionRegenerate(oldsid, sid string) (session.Store, error)
 
 	var doc []byte
 	if err := cp.b.Get(oldsid, &doc); err != nil || doc == nil {
-		cp.b.Set(sid, int(cp.maxlifetime), "")
+		cp.b.Set(sid, int(cp.maxLifeTime), "")
 	} else {
 		err := cp.b.Delete(oldsid)
 		if err != nil {
 			return nil, err
 		}
-		_, _ = cp.b.Add(sid, int(cp.maxlifetime), doc)
+		_, _ = cp.b.Add(sid, int(cp.maxLifeTime), doc)
 	}
 
 	err := cp.b.Get(sid, &doc)
@@ -220,7 +220,7 @@ func (cp *Provider) SessionRegenerate(oldsid, sid string) (session.Store, error)
 		}
 	}
 
-	cs := &SessionStore{b: cp.b, sid: sid, values: kv, maxlifetime: cp.maxlifetime}
+	cs := &SessionStore{b: cp.b, sid: sid, values: kv, maxLifeTime: cp.maxLifeTime}
 	return cs, nil
 }
 
@@ -229,7 +229,7 @@ func (cp *Provider) SessionDestroy(sid string) error {
 	cp.b = cp.getBucket()
 	defer cp.b.Close()
 
-	cp.b.Delete(sid)
+	_ = cp.b.Delete(sid)
 	return nil
 }
 

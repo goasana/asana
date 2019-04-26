@@ -68,7 +68,7 @@ func (n *Namespace) Cond(cond namespaceCond) *Namespace {
 		mr.tree.AddRouter("*", true)
 		n.handlers.filters[BeforeRouter] = append([]*FilterRouter{mr}, v...)
 	} else {
-		n.handlers.InsertFilter("*", BeforeRouter, fn)
+		_ = n.handlers.InsertFilter("*", BeforeRouter, fn)
 	}
 	return n
 }
@@ -98,8 +98,8 @@ func (n *Namespace) Filter(action string, filter ...FilterFunc) *Namespace {
 
 // Router same as beego.Rourer
 // refer: https://godoc.org/github.com/GNURub/beego#Router
-func (n *Namespace) Router(rootpath string, c ControllerInterface, mappingMethods ...string) *Namespace {
-	n.handlers.Add(rootpath, c, mappingMethods...)
+func (n *Namespace) Router(rootPath string, c ControllerInterface, mappingMethods ...string) *Namespace {
+	n.handlers.Add(rootPath, c, mappingMethods...)
 	return n
 }
 
@@ -119,64 +119,64 @@ func (n *Namespace) AutoPrefix(prefix string, c ControllerInterface) *Namespace 
 
 // Get same as beego.Get
 // refer: https://godoc.org/github.com/GNURub/beego#Get
-func (n *Namespace) Get(rootpath string, f FilterFunc) *Namespace {
-	n.handlers.Get(rootpath, f)
+func (n *Namespace) Get(rootPath string, f FilterFunc) *Namespace {
+	n.handlers.Get(rootPath, f)
 	return n
 }
 
 // Post same as beego.Post
 // refer: https://godoc.org/github.com/GNURub/beego#Post
-func (n *Namespace) Post(rootpath string, f FilterFunc) *Namespace {
-	n.handlers.Post(rootpath, f)
+func (n *Namespace) Post(rootPath string, f FilterFunc) *Namespace {
+	n.handlers.Post(rootPath, f)
 	return n
 }
 
 // Delete same as beego.Delete
 // refer: https://godoc.org/github.com/GNURub/beego#Delete
-func (n *Namespace) Delete(rootpath string, f FilterFunc) *Namespace {
-	n.handlers.Delete(rootpath, f)
+func (n *Namespace) Delete(rootPath string, f FilterFunc) *Namespace {
+	n.handlers.Delete(rootPath, f)
 	return n
 }
 
 // Put same as beego.Put
 // refer: https://godoc.org/github.com/GNURub/beego#Put
-func (n *Namespace) Put(rootpath string, f FilterFunc) *Namespace {
-	n.handlers.Put(rootpath, f)
+func (n *Namespace) Put(rootPath string, f FilterFunc) *Namespace {
+	n.handlers.Put(rootPath, f)
 	return n
 }
 
 // Head same as beego.Head
 // refer: https://godoc.org/github.com/GNURub/beego#Head
-func (n *Namespace) Head(rootpath string, f FilterFunc) *Namespace {
-	n.handlers.Head(rootpath, f)
+func (n *Namespace) Head(rootPath string, f FilterFunc) *Namespace {
+	n.handlers.Head(rootPath, f)
 	return n
 }
 
 // Options same as beego.Options
 // refer: https://godoc.org/github.com/GNURub/beego#Options
-func (n *Namespace) Options(rootpath string, f FilterFunc) *Namespace {
-	n.handlers.Options(rootpath, f)
+func (n *Namespace) Options(rootPath string, f FilterFunc) *Namespace {
+	n.handlers.Options(rootPath, f)
 	return n
 }
 
 // Patch same as beego.Patch
 // refer: https://godoc.org/github.com/GNURub/beego#Patch
-func (n *Namespace) Patch(rootpath string, f FilterFunc) *Namespace {
-	n.handlers.Patch(rootpath, f)
+func (n *Namespace) Patch(rootPath string, f FilterFunc) *Namespace {
+	n.handlers.Patch(rootPath, f)
 	return n
 }
 
 // Any same as beego.Any
 // refer: https://godoc.org/github.com/GNURub/beego#Any
-func (n *Namespace) Any(rootpath string, f FilterFunc) *Namespace {
-	n.handlers.Any(rootpath, f)
+func (n *Namespace) Any(rootPath string, f FilterFunc) *Namespace {
+	n.handlers.Any(rootPath, f)
 	return n
 }
 
 // Handler same as beego.Handler
 // refer: https://godoc.org/github.com/GNURub/beego#Handler
-func (n *Namespace) Handler(rootpath string, h http.Handler) *Namespace {
-	n.handlers.Handler(rootpath, h)
+func (n *Namespace) Handler(rootPath string, h http.Handler) *Namespace {
+	n.handlers.Handler(rootPath, h)
 	return n
 }
 
@@ -304,65 +304,65 @@ func NSInclude(cList ...ControllerInterface) LinkNamespace {
 }
 
 // NSRouter call Namespace Router
-func NSRouter(rootpath string, c ControllerInterface, mappingMethods ...string) LinkNamespace {
+func NSRouter(rootPath string, c ControllerInterface, mappingMethods ...string) LinkNamespace {
 	return func(ns *Namespace) {
-		ns.Router(rootpath, c, mappingMethods...)
+		ns.Router(rootPath, c, mappingMethods...)
 	}
 }
 
 // NSGet call Namespace Get
-func NSGet(rootpath string, f FilterFunc) LinkNamespace {
+func NSGet(rootPath string, f FilterFunc) LinkNamespace {
 	return func(ns *Namespace) {
-		ns.Get(rootpath, f)
+		ns.Get(rootPath, f)
 	}
 }
 
 // NSPost call Namespace Post
-func NSPost(rootpath string, f FilterFunc) LinkNamespace {
+func NSPost(rootPath string, f FilterFunc) LinkNamespace {
 	return func(ns *Namespace) {
-		ns.Post(rootpath, f)
+		ns.Post(rootPath, f)
 	}
 }
 
 // NSHead call Namespace Head
-func NSHead(rootpath string, f FilterFunc) LinkNamespace {
+func NSHead(rootPath string, f FilterFunc) LinkNamespace {
 	return func(ns *Namespace) {
-		ns.Head(rootpath, f)
+		ns.Head(rootPath, f)
 	}
 }
 
 // NSPut call Namespace Put
-func NSPut(rootpath string, f FilterFunc) LinkNamespace {
+func NSPut(rootPath string, f FilterFunc) LinkNamespace {
 	return func(ns *Namespace) {
-		ns.Put(rootpath, f)
+		ns.Put(rootPath, f)
 	}
 }
 
 // NSDelete call Namespace Delete
-func NSDelete(rootpath string, f FilterFunc) LinkNamespace {
+func NSDelete(rootPath string, f FilterFunc) LinkNamespace {
 	return func(ns *Namespace) {
-		ns.Delete(rootpath, f)
+		ns.Delete(rootPath, f)
 	}
 }
 
 // NSAny call Namespace Any
-func NSAny(rootpath string, f FilterFunc) LinkNamespace {
+func NSAny(rootPath string, f FilterFunc) LinkNamespace {
 	return func(ns *Namespace) {
-		ns.Any(rootpath, f)
+		ns.Any(rootPath, f)
 	}
 }
 
 // NSOptions call Namespace Options
-func NSOptions(rootpath string, f FilterFunc) LinkNamespace {
+func NSOptions(rootPath string, f FilterFunc) LinkNamespace {
 	return func(ns *Namespace) {
-		ns.Options(rootpath, f)
+		ns.Options(rootPath, f)
 	}
 }
 
 // NSPatch call Namespace Patch
-func NSPatch(rootpath string, f FilterFunc) LinkNamespace {
+func NSPatch(rootPath string, f FilterFunc) LinkNamespace {
 	return func(ns *Namespace) {
-		ns.Patch(rootpath, f)
+		ns.Patch(rootPath, f)
 	}
 }
 
@@ -389,8 +389,8 @@ func NSNamespace(prefix string, params ...LinkNamespace) LinkNamespace {
 }
 
 // NSHandler add handler
-func NSHandler(rootpath string, h http.Handler) LinkNamespace {
+func NSHandler(rootPath string, h http.Handler) LinkNamespace {
 	return func(ns *Namespace) {
-		ns.Handler(rootpath, h)
+		ns.Handler(rootPath, h)
 	}
 }

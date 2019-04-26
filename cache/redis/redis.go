@@ -30,21 +30,20 @@
 package redis
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
-	"github.com/gomodule/redigo/redis"
-
 	"github.com/GNURub/beego/cache"
-	"strings"
+	"github.com/GNURub/beego/encoder/json"
+	"github.com/gomodule/redigo/redis"
 )
 
 var (
 	// DefaultKey the collection name of redis for cache adapter.
-	DefaultKey = "beecacheRedis"
+	DefaultKey = "beeCacheRedis"
 )
 
 // Cache is Redis cache adapter.
@@ -167,7 +166,7 @@ func (rc *Cache) ClearAll() error {
 // so no gc operation.
 func (rc *Cache) StartAndGC(config string) error {
 	var cf map[string]string
-	json.Unmarshal([]byte(config), &cf)
+	_ = json.Decode([]byte(config), &cf)
 
 	if _, ok := cf["key"]; !ok {
 		cf["key"] = DefaultKey
@@ -216,15 +215,15 @@ func (rc *Cache) connectInit() {
 
 		if rc.password != "" {
 			if _, err := c.Do("AUTH", rc.password); err != nil {
-				c.Close()
+				_ = c.Close()
 				return nil, err
 			}
 		}
 
-		_, selecterr := c.Do("SELECT", rc.dbNum)
-		if selecterr != nil {
-			c.Close()
-			return nil, selecterr
+		_, selectErr := c.Do("SELECT", rc.dbNum)
+		if selectErr != nil {
+			_ = c.Close()
+			return nil, selectErr
 		}
 		return
 	}

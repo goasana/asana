@@ -24,7 +24,7 @@ import (
 
 func TestFiles_1(t *testing.T) {
 	log := NewLogger(10000)
-	log.SetLogger("multifile", `{"filename":"test.log","separate":["emergency", "alert", "critical", "error", "warning", "notice", "info", "debug"]}`)
+	_ = log.SetLogger("multifile", `{"filename":"test.log","separate":["emergency", "alert", "critical", "error", "warning", "notice", "info", "debug"]}`)
 	log.Debug("debug")
 	log.Informational("info")
 	log.Notice("notice")
@@ -72,7 +72,7 @@ func TestFiles_1(t *testing.T) {
 				t.Fatal(file + " " + lastLine + " not contains the log msg " + fn)
 			}
 		}
-		os.Remove(file)
+		_ = os.Remove(file)
 	}
 
 }

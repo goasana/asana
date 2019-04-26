@@ -15,12 +15,12 @@
 package configmap
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"testing"
 
 	"github.com/GNURub/beego/config"
+	"github.com/GNURub/beego/encoder/json"
 )
 
 // Is needed add to kubernetes ex: kubectl get configmap beego --namespace default {"appname": "beeapi", ...}
@@ -46,7 +46,7 @@ func TestConfigMap(t *testing.T) {
 		jsonconf config.Configer
 	)
 	if tr := os.Getenv("TRAVIS"); len(tr) > 0 {
-		j, _ := json.Marshal(jsoncontext)
+		j, _ := json.Encode(jsoncontext, true)
 		jsonconf, err = config.NewConfigData("configMap", j)
 	} else {
 		jsonconf, err = config.NewConfig("configMap", "beego")

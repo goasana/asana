@@ -151,7 +151,7 @@ func NewLogger(channelLens ...int64) *BeeLogger {
 		bl.msgChanLen = defaultAsyncMsgLen
 	}
 	bl.signalChan = make(chan string, 1)
-	bl.setLogger(AdapterConsole)
+	_ = bl.setLogger(AdapterConsole)
 	return bl
 }
 
@@ -195,7 +195,7 @@ func (bl *BeeLogger) setLogger(adapterName string, configs ...string) error {
 	lg := logAdapter()
 	err := lg.Init(config)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "logs.BeeLogger.SetLogger: "+err.Error())
+		_, _ = fmt.Fprintln(os.Stderr, "logs.BeeLogger.SetLogger: "+err.Error())
 		return err
 	}
 	bl.outputs = append(bl.outputs, &nameLogger{name: adapterName, Logger: lg})
@@ -218,7 +218,7 @@ func (bl *BeeLogger) SetLogger(adapterName string, configs ...string) error {
 func (bl *BeeLogger) DelLogger(adapterName string) error {
 	bl.lock.Lock()
 	defer bl.lock.Unlock()
-	outputs := []*nameLogger{}
+	var outputs []*nameLogger
 	for _, lg := range bl.outputs {
 		if lg.name == adapterName {
 			lg.Destroy()
@@ -237,7 +237,7 @@ func (bl *BeeLogger) writeToLoggers(when time.Time, msg string, level int) {
 	for _, l := range bl.outputs {
 		err := l.WriteMsg(when, msg, level)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "unable to WriteMsg to adapter:%v,error:%v\n", l.name, err)
+			_, _ = fmt.Fprintf(os.Stderr, "unable to WriteMsg to adapter:%v,error:%v\n", l.name, err)
 		}
 	}
 }
@@ -261,7 +261,7 @@ func (bl *BeeLogger) Write(p []byte) (n int, err error) {
 func (bl *BeeLogger) writeMsg(logLevel int, msg string, v ...interface{}) error {
 	if !bl.init {
 		bl.lock.Lock()
-		bl.setLogger(AdapterConsole)
+		_ = bl.setLogger(AdapterConsole)
 		bl.lock.Unlock()
 	}
 
@@ -366,7 +366,7 @@ func (bl *BeeLogger) Emergency(format string, v ...interface{}) {
 	if LevelEmergency > bl.level {
 		return
 	}
-	bl.writeMsg(LevelEmergency, format, v...)
+	_ = bl.writeMsg(LevelEmergency, format, v...)
 }
 
 // Alert Log ALERT level message.
@@ -374,7 +374,7 @@ func (bl *BeeLogger) Alert(format string, v ...interface{}) {
 	if LevelAlert > bl.level {
 		return
 	}
-	bl.writeMsg(LevelAlert, format, v...)
+	_ = bl.writeMsg(LevelAlert, format, v...)
 }
 
 // Critical Log CRITICAL level message.
@@ -382,7 +382,7 @@ func (bl *BeeLogger) Critical(format string, v ...interface{}) {
 	if LevelCritical > bl.level {
 		return
 	}
-	bl.writeMsg(LevelCritical, format, v...)
+	_ = bl.writeMsg(LevelCritical, format, v...)
 }
 
 // Error Log ERROR level message.
@@ -390,7 +390,7 @@ func (bl *BeeLogger) Error(format string, v ...interface{}) {
 	if LevelError > bl.level {
 		return
 	}
-	bl.writeMsg(LevelError, format, v...)
+	_ = bl.writeMsg(LevelError, format, v...)
 }
 
 // Warning Log WARNING level message.
@@ -398,7 +398,7 @@ func (bl *BeeLogger) Warning(format string, v ...interface{}) {
 	if LevelWarn > bl.level {
 		return
 	}
-	bl.writeMsg(LevelWarn, format, v...)
+	_ = bl.writeMsg(LevelWarn, format, v...)
 }
 
 // Notice Log NOTICE level message.
@@ -406,7 +406,7 @@ func (bl *BeeLogger) Notice(format string, v ...interface{}) {
 	if LevelNotice > bl.level {
 		return
 	}
-	bl.writeMsg(LevelNotice, format, v...)
+	_ = bl.writeMsg(LevelNotice, format, v...)
 }
 
 // Informational Log INFORMATIONAL level message.
@@ -414,7 +414,7 @@ func (bl *BeeLogger) Informational(format string, v ...interface{}) {
 	if LevelInfo > bl.level {
 		return
 	}
-	bl.writeMsg(LevelInfo, format, v...)
+	_ = bl.writeMsg(LevelInfo, format, v...)
 }
 
 // Debug Log DEBUG level message.
@@ -422,7 +422,7 @@ func (bl *BeeLogger) Debug(format string, v ...interface{}) {
 	if LevelDebug > bl.level {
 		return
 	}
-	bl.writeMsg(LevelDebug, format, v...)
+	_ = bl.writeMsg(LevelDebug, format, v...)
 }
 
 // Warn Log WARN level message.
@@ -431,7 +431,7 @@ func (bl *BeeLogger) Warn(format string, v ...interface{}) {
 	if LevelWarn > bl.level {
 		return
 	}
-	bl.writeMsg(LevelWarn, format, v...)
+	_ = bl.writeMsg(LevelWarn, format, v...)
 }
 
 // Info Log INFO level message.
@@ -440,7 +440,7 @@ func (bl *BeeLogger) Info(format string, v ...interface{}) {
 	if LevelInfo > bl.level {
 		return
 	}
-	bl.writeMsg(LevelInfo, format, v...)
+	_ = bl.writeMsg(LevelInfo, format, v...)
 }
 
 // Trace Log TRACE level message.
@@ -449,7 +449,7 @@ func (bl *BeeLogger) Trace(format string, v ...interface{}) {
 	if LevelDebug > bl.level {
 		return
 	}
-	bl.writeMsg(LevelDebug, format, v...)
+	_ = bl.writeMsg(LevelDebug, format, v...)
 }
 
 // Flush flush all chan data.

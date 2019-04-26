@@ -167,7 +167,6 @@ func TestWithSetting(t *testing.T) {
 		DialContext: (&net.Dialer{
 			Timeout:   30 * time.Second,
 			KeepAlive: 30 * time.Second,
-			DualStack: true,
 		}).DialContext,
 		MaxIdleConns:          50,
 		IdleConnTimeout:       90 * time.Second,

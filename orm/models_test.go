@@ -16,12 +16,12 @@ package orm
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
 	"time"
 
+	"github.com/GNURub/beego/encoder/json"
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
@@ -84,7 +84,7 @@ type JSONFieldTest struct {
 }
 
 func (e *JSONFieldTest) String() string {
-	data, _ := json.Marshal(e)
+	data, _ := json.Encode(e, false)
 	return string(data)
 }
 
@@ -95,7 +95,7 @@ func (e *JSONFieldTest) FieldType() int {
 func (e *JSONFieldTest) SetRaw(value interface{}) error {
 	switch d := value.(type) {
 	case string:
-		return json.Unmarshal([]byte(d), e)
+		return json.Decode([]byte(d), e)
 	default:
 		return fmt.Errorf("<JSONField.SetRaw> unknown value `%v`", value)
 	}
@@ -434,7 +434,7 @@ var (
 )
 
 var (
-	helpinfo = `need driver and source!
+	helpInfo = `need driver and source!
 
 	Default DB Drivers.
 	
@@ -483,11 +483,11 @@ func init() {
 	Debug, _ = StrTo(DBARGS.Debug).Bool()
 
 	if DBARGS.Driver == "" || DBARGS.Source == "" {
-		fmt.Println(helpinfo)
+		fmt.Println(helpInfo)
 		os.Exit(2)
 	}
 
-	RegisterDataBase("default", DBARGS.Driver, DBARGS.Source, 20)
+	_ = RegisterDataBase("default", DBARGS.Driver, DBARGS.Source, 20)
 
 	alias := getDbAlias("default")
 	if alias.Driver == DRMySQL {

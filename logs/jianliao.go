@@ -1,11 +1,12 @@
 package logs
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
 	"time"
+
+	"github.com/GNURub/beego/encoder/json"
 )
 
 // JLWriter implements beego LoggerInterface and is used to send jiaoliao webhook
@@ -25,7 +26,7 @@ func newJLWriter() Logger {
 
 // Init JLWriter with json config string
 func (s *JLWriter) Init(jsonconfig string) error {
-	return json.Unmarshal([]byte(jsonconfig), s)
+	return json.Decode([]byte(jsonconfig), s)
 }
 
 // WriteMsg write message in smtp writer.

@@ -15,10 +15,11 @@
 package cache
 
 import (
-	"encoding/json"
 	"errors"
 	"sync"
 	"time"
+
+	"github.com/GNURub/beego/encoder/json"
 )
 
 var (
@@ -195,7 +196,7 @@ func (bc *MemoryCache) ClearAll() error {
 // StartAndGC start memory cache. it will check expiration in every clock time.
 func (bc *MemoryCache) StartAndGC(config string) error {
 	var cf map[string]int
-	json.Unmarshal([]byte(config), &cf)
+	_ = json.Decode([]byte(config), &cf)
 	if _, ok := cf["interval"]; !ok {
 		cf = make(map[string]int)
 		cf["interval"] = DefaultEvery

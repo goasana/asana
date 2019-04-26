@@ -39,7 +39,7 @@ func (s *Synchronizer) Get(key string, timeout time.Duration) interface{} {
 
 	go func() {
 		if someIsNull && val != nil {
-			s.Put(key, val, timeout)
+			_ = s.Put(key, val, timeout)
 		}
 	}()
 

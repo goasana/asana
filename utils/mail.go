@@ -17,9 +17,9 @@ package utils
 import (
 	"bytes"
 	"encoding/base64"
-	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/GNURub/beego/encoder/json"
 	"io"
 	"mime"
 	"mime/multipart"
@@ -73,7 +73,7 @@ type Attachment struct {
 func NewEMail(config string) *Email {
 	e := new(Email)
 	e.Headers = textproto.MIMEHeader{}
-	err := json.Unmarshal([]byte(config), e)
+	err := json.Decode([]byte(config), e)
 	if err != nil {
 		return nil
 	}

@@ -17,7 +17,7 @@ func Encode(v interface{}) ([]byte, error) {
 	return yaml.Marshal(v)
 }
 
-func (j yamlEncoder) Encode(v interface{}) ([]byte, error) {
+func (j yamlEncoder) Encode(v interface{}, hasIndent ...bool) ([]byte, error) {
 	return Encode(v)
 }
 
