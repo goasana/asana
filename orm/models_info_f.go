@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -193,7 +193,7 @@ checkType:
 		}
 		fieldType = f.FieldType()
 		if fieldType&IsRelField > 0 {
-			err = fmt.Errorf("unsupport type custom field, please refer to https://github.com/GNURub/beego/blob/master/orm/models_fields.go#L24-L42")
+			err = fmt.Errorf("unsupport type custom field, please refer to https://github.com/asana/asana/blob/master/orm/models_fields.go#L24-L42")
 			goto end
 		}
 	default:

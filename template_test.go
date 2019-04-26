@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package beego
+package asana
 
 import (
 	"bytes"
-	"github.com/GNURub/beego/testdata"
+	"github.com/goasana/framework/testdata"
 	"github.com/elazarl/go-bindata-assetfs"
 	"net/http"
 	"os"
@@ -25,13 +25,13 @@ import (
 )
 
 var header = `{{define "header"}}
-<h1>Hello, GNURub!</h1>
+<h1>Hello, asana!</h1>
 {{end}}`
 
 var index = `<!DOCTYPE html>
 <html>
   <head>
-    <title>beego welcome template</title>
+    <title>asana welcome template</title>
   </head>
   <body>
 {{template "block"}}
@@ -74,11 +74,11 @@ func TestTemplate(t *testing.T) {
 	if err := AddViewPath(dir); err != nil {
 		t.Fatal(err)
 	}
-	beeTemplates := beeViewPathTemplates[dir]
-	if len(beeTemplates) != 3 {
-		t.Fatalf("should be 3 but got %v", len(beeTemplates))
+	asanaTemplates := asanaViewPathTemplates[dir]
+	if len(asanaTemplates) != 3 {
+		t.Fatalf("should be 3 but got %v", len(asanaTemplates))
 	}
-	if err := beeTemplates["index.tpl"].ExecuteTemplate(os.Stdout, "index.tpl", nil); err != nil {
+	if err := asanaTemplates["index.tpl"].ExecuteTemplate(os.Stdout, "index.tpl", nil); err != nil {
 		t.Fatal(err)
 	}
 	for _, name := range files {
@@ -98,7 +98,7 @@ var menu = `<div class="menu">
 var user = `<!DOCTYPE html>
 <html>
   <head>
-    <title>beego welcome template</title>
+    <title>asana welcome template</title>
   </head>
   <body>
 {{template "../public/menu.tpl"}}
@@ -137,8 +137,8 @@ func TestRelativeTemplate(t *testing.T) {
 	if err := BuildTemplate(dir, files[1]); err != nil {
 		t.Fatal(err)
 	}
-	beeTemplates := beeViewPathTemplates[dir]
-	if err := beeTemplates["easyui/rbac/user.tpl"].ExecuteTemplate(os.Stdout, "easyui/rbac/user.tpl", nil); err != nil {
+	asanaTemplates := asanaViewPathTemplates[dir]
+	if err := asanaTemplates["easyui/rbac/user.tpl"].ExecuteTemplate(os.Stdout, "easyui/rbac/user.tpl", nil); err != nil {
 		t.Fatal(err)
 	}
 	for _, name := range files {
@@ -242,12 +242,12 @@ func TestTemplateLayout(t *testing.T) {
 	if err := AddViewPath(dir); err != nil {
 		t.Fatal(err)
 	}
-	beeTemplates := beeViewPathTemplates[dir]
-	if len(beeTemplates) != 2 {
-		t.Fatalf("should be 2 but got %v", len(beeTemplates))
+	asanaTemplates := asanaViewPathTemplates[dir]
+	if len(asanaTemplates) != 2 {
+		t.Fatalf("should be 2 but got %v", len(asanaTemplates))
 	}
 	out := bytes.NewBufferString("")
-	if err := beeTemplates["add.tpl"].ExecuteTemplate(out, "add.tpl", map[string]string{"Title": "Hello", "SomeVar": "val"}); err != nil {
+	if err := asanaTemplates["add.tpl"].ExecuteTemplate(out, "add.tpl", map[string]string{"Title": "Hello", "SomeVar": "val"}); err != nil {
 		t.Fatal(err)
 	}
 	if out.String() != output {
@@ -271,7 +271,7 @@ func (d TestingFileSystem) Open(name string) (http.File, error) {
 var outputBinData = `<!DOCTYPE html>
 <html>
   <head>
-    <title>beego welcome template</title>
+    <title>asana welcome template</title>
   </head>
   <body>
 
@@ -279,7 +279,7 @@ var outputBinData = `<!DOCTYPE html>
 <h1>Hello, blocks!</h1>
 
 	
-<h1>Hello, astaxie!</h1>
+<h1>Hello, asana!</h1>
 
 	
 
@@ -297,15 +297,15 @@ func TestFsBinData(t *testing.T) {
 	if err := AddViewPath("views"); err != nil {
 		t.Fatal(err)
 	}
-	beeTemplates := beeViewPathTemplates[dir]
-	if len(beeTemplates) != 3 {
-		t.Fatalf("should be 3 but got %v", len(beeTemplates))
+	asanaTemplates := asanaViewPathTemplates[dir]
+	if len(asanaTemplates) != 3 {
+		t.Fatalf("should be 3 but got %v", len(asanaTemplates))
 	}
-	if err := beeTemplates["index.tpl"].ExecuteTemplate(os.Stdout, "index.tpl", map[string]string{"Title": "Hello", "SomeVar": "val"}); err != nil {
+	if err := asanaTemplates["index.tpl"].ExecuteTemplate(os.Stdout, "index.tpl", map[string]string{"Title": "Hello", "SomeVar": "val"}); err != nil {
 		t.Fatal(err)
 	}
 	out := bytes.NewBufferString("")
-	if err := beeTemplates["index.tpl"].ExecuteTemplate(out, "index.tpl", map[string]string{"Title": "Hello", "SomeVar": "val"}); err != nil {
+	if err := asanaTemplates["index.tpl"].ExecuteTemplate(out, "index.tpl", map[string]string{"Title": "Hello", "SomeVar": "val"}); err != nil {
 		t.Fatal(err)
 	}
 

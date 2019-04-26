@@ -9,7 +9,7 @@ import (
 	"github.com/GNURub/beego/encoder/json"
 )
 
-// SLACKWriter implements beego LoggerInterface and is used to send jiaoliao webhook
+// SLACKWriter implements asana LoggerInterface and is used to send jiaoliao webhook
 type SLACKWriter struct {
 	WebhookURL string `json:"webhookurl"`
 	Level      int    `json:"level"`

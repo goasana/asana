@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 //
 // Usage:
 // import(
-//   "github.com/GNURub/beego/session"
+//   "github.com/goasana/framework/session"
 // )
 //
 //	func init() {
@@ -24,7 +24,7 @@
 //		go globalSessions.GC()
 //	}
 //
-// more docs: http://beego.me/docs/module/session.md
+// more docs: http://asana.me/docs/module/session.md
 package session
 
 import (
@@ -124,7 +124,7 @@ type Manager struct {
 // json config:
 // 1. is https  default false
 // 2. hashfunc  default sha1
-// 3. hashkey default beegosessionkey
+// 3. hashkey default asanasessionkey
 // 4. maxage default is none
 func NewManager(provideName string, cf *ManagerConfig) (*Manager, error) {
 	provider, ok := provides[provideName]

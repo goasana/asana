@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package beego
+package asana
 
 import (
 	"reflect"
 	"testing"
 
-	"github.com/GNURub/beego/config"
-	"github.com/GNURub/beego/config/file"
-	"github.com/GNURub/beego/encoder"
-	"github.com/GNURub/beego/encoder/json"
+	"github.com/goasana/framework/config"
+	"github.com/goasana/framework/config/file"
+	"github.com/goasana/framework/encoder"
+	"github.com/goasana/framework/encoder/json"
 )
 
 func TestDefaults(t *testing.T) {
@@ -36,15 +36,15 @@ func TestDefaults(t *testing.T) {
 
 func TestAssignConfig_01(t *testing.T) {
 	_BConfig := &Config{}
-	_BConfig.AppName = "beego_test"
+	_BConfig.AppName = "asana_test"
 	jcf := file.NewConfigFile(config.Option{
 		Encoder: encoder.GetEncoder("json"),
 		SeparatorKeys: "::",
 	})
 
-	ac, _ := jcf.ParseData([]byte(`{"AppName":"beego_json"}`))
+	ac, _ := jcf.ParseData([]byte(`{"AppName":"asana_json"}`))
 	assignSingleConfig(_BConfig, ac)
-	if _BConfig.AppName != "beego_json" {
+	if _BConfig.AppName != "asana_json" {
 		t.Log(_BConfig)
 		t.FailNow()
 	}
@@ -122,7 +122,7 @@ func TestAssignConfig_03(t *testing.T) {
 		Encoder: encoder.GetEncoder("json"),
 		SeparatorKeys: "::",
 	})
-	ac, _ := jcf.ParseData([]byte(`{"AppName":"beego"}`))
+	ac, _ := jcf.ParseData([]byte(`{"AppName":"asana"}`))
 	_ = ac.Set("AppName", "test_app")
 	_ = ac.Set("RunMode", "online")
 	_ = ac.Set("StaticDir", "download:down download2:down2")

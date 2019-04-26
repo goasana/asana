@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ func TestRequired(t *testing.T) {
 	if valid.Required("\n", "string").Ok {
 		t.Error("new line string should be false") // For #2361
 	}
-	if !valid.Required("GNURub", "string").Ok {
+	if !valid.Required("asana", "string").Ok {
 		t.Error("string should be true")
 	}
 	if valid.Required(0, "zero").Ok {

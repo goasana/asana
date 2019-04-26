@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/GNURub/beego/session"
+	"github.com/goasana/framework/session"
 )
 
 var maxParam = 50
@@ -427,21 +427,21 @@ func (input *BeegoInput) ParseFormOrMulitForm(maxMemory int64) error {
 }
 
 // Bind data from request.Form[key] to dest
-// like /?id=123&isok=true&ft=1.2&ol[0]=1&ol[1]=2&ul[]=str&ul[]=array&user.Name=GNURub
-// var id int  beegoInput.Bind(&id, "id")  id ==123
-// var isok bool  beegoInput.Bind(&isok, "isok")  isok ==true
-// var ft float64  beegoInput.Bind(&ft, "ft")  ft ==1.2
-// ol := make([]int, 0, 2)  beegoInput.Bind(&ol, "ol")  ol ==[1 2]
-// ul := make([]string, 0, 2)  beegoInput.Bind(&ul, "ul")  ul ==[str array]
-// user struct{Name}  beegoInput.Bind(&user, "user")  user == {Name:"GNURub"}
+// like /?id=123&isok=true&ft=1.2&ol[0]=1&ol[1]=2&ul[]=str&ul[]=array&user.Name=asana
+// var id int  asanaInput.Bind(&id, "id")  id ==123
+// var isok bool  asanaInput.Bind(&isok, "isok")  isok ==true
+// var ft float64  asanaInput.Bind(&ft, "ft")  ft ==1.2
+// ol := make([]int, 0, 2)  asanaInput.Bind(&ol, "ol")  ol ==[1 2]
+// ul := make([]string, 0, 2)  asanaInput.Bind(&ul, "ul")  ul ==[str array]
+// user struct{Name}  asanaInput.Bind(&user, "user")  user == {Name:"asana"}
 func (input *BeegoInput) Bind(dest interface{}, key string) error {
 	value := reflect.ValueOf(dest)
 	if value.Kind() != reflect.Ptr {
-		return errors.New("beego: non-pointer passed to Bind: " + key)
+		return errors.New("asana: non-pointer passed to Bind: " + key)
 	}
 	value = value.Elem()
 	if !value.CanSet() {
-		return errors.New("beego: non-settable variable passed to Bind: " + key)
+		return errors.New("asana: non-settable variable passed to Bind: " + key)
 	}
 	typ := value.Type()
 	// Get real type if dest define with interface{}.
@@ -451,7 +451,7 @@ func (input *BeegoInput) Bind(dest interface{}, key string) error {
 	}
 	rv := input.bind(key, typ)
 	if !rv.IsValid() {
-		return errors.New("beego: reflect value is empty")
+		return errors.New("asana: reflect value is empty")
 	}
 	value.Set(rv)
 	return nil

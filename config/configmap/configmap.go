@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,13 +21,13 @@
 //
 // Usage:
 //  import(
-//    _ "github.com/GNURub/beego/config/configmap"
-//      "github.com/GNURub/beego/config"
+//    _ "github.com/goasana/framework/config/configmap"
+//      "github.com/goasana/framework/config"
 //  )
 //
 //  cnf, err := NewConfig(config.KConfigMapProvider, "myConfAppName")
 //
-//More docs http://beego.me/docs/module/md
+//More docs http://asana.me/docs/module/md
 package configmap
 
 import (
@@ -39,9 +39,9 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
-	"github.com/GNURub/beego/config"
-	"github.com/GNURub/beego/config/base"
-	"github.com/GNURub/beego/encoder/json"
+	"github.com/goasana/framework/encoder/json"
+	"github.com/goasana/framework/config"
+	"github.com/goasana/framework/config/base"
 )
 
 func getClient() (*kubernetes.Clientset, error) {
@@ -150,7 +150,7 @@ func NewConfigMap(option config.Option) *ConfigMap {
 
 func init() {
 	config.Register(config.KConfigMapProvider, NewConfigMap(config.Option{
-		ConfigName:    "beego",
+		ConfigName:    "asana",
 		Context:       context.Background(),
 		Encoder:       json.NewEncoder(),
 		SeparatorKeys: "::",

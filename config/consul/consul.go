@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,13 +19,13 @@
 //
 // Usage:
 //  import(
-//    _ "github.com/GNURub/beego/config/consul"
-//      "github.com/GNURub/beego/config"
+//    _ "github.com/goasana/framework/config/consul"
+//      "github.com/goasana/framework/config"
 //  )
 //
 //  cnf, err := NewConfig(config.ConsulProvider, "myConfAppName")
 //
-//More docs http://beego.me/docs/module/md
+//More docs http://asana.me/docs/module/md
 package configmap
 
 import (
@@ -34,13 +34,13 @@ import (
 	"net"
 	"strings"
 
-	"github.com/GNURub/beego/config"
-	"github.com/GNURub/beego/config/base"
-	"github.com/GNURub/beego/encoder"
+	"github.com/goasana/framework/config"
+	"github.com/goasana/framework/config/base"
+	"github.com/goasana/framework/encoder"
 	"github.com/hashicorp/consul/api"
 )
 
-const DefaultPrefix = "/beego/config/"
+const DefaultPrefix = "/asana/config/"
 
 type addressKey struct{}
 type prefixKey struct{}

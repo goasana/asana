@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,8 +33,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/GNURub/beego/logs"
-	"github.com/GNURub/beego/orm"
+	"github.com/goasana/framework/logs"
+	"github.com/goasana/framework/orm"
 )
 
 // const the data format for the bee generate migration datatype

@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package beego
+package asana
 
 import (
 	"net/http"
 	"strings"
 
-	beecontext "github.com/GNURub/beego/context"
+	asanaContext "github.com/goasana/framework/context"
 )
 
-type namespaceCond func(*beecontext.Context) bool
+type namespaceCond func(*asanaContext.Context) bool
 
 // LinkNamespace used as link action
 type LinkNamespace func(*Namespace)
@@ -48,14 +48,14 @@ func NewNamespace(prefix string, params ...LinkNamespace) *Namespace {
 // if cond return true can run this namespace, else can't
 // usage:
 // ns.Cond(func (ctx *context.Context) bool{
-//       if ctx.Input.Domain() == "api.beego.me" {
+//       if ctx.Input.Domain() == "api.asana.me" {
 //         return true
 //       }
 //       return false
 //   })
 // Cond as the first filter
 func (n *Namespace) Cond(cond namespaceCond) *Namespace {
-	fn := func(ctx *beecontext.Context) {
+	fn := func(ctx *asanaContext.Context) {
 		if !cond(ctx) {
 			exception("405", ctx)
 		}
@@ -96,92 +96,92 @@ func (n *Namespace) Filter(action string, filter ...FilterFunc) *Namespace {
 	return n
 }
 
-// Router same as beego.Rourer
-// refer: https://godoc.org/github.com/GNURub/beego#Router
+// Router same as asana.Rourer
+// refer: https://godoc.org/github.com/goasana/framework#Router
 func (n *Namespace) Router(rootPath string, c ControllerInterface, mappingMethods ...string) *Namespace {
 	n.handlers.Add(rootPath, c, mappingMethods...)
 	return n
 }
 
-// AutoRouter same as beego.AutoRouter
-// refer: https://godoc.org/github.com/GNURub/beego#AutoRouter
+// AutoRouter same as asana.AutoRouter
+// refer: https://godoc.org/github.com/goasana/framework#AutoRouter
 func (n *Namespace) AutoRouter(c ControllerInterface) *Namespace {
 	n.handlers.AddAuto(c)
 	return n
 }
 
-// AutoPrefix same as beego.AutoPrefix
-// refer: https://godoc.org/github.com/GNURub/beego#AutoPrefix
+// AutoPrefix same as asana.AutoPrefix
+// refer: https://godoc.org/github.com/goasana/framework#AutoPrefix
 func (n *Namespace) AutoPrefix(prefix string, c ControllerInterface) *Namespace {
 	n.handlers.AddAutoPrefix(prefix, c)
 	return n
 }
 
-// Get same as beego.Get
-// refer: https://godoc.org/github.com/GNURub/beego#Get
+// Get same as asana.Get
+// refer: https://godoc.org/github.com/goasana/framework#Get
 func (n *Namespace) Get(rootPath string, f FilterFunc) *Namespace {
 	n.handlers.Get(rootPath, f)
 	return n
 }
 
-// Post same as beego.Post
-// refer: https://godoc.org/github.com/GNURub/beego#Post
+// Post same as asana.Post
+// refer: https://godoc.org/github.com/goasana/framework#Post
 func (n *Namespace) Post(rootPath string, f FilterFunc) *Namespace {
 	n.handlers.Post(rootPath, f)
 	return n
 }
 
-// Delete same as beego.Delete
-// refer: https://godoc.org/github.com/GNURub/beego#Delete
+// Delete same as asana.Delete
+// refer: https://godoc.org/github.com/goasana/framework#Delete
 func (n *Namespace) Delete(rootPath string, f FilterFunc) *Namespace {
 	n.handlers.Delete(rootPath, f)
 	return n
 }
 
-// Put same as beego.Put
-// refer: https://godoc.org/github.com/GNURub/beego#Put
+// Put same as asana.Put
+// refer: https://godoc.org/github.com/goasana/framework#Put
 func (n *Namespace) Put(rootPath string, f FilterFunc) *Namespace {
 	n.handlers.Put(rootPath, f)
 	return n
 }
 
-// Head same as beego.Head
-// refer: https://godoc.org/github.com/GNURub/beego#Head
+// Head same as asana.Head
+// refer: https://godoc.org/github.com/goasana/framework#Head
 func (n *Namespace) Head(rootPath string, f FilterFunc) *Namespace {
 	n.handlers.Head(rootPath, f)
 	return n
 }
 
-// Options same as beego.Options
-// refer: https://godoc.org/github.com/GNURub/beego#Options
+// Options same as asana.Options
+// refer: https://godoc.org/github.com/goasana/framework#Options
 func (n *Namespace) Options(rootPath string, f FilterFunc) *Namespace {
 	n.handlers.Options(rootPath, f)
 	return n
 }
 
-// Patch same as beego.Patch
-// refer: https://godoc.org/github.com/GNURub/beego#Patch
+// Patch same as asana.Patch
+// refer: https://godoc.org/github.com/goasana/framework#Patch
 func (n *Namespace) Patch(rootPath string, f FilterFunc) *Namespace {
 	n.handlers.Patch(rootPath, f)
 	return n
 }
 
-// Any same as beego.Any
-// refer: https://godoc.org/github.com/GNURub/beego#Any
+// Any same as asana.Any
+// refer: https://godoc.org/github.com/goasana/framework#Any
 func (n *Namespace) Any(rootPath string, f FilterFunc) *Namespace {
 	n.handlers.Any(rootPath, f)
 	return n
 }
 
-// Handler same as beego.Handler
-// refer: https://godoc.org/github.com/GNURub/beego#Handler
+// Handler same as asana.Handler
+// refer: https://godoc.org/github.com/goasana/framework#Handler
 func (n *Namespace) Handler(rootPath string, h http.Handler) *Namespace {
 	n.handlers.Handler(rootPath, h)
 	return n
 }
 
 // Include add include class
-// refer: https://godoc.org/github.com/GNURub/beego#Include
+// refer: https://godoc.org/github.com/goasana/framework#Include
 func (n *Namespace) Include(cList ...ControllerInterface) *Namespace {
 	n.handlers.Include(cList...)
 	return n
@@ -189,17 +189,17 @@ func (n *Namespace) Include(cList ...ControllerInterface) *Namespace {
 
 // Namespace add nest Namespace
 // usage:
-//ns := beego.NewNamespace(“/v1”).
+//ns := asana.NewNamespace(“/v1”).
 //Namespace(
-//    beego.NewNamespace("/shop").
+//    asana.NewNamespace("/shop").
 //        Get("/:id", func(ctx *context.Context) {
 //            ctx.Output.Body([]byte("shopinfo"))
 //    }),
-//    beego.NewNamespace("/order").
+//    asana.NewNamespace("/order").
 //        Get("/:id", func(ctx *context.Context) {
 //            ctx.Output.Body([]byte("orderinfo"))
 //    }),
-//    beego.NewNamespace("/crm").
+//    asana.NewNamespace("/crm").
 //        Get("/:id", func(ctx *context.Context) {
 //            ctx.Output.Body([]byte("crminfo"))
 //    }),
@@ -223,7 +223,7 @@ func (n *Namespace) Namespace(ns ...*Namespace) *Namespace {
 					t := NewTree()
 					t.AddTree(ni.prefix, mr.tree)
 					mr.tree = t
-					n.handlers.insertFilterRouter(pos, mr)
+					_ = n.handlers.insertFilterRouter(pos, mr)
 				}
 			}
 		}
@@ -231,7 +231,7 @@ func (n *Namespace) Namespace(ns ...*Namespace) *Namespace {
 	return n
 }
 
-// AddNamespace register Namespace into beego.Handler
+// AddNamespace register Namespace into asana.Handler
 // support multi Namespace
 func AddNamespace(nl ...*Namespace) {
 	for _, n := range nl {
@@ -252,7 +252,7 @@ func AddNamespace(nl ...*Namespace) {
 					t := NewTree()
 					t.AddTree(n.prefix, mr.tree)
 					mr.tree = t
-					BeeApp.Handlers.insertFilterRouter(pos, mr)
+					_ = BeeApp.Handlers.insertFilterRouter(pos, mr)
 				}
 			}
 		}

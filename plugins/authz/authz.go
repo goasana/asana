@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,15 +15,15 @@
 // Package authz provides handlers to enable ACL, RBAC, ABAC authorization support.
 // Simple Usage:
 //	import(
-//		"github.com/GNURub/beego"
-//		"github.com/GNURub/beego/plugins/authz"
+//		"github.com/goasana/framework"
+//		"github.com/goasana/framework/plugins/authz"
 //		"github.com/casbin/casbin"
 //	)
 //
 //	func main(){
 //		// mediate the access for every request
-//		beego.InsertFilter("*", beego.BeforeRouter, authz.NewAuthorizer(casbin.NewEnforcer("authz_model.conf", "authz_policy.csv")))
-//		beego.Run()
+//		asana.InsertFilter("*", asana.BeforeRouter, authz.NewAuthorizer(casbin.NewEnforcer("authz_model.conf", "authz_policy.csv")))
+//		asana.Run()
 //	}
 //
 //
@@ -34,22 +34,22 @@
 //		e.AddRoleForUser("alice", "admin")
 //		e.AddPolicy(...)
 //
-//		beego.InsertFilter("*", beego.BeforeRouter, authz.NewAuthorizer(e))
-//		beego.Run()
+//		asana.InsertFilter("*", asana.BeforeRouter, authz.NewAuthorizer(e))
+//		asana.Run()
 //	}
 package authz
 
 import (
 	"net/http"
 
-	"github.com/GNURub/beego"
-	"github.com/GNURub/beego/context"
+	"github.com/goasana/framework"
+	"github.com/goasana/framework/context"
 	"github.com/casbin/casbin"
 )
 
 // NewAuthorizer returns the authorizer.
 // Use a casbin enforcer as input
-func NewAuthorizer(e *casbin.Enforcer) beego.FilterFunc {
+func NewAuthorizer(e *casbin.Enforcer) asana.FilterFunc {
 	return func(ctx *context.Context) {
 		a := &BasicAuthorizer{enforcer: e}
 

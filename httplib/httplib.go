@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
 // Package httplib is used as http.Client
 // Usage:
 //
-// import "github.com/GNURub/beego/httplib"
+// import "github.com/goasana/framework/httplib"
 //
-//	b := httplib.Post("http://beego.me/")
-//	b.Param("username","GNURub")
+//	b := httplib.Post("http://asana.me/")
+//	b.Param("username","asana")
 //	b.Param("password","123456")
 //	b.PostFile("uploadfile1", "httplib.pdf")
 //	b.PostFile("uploadfile2", "httplib.txt")
@@ -28,7 +28,7 @@
 //	}
 //	fmt.Println(str)
 //
-//  more docs http://beego.me/docs/module/httplib.md
+//  more docs http://asana.me/docs/module/httplib.md
 package httplib
 
 import (
@@ -56,7 +56,7 @@ import (
 )
 
 var defaultSetting = BeegoHTTPSettings{
-	UserAgent:        "beegoServer",
+	UserAgent:        "asanaServer",
 	ConnectTimeout:   60 * time.Second,
 	ReadWriteTimeout: 60 * time.Second,
 	Gzip:             true,

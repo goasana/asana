@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package captcha
 import (
 	"testing"
 
-	"github.com/GNURub/beego/utils"
+	"github.com/goasana/framework/utils"
 )
 
 type byteCounter struct {

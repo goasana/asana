@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package beego
+package asana
 
 import (
 	"net/http"
@@ -20,9 +20,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/GNURub/beego/context"
-	"github.com/GNURub/beego/logs"
-	"github.com/GNURub/beego/testdata/proto"
+	"github.com/goasana/framework/context"
+	"github.com/goasana/framework/logs"
+	"github.com/goasana/framework/testdata/proto"
 	"github.com/golang/protobuf/proto"
 )
 
@@ -31,7 +31,7 @@ type TestController struct {
 }
 
 func (tc *TestController) Get() {
-	tc.Data["Username"] = "GNURub"
+	tc.Data["Username"] = "asana"
 	tc.Ctx.Output.Body([]byte("ok"))
 }
 
@@ -83,7 +83,7 @@ func (jc *JSONController) Prepare() {
 }
 
 func (jc *JSONController) Get() {
-	jc.Data["Username"] = "GNURub"
+	jc.Data["Username"] = "asana"
 	jc.Ctx.Output.Body([]byte("ok"))
 }
 
@@ -117,9 +117,9 @@ func TestUrlFor2(t *testing.T) {
 	handler.Add("/v1/:username/edit", &TestController{}, "get:GetURL")
 	handler.Add("/v1/:v(.+)_cms/ttt_:id(.+)_:page(.+).html", &TestController{}, "*:Param")
 	handler.Add("/:year:int/:month:int/:title/:entid", &TestController{})
-	if handler.URLFor("TestController.GetURL", ":username", "GNURub") != "/v1/GNURub/edit" {
+	if handler.URLFor("TestController.GetURL", ":username", "asana") != "/v1/asana/edit" {
 		logs.Info(handler.URLFor("TestController.GetURL"))
-		t.Errorf("TestController.List must equal to /v1/GNURub/edit")
+		t.Errorf("TestController.List must equal to /v1/asana/edit")
 	}
 
 	if handler.URLFor("TestController.List", ":v", "za", ":id", "12", ":page", "123") !=
@@ -153,14 +153,14 @@ func TestUserFunc(t *testing.T) {
 }
 
 func TestPostFunc(t *testing.T) {
-	r, _ := http.NewRequest("POST", "/GNURub", nil)
+	r, _ := http.NewRequest("POST", "/asana", nil)
 	w := httptest.NewRecorder()
 
 	handler := NewControllerRegister()
 	handler.Add("/:name", &TestController{})
 	handler.ServeHTTP(w, r)
-	if w.Body.String() != "GNURub" {
-		t.Errorf("post func should GNURub")
+	if w.Body.String() != "asana" {
+		t.Errorf("post func should asana")
 	}
 }
 
@@ -228,11 +228,11 @@ func TestRouteOk(t *testing.T) {
 
 func TestManyRoute(t *testing.T) {
 
-	r, _ := http.NewRequest("GET", "/beego32-12.html", nil)
+	r, _ := http.NewRequest("GET", "/asana32-12.html", nil)
 	w := httptest.NewRecorder()
 
 	handler := NewControllerRegister()
-	handler.Add("/beego:id([0-9]+)-:page([0-9]+).html", &TestController{}, "get:GetManyRouter")
+	handler.Add("/asana:id([0-9]+)-:page([0-9]+).html", &TestController{}, "get:GetManyRouter")
 	handler.ServeHTTP(w, r)
 
 	body := w.Body.String()
@@ -245,11 +245,11 @@ func TestManyRoute(t *testing.T) {
 // Test for issue #1669
 func TestEmptyResponse(t *testing.T) {
 
-	r, _ := http.NewRequest("GET", "/beego-empty.html", nil)
+	r, _ := http.NewRequest("GET", "/asana-empty.html", nil)
 	w := httptest.NewRecorder()
 
 	handler := NewControllerRegister()
-	handler.Add("/beego-empty.html", &TestController{}, "get:GetEmptyBody")
+	handler.Add("/asana-empty.html", &TestController{}, "get:GetEmptyBody")
 	handler.ServeHTTP(w, r)
 
 	if body := w.Body.String(); body != "" {
@@ -367,7 +367,7 @@ func TestRouterHandlerAll(t *testing.T) {
 // Benchmarks NewApp:
 //
 
-func beegoFilterFunc(ctx *context.Context) {
+func asanaFilterFunc(ctx *context.Context) {
 	ctx.WriteString("hello")
 }
 
@@ -381,8 +381,8 @@ func (a *AdminController) Get() {
 
 func TestRouterFunc(t *testing.T) {
 	mux := NewControllerRegister()
-	mux.Get("/action", beegoFilterFunc)
-	mux.Post("/action", beegoFilterFunc)
+	mux.Get("/action", asanaFilterFunc)
+	mux.Post("/action", asanaFilterFunc)
 	rw, r := testRequest("GET", "/action")
 	mux.ServeHTTP(rw, r)
 	if rw.Body.String() != "hello" {
@@ -392,7 +392,7 @@ func TestRouterFunc(t *testing.T) {
 
 func BenchmarkFunc(b *testing.B) {
 	mux := NewControllerRegister()
-	mux.Get("/action", beegoFilterFunc)
+	mux.Get("/action", asanaFilterFunc)
 	rw, r := testRequest("GET", "/action")
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -456,19 +456,19 @@ func TestInsertFilter(t *testing.T) {
 // to preserve the parameters from before its execution.
 func TestParamResetFilter(t *testing.T) {
 	testName := "TestParamResetFilter"
-	route := "/beego/*" // splat
-	path := "/beego/routes/routes"
+	route := "/asana/*" // splat
+	path := "/asana/routes/routes"
 
 	mux := NewControllerRegister()
 
-	mux.InsertFilter("*", BeforeExec, beegoResetParams, true, true)
+	mux.InsertFilter("*", BeforeExec, asanaResetParams, true, true)
 
-	mux.Get(route, beegoHandleResetParams)
+	mux.Get(route, asanaHandleResetParams)
 
 	rw, r := testRequest("GET", path)
 	mux.ServeHTTP(rw, r)
 
-	// The two functions, `beegoResetParams` and `beegoHandleResetParams` add
+	// The two functions, `asanaResetParams` and `asanaHandleResetParams` add
 	// a response header of `Splat`.  The expectation here is that that Header
 	// value should match what the _request's_ router set, not the filter's.
 
@@ -492,9 +492,9 @@ func TestFilterBeforeRouter(t *testing.T) {
 	url := "/beforeRouter"
 
 	mux := NewControllerRegister()
-	mux.InsertFilter(url, BeforeRouter, beegoBeforeRouter1)
+	mux.InsertFilter(url, BeforeRouter, asanaBeforeRouter1)
 
-	mux.Get(url, beegoFilterFunc)
+	mux.Get(url, asanaFilterFunc)
 
 	rw, r := testRequest("GET", url)
 	mux.ServeHTTP(rw, r)
@@ -514,10 +514,10 @@ func TestFilterBeforeExec(t *testing.T) {
 	url := "/beforeExec"
 
 	mux := NewControllerRegister()
-	mux.InsertFilter(url, BeforeRouter, beegoFilterNoOutput)
-	mux.InsertFilter(url, BeforeExec, beegoBeforeExec1)
+	mux.InsertFilter(url, BeforeRouter, asanaFilterNoOutput)
+	mux.InsertFilter(url, BeforeExec, asanaBeforeExec1)
 
-	mux.Get(url, beegoFilterFunc)
+	mux.Get(url, asanaFilterFunc)
 
 	rw, r := testRequest("GET", url)
 	mux.ServeHTTP(rw, r)
@@ -540,11 +540,11 @@ func TestFilterAfterExec(t *testing.T) {
 	url := "/afterExec"
 
 	mux := NewControllerRegister()
-	mux.InsertFilter(url, BeforeRouter, beegoFilterNoOutput)
-	mux.InsertFilter(url, BeforeExec, beegoFilterNoOutput)
-	mux.InsertFilter(url, AfterExec, beegoAfterExec1, false)
+	mux.InsertFilter(url, BeforeRouter, asanaFilterNoOutput)
+	mux.InsertFilter(url, BeforeExec, asanaFilterNoOutput)
+	mux.InsertFilter(url, AfterExec, asanaAfterExec1, false)
 
-	mux.Get(url, beegoFilterFunc)
+	mux.Get(url, asanaFilterFunc)
 
 	rw, r := testRequest("GET", url)
 	mux.ServeHTTP(rw, r)
@@ -570,12 +570,12 @@ func TestFilterFinishRouter(t *testing.T) {
 	url := "/finishRouter"
 
 	mux := NewControllerRegister()
-	mux.InsertFilter(url, BeforeRouter, beegoFilterNoOutput)
-	mux.InsertFilter(url, BeforeExec, beegoFilterNoOutput)
-	mux.InsertFilter(url, AfterExec, beegoFilterNoOutput)
-	mux.InsertFilter(url, FinishRouter, beegoFinishRouter1)
+	mux.InsertFilter(url, BeforeRouter, asanaFilterNoOutput)
+	mux.InsertFilter(url, BeforeExec, asanaFilterNoOutput)
+	mux.InsertFilter(url, AfterExec, asanaFilterNoOutput)
+	mux.InsertFilter(url, FinishRouter, asanaFinishRouter1)
 
-	mux.Get(url, beegoFilterFunc)
+	mux.Get(url, asanaFilterFunc)
 
 	rw, r := testRequest("GET", url)
 	mux.ServeHTTP(rw, r)
@@ -604,10 +604,10 @@ func TestFilterFinishRouterMultiFirstOnly(t *testing.T) {
 	url := "/finishRouterMultiFirstOnly"
 
 	mux := NewControllerRegister()
-	mux.InsertFilter(url, FinishRouter, beegoFinishRouter1, false)
-	mux.InsertFilter(url, FinishRouter, beegoFinishRouter2)
+	mux.InsertFilter(url, FinishRouter, asanaFinishRouter1, false)
+	mux.InsertFilter(url, FinishRouter, asanaFinishRouter2)
 
-	mux.Get(url, beegoFilterFunc)
+	mux.Get(url, asanaFilterFunc)
 
 	rw, r := testRequest("GET", url)
 	mux.ServeHTTP(rw, r)
@@ -631,10 +631,10 @@ func TestFilterFinishRouterMulti(t *testing.T) {
 	url := "/finishRouterMulti"
 
 	mux := NewControllerRegister()
-	mux.InsertFilter(url, FinishRouter, beegoFinishRouter1, false)
-	mux.InsertFilter(url, FinishRouter, beegoFinishRouter2, false)
+	mux.InsertFilter(url, FinishRouter, asanaFinishRouter1, false)
+	mux.InsertFilter(url, FinishRouter, asanaFinishRouter2, false)
 
-	mux.Get(url, beegoFilterFunc)
+	mux.Get(url, asanaFilterFunc)
 
 	rw, r := testRequest("GET", url)
 	mux.ServeHTTP(rw, r)
@@ -650,34 +650,34 @@ func TestFilterFinishRouterMulti(t *testing.T) {
 	}
 }
 
-func beegoFilterNoOutput(ctx *context.Context) {
+func asanaFilterNoOutput(ctx *context.Context) {
 }
 
-func beegoBeforeRouter1(ctx *context.Context) {
+func asanaBeforeRouter1(ctx *context.Context) {
 	ctx.WriteString("|BeforeRouter1")
 }
 
-func beegoBeforeExec1(ctx *context.Context) {
+func asanaBeforeExec1(ctx *context.Context) {
 	ctx.WriteString("|BeforeExec1")
 }
 
-func beegoAfterExec1(ctx *context.Context) {
+func asanaAfterExec1(ctx *context.Context) {
 	ctx.WriteString("|AfterExec1")
 }
 
-func beegoFinishRouter1(ctx *context.Context) {
+func asanaFinishRouter1(ctx *context.Context) {
 	ctx.WriteString("|FinishRouter1")
 }
 
-func beegoFinishRouter2(ctx *context.Context) {
+func asanaFinishRouter2(ctx *context.Context) {
 	ctx.WriteString("|FinishRouter2")
 }
 
-func beegoResetParams(ctx *context.Context) {
+func asanaResetParams(ctx *context.Context) {
 	ctx.ResponseWriter.Header().Set("splat", ctx.Input.Param(":splat"))
 }
 
-func beegoHandleResetParams(ctx *context.Context) {
+func asanaHandleResetParams(ctx *context.Context) {
 	ctx.ResponseWriter.Header().Set("splat", ctx.Input.Param(":splat"))
 }
 
@@ -692,7 +692,7 @@ func (jc *YAMLController) Prepare() {
 }
 
 func (jc *YAMLController) Get() {
-	jc.Data["Username"] = "GNURub"
+	jc.Data["Username"] = "asana"
 	jc.Ctx.Output.Body([]byte("ok"))
 }
 

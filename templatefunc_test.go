@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package beego
+package asana
 
 import (
 	"html/template"
@@ -143,8 +143,8 @@ func TestParseForm(t *testing.T) {
 		"Email":        []string{"test@gmail.com"},
 		"Intro":        []string{"I am an engineer!"},
 		"strbool":      []string{"yes"},
-		"date":         []string{"2014-11-12"},
-		"organization": []string{"beego"},
+		"date":         []string{"2019-11-12"},
+		"organization": []string{"asana"},
 		"title":        []string{"CXO"},
 		"hobby":        []string{"", "Basketball", "Football"},
 		"memo":         []string{"nothing"},
@@ -177,11 +177,11 @@ func TestParseForm(t *testing.T) {
 		t.Errorf("strboll should equal `true`, but got `%v`", u.StrBool)
 	}
 	y, m, d := u.Date.Date()
-	if y != 2014 || m.String() != "November" || d != 12 {
-		t.Errorf("Date should equal `2014-11-12`, but got `%v`", u.Date.String())
+	if y != 2019 || m.String() != "November" || d != 12 {
+		t.Errorf("Date should equal `2019-11-12`, but got `%v`", u.Date.String())
 	}
-	if u.Organization != "beego" {
-		t.Errorf("Organization should equal `beego`, but got `%v`", u.Organization)
+	if u.Organization != "asana" {
+		t.Errorf("Organization should equal `asana`, but got `%v`", u.Organization)
 	}
 	if u.Title != "CXO" {
 		t.Errorf("Title should equal `CXO`, but got `%v`", u.Title)

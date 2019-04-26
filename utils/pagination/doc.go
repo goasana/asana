@@ -4,14 +4,14 @@ context of a http request.
 
 Usage
 
-In your beego.Controller:
+In your asana.Controller:
 
  package controllers
 
- import "github.com/GNURub/beego/utils/pagination"
+ import "github.com/goasana/framework/utils/pagination"
 
  type PostsController struct {
-   beego.Controller
+   asana.Controller
  }
 
  func (this *PostsController) ListAllPosts() {
@@ -52,7 +52,7 @@ In your view templates:
 
 See also
 
-http://beego.me/docs/mvc/view/page.md
+http://asana.me/docs/mvc/view/page.md
 
 */
 package pagination

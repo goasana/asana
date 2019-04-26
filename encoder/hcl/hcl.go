@@ -1,8 +1,8 @@
 package hcl
 
 import (
-	"github.com/GNURub/beego/encoder"
-	"github.com/GNURub/beego/encoder/json"
+	"github.com/goasana/framework/encoder"
+	"github.com/goasana/framework/encoder/json"
 	"github.com/hashicorp/hcl"
 )
 

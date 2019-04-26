@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
 package testing
 
 import (
-	"github.com/GNURub/beego/config"
-	"github.com/GNURub/beego/httplib"
+	"github.com/goasana/framework/config"
+	"github.com/goasana/framework/httplib"
 )
 
 var port = ""
 var baseURL = "http://localhost:"
 
-// TestHTTPRequest beego test request client
+// TestHTTPRequest asana test request client
 type TestHTTPRequest struct {
 	httplib.BeegoHTTPRequest
 }

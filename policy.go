@@ -1,4 +1,4 @@
-// Copyright 2016 beego authors. All Rights Reserved.
+// Copyright 2016 asana authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package beego
+package asana
 
 import (
 	"strings"
 
-	"github.com/GNURub/beego/context"
+	"github.com/goasana/framework/context"
 )
 
 // PolicyFunc defines a policy function which is invoked before the controller handler is executed.
@@ -71,7 +71,7 @@ func (p *ControllerRegister) addToPolicy(method, pattern string, r ...PolicyFunc
 	}
 }
 
-// Policy Register new policy in beego
+// Policy Register new policy in asana
 func Policy(pattern, method string, policy ...PolicyFunc) {
 	BeeApp.Handlers.addToPolicy(method, pattern, policy...)
 }

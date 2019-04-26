@@ -6,21 +6,21 @@ an example for use captcha
 package controllers
 
 import (
-	"github.com/GNURub/beego"
-	"github.com/GNURub/beego/cache"
-	"github.com/GNURub/beego/utils/captcha"
+	"github.com/goasana/framework"
+	"github.com/goasana/framework/cache"
+	"github.com/goasana/framework/utils/captcha"
 )
 
 var cpt *captcha.Captcha
 
 func init() {
-	// use beego cache system store the captcha data
+	// use asana cache system store the captcha data
 	store := cache.NewMemoryCache()
 	cpt = captcha.NewWithFilter("/captcha/", store)
 }
 
 type MainController struct {
-	beego.Controller
+	asana.Controller
 }
 
 func (this *MainController) Get() {

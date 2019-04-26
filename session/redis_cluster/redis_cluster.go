@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
 //
 // Usage:
 // import(
-//   _ "github.com/GNURub/beego/session/redis_cluster"
-//   "github.com/GNURub/beego/session"
+//   _ "github.com/goasana/framework/session/redis_cluster"
+//   "github.com/goasana/framework/session"
 // )
 //
 //	func init() {
@@ -29,7 +29,7 @@
 //		go globalSessions.GC()
 //	}
 //
-// more docs: http://beego.me/docs/module/session.md
+// more docs: http://asana.me/docs/module/session.md
 package redis_cluster
 
 import (
@@ -37,9 +37,11 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"github.com/goasana/framework/session"
+	rediss "github.com/go-redis/redis"
 	"time"
 
-	"github.com/GNURub/beego/session"
+	"github.com/goasana/framework/session"
 	"github.com/go-redis/redis"
 )
 

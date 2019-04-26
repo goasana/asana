@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>beego welcome template</title>
+    <title>asana welcome template</title>
   </head>
   <body>
 

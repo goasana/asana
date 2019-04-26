@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package beego
+package asana
 
 import (
 	"fmt"
@@ -22,14 +22,14 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/GNURub/beego/config"
-	"github.com/GNURub/beego/config/base"
-	_ "github.com/GNURub/beego/config/file"
-	"github.com/GNURub/beego/context"
-	_ "github.com/GNURub/beego/encoder/yaml"
-	"github.com/GNURub/beego/logs"
-	"github.com/GNURub/beego/session"
-	"github.com/GNURub/beego/utils"
+	"github.com/goasana/framework/config"
+	"github.com/goasana/framework/config/base"
+	_ "github.com/goasana/framework/config/file"
+	"github.com/goasana/framework/context"
+	_ "github.com/goasana/framework/encoder/yaml"
+	"github.com/goasana/framework/logs"
+	"github.com/goasana/framework/session"
+	"github.com/goasana/framework/utils"
 )
 
 // Config is the main struct for BConfig
@@ -122,7 +122,7 @@ var (
 	// BConfig is the default config for Application
 	BConfig *Config
 	// AppConfig is the instance of Config, store the config information from file
-	AppConfig *beegoAppConfig
+	AppConfig *asanaAppConfig
 	// AppPath is the absolute path to the app
 	AppPath string
 	// GlobalSessions is the instance for the session manager
@@ -152,7 +152,7 @@ func init() {
 	if !utils.FileExists(appConfigPath) {
 		appConfigPath = filepath.Join(AppPath, "conf", filename)
 		if !utils.FileExists(appConfigPath) {
-			AppConfig = &beegoAppConfig{Configer: base.NewBaseConfig()}
+			AppConfig = &asanaAppConfig{Configer: base.NewBaseConfig()}
 			return
 		}
 	}
@@ -199,10 +199,10 @@ func recoverPanic(ctx *context.Context) {
 
 func newBConfig() *Config {
 	return &Config{
-		AppName:             "beego",
+		AppName:             "asana",
 		RunMode:             PROD,
 		RouterCaseSensitive: true,
-		ServerName:          "beegoServer:" + VERSION,
+		ServerName:          "asanaServer:" + VERSION,
 		RecoverPanic:        true,
 		RecoverFunc:         recoverPanic,
 		CopyRequestBody:     false,
@@ -243,12 +243,12 @@ func newBConfig() *Config {
 			TemplateRight:          "}}",
 			ViewsPath:              "views",
 			EnableXSRF:             false,
-			XSRFKey:                "beegoxsrf",
+			XSRFKey:                "asanaxsrf",
 			XSRFExpire:             0,
 			Session: SessionConfig{
 				SessionOn:                    false,
 				SessionProvider:              "memory",
-				SessionName:                  "beegosessionID",
+				SessionName:                  "asanasessionID",
 				SessionGCMaxLifetime:         3600,
 				SessionProviderConfig:        "",
 				SessionDisableHTTPOnly:       false,
@@ -386,15 +386,15 @@ func LoadAppConfig(adapterName config.ConfigProvider, configName string) error {
 	return parseConfig(configName)
 }
 
-type beegoAppConfig struct {
+type asanaAppConfig struct {
 	config.Configer
 }
 
-func newAppConfig(appConfigProvider config.ConfigProvider, appConfigPath string) (*beegoAppConfig, error) {
+func newAppConfig(appConfigProvider config.ConfigProvider, appConfigPath string) (*asanaAppConfig, error) {
 	ac, err := config.NewConfig(appConfigProvider, appConfigPath)
 
 	if err != nil {
 		return nil, err
 	}
-	return &beegoAppConfig{ac}, nil
+	return &asanaAppConfig{ac}, nil
 }

@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,77 +12,77 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package beego
+package asana
 
 import (
 	"strings"
 	"testing"
 
-	"github.com/GNURub/beego/context"
+	"github.com/goasana/framework/context"
 )
 
-type testinfo struct {
+type testInfo struct {
 	url        string
 	requestUrl string
 	params     map[string]string
 }
 
-var routers []testinfo
+var routers []testInfo
 
 func init() {
-	routers = make([]testinfo, 0)
-	routers = append(routers, testinfo{"/topic/?:auth:int", "/topic", nil})
-	routers = append(routers, testinfo{"/topic/?:auth:int", "/topic/123", map[string]string{":auth": "123"}})
-	routers = append(routers, testinfo{"/topic/:id/?:auth", "/topic/1", map[string]string{":id": "1"}})
-	routers = append(routers, testinfo{"/topic/:id/?:auth", "/topic/1/2", map[string]string{":id": "1", ":auth": "2"}})
-	routers = append(routers, testinfo{"/topic/:id/?:auth:int", "/topic/1", map[string]string{":id": "1"}})
-	routers = append(routers, testinfo{"/topic/:id/?:auth:int", "/topic/1/123", map[string]string{":id": "1", ":auth": "123"}})
-	routers = append(routers, testinfo{"/:id", "/123", map[string]string{":id": "123"}})
-	routers = append(routers, testinfo{"/hello/?:id", "/hello", map[string]string{":id": ""}})
-	routers = append(routers, testinfo{"/", "/", nil})
-	routers = append(routers, testinfo{"/customer/login", "/customer/login", nil})
-	routers = append(routers, testinfo{"/customer/login", "/customer/login.json", map[string]string{":ext": "json"}})
-	routers = append(routers, testinfo{"/*", "/http://customer/123/", map[string]string{":splat": "http://customer/123/"}})
-	routers = append(routers, testinfo{"/*", "/customer/2009/12/11", map[string]string{":splat": "customer/2009/12/11"}})
-	routers = append(routers, testinfo{"/aa/*/bb", "/aa/2009/bb", map[string]string{":splat": "2009"}})
-	routers = append(routers, testinfo{"/cc/*/dd", "/cc/2009/11/dd", map[string]string{":splat": "2009/11"}})
-	routers = append(routers, testinfo{"/cc/:id/*", "/cc/2009/11/dd", map[string]string{":id": "2009", ":splat": "11/dd"}})
-	routers = append(routers, testinfo{"/ee/:year/*/ff", "/ee/2009/11/ff", map[string]string{":year": "2009", ":splat": "11"}})
-	routers = append(routers, testinfo{"/thumbnail/:size/uploads/*",
-		"/thumbnail/100x100/uploads/items/2014/04/20/dPRCdChkUd651t1Hvs18.jpg",
-		map[string]string{":size": "100x100", ":splat": "items/2014/04/20/dPRCdChkUd651t1Hvs18.jpg"}})
-	routers = append(routers, testinfo{"/*.*", "/nice/api.json", map[string]string{":path": "nice/api", ":ext": "json"}})
-	routers = append(routers, testinfo{"/:name/*.*", "/nice/api.json", map[string]string{":name": "nice", ":path": "api", ":ext": "json"}})
-	routers = append(routers, testinfo{"/:name/test/*.*", "/nice/test/api.json", map[string]string{":name": "nice", ":path": "api", ":ext": "json"}})
-	routers = append(routers, testinfo{"/dl/:width:int/:height:int/*.*",
+	routers = make([]testInfo, 0)
+	routers = append(routers, testInfo{"/topic/?:auth:int", "/topic", nil})
+	routers = append(routers, testInfo{"/topic/?:auth:int", "/topic/123", map[string]string{":auth": "123"}})
+	routers = append(routers, testInfo{"/topic/:id/?:auth", "/topic/1", map[string]string{":id": "1"}})
+	routers = append(routers, testInfo{"/topic/:id/?:auth", "/topic/1/2", map[string]string{":id": "1", ":auth": "2"}})
+	routers = append(routers, testInfo{"/topic/:id/?:auth:int", "/topic/1", map[string]string{":id": "1"}})
+	routers = append(routers, testInfo{"/topic/:id/?:auth:int", "/topic/1/123", map[string]string{":id": "1", ":auth": "123"}})
+	routers = append(routers, testInfo{"/:id", "/123", map[string]string{":id": "123"}})
+	routers = append(routers, testInfo{"/hello/?:id", "/hello", map[string]string{":id": ""}})
+	routers = append(routers, testInfo{"/", "/", nil})
+	routers = append(routers, testInfo{"/customer/login", "/customer/login", nil})
+	routers = append(routers, testInfo{"/customer/login", "/customer/login.json", map[string]string{":ext": "json"}})
+	routers = append(routers, testInfo{"/*", "/http://customer/123/", map[string]string{":splat": "http://customer/123/"}})
+	routers = append(routers, testInfo{"/*", "/customer/2009/12/11", map[string]string{":splat": "customer/2009/12/11"}})
+	routers = append(routers, testInfo{"/aa/*/bb", "/aa/2009/bb", map[string]string{":splat": "2009"}})
+	routers = append(routers, testInfo{"/cc/*/dd", "/cc/2009/11/dd", map[string]string{":splat": "2009/11"}})
+	routers = append(routers, testInfo{"/cc/:id/*", "/cc/2009/11/dd", map[string]string{":id": "2009", ":splat": "11/dd"}})
+	routers = append(routers, testInfo{"/ee/:year/*/ff", "/ee/2009/11/ff", map[string]string{":year": "2009", ":splat": "11"}})
+	routers = append(routers, testInfo{"/thumbnail/:size/uploads/*",
+		"/thumbnail/100x100/uploads/items/2019/04/20/dPRCdChkUd651t1Hvs18.jpg",
+		map[string]string{":size": "100x100", ":splat": "items/2019/04/20/dPRCdChkUd651t1Hvs18.jpg"}})
+	routers = append(routers, testInfo{"/*.*", "/nice/api.json", map[string]string{":path": "nice/api", ":ext": "json"}})
+	routers = append(routers, testInfo{"/:name/*.*", "/nice/api.json", map[string]string{":name": "nice", ":path": "api", ":ext": "json"}})
+	routers = append(routers, testInfo{"/:name/test/*.*", "/nice/test/api.json", map[string]string{":name": "nice", ":path": "api", ":ext": "json"}})
+	routers = append(routers, testInfo{"/dl/:width:int/:height:int/*.*",
 		"/dl/48/48/05ac66d9bda00a3acf948c43e306fc9a.jpg",
 		map[string]string{":width": "48", ":height": "48", ":ext": "jpg", ":path": "05ac66d9bda00a3acf948c43e306fc9a"}})
-	routers = append(routers, testinfo{"/v1/shop/:id:int", "/v1/shop/123", map[string]string{":id": "123"}})
-	routers = append(routers, testinfo{"/v1/shop/:id\\((a|b|c)\\)", "/v1/shop/123(a)", map[string]string{":id": "123"}})
-	routers = append(routers, testinfo{"/v1/shop/:id\\((a|b|c)\\)", "/v1/shop/123(b)", map[string]string{":id": "123"}})
-	routers = append(routers, testinfo{"/v1/shop/:id\\((a|b|c)\\)", "/v1/shop/123(c)", map[string]string{":id": "123"}})
-	routers = append(routers, testinfo{"/:year:int/:month:int/:id/:endid", "/1111/111/aaa/aaa", map[string]string{":year": "1111", ":month": "111", ":id": "aaa", ":endid": "aaa"}})
-	routers = append(routers, testinfo{"/v1/shop/:id/:name", "/v1/shop/123/nike", map[string]string{":id": "123", ":name": "nike"}})
-	routers = append(routers, testinfo{"/v1/shop/:id/account", "/v1/shop/123/account", map[string]string{":id": "123"}})
-	routers = append(routers, testinfo{"/v1/shop/:name:string", "/v1/shop/nike", map[string]string{":name": "nike"}})
-	routers = append(routers, testinfo{"/v1/shop/:id([0-9]+)", "/v1/shop//123", map[string]string{":id": "123"}})
-	routers = append(routers, testinfo{"/v1/shop/:id([0-9]+)_:name", "/v1/shop/123_nike", map[string]string{":id": "123", ":name": "nike"}})
-	routers = append(routers, testinfo{"/v1/shop/:id(.+)_cms.html", "/v1/shop/123_cms.html", map[string]string{":id": "123"}})
-	routers = append(routers, testinfo{"/v1/shop/cms_:id(.+)_:page(.+).html", "/v1/shop/cms_123_1.html", map[string]string{":id": "123", ":page": "1"}})
-	routers = append(routers, testinfo{"/v1/:v/cms/aaa_:id(.+)_:page(.+).html", "/v1/2/cms/aaa_123_1.html", map[string]string{":v": "2", ":id": "123", ":page": "1"}})
-	routers = append(routers, testinfo{"/v1/:v/cms_:id(.+)_:page(.+).html", "/v1/2/cms_123_1.html", map[string]string{":v": "2", ":id": "123", ":page": "1"}})
-	routers = append(routers, testinfo{"/v1/:v(.+)_cms/ttt_:id(.+)_:page(.+).html", "/v1/2_cms/ttt_123_1.html", map[string]string{":v": "2", ":id": "123", ":page": "1"}})
-	routers = append(routers, testinfo{"/api/projects/:pid/members/?:mid", "/api/projects/1/members", map[string]string{":pid": "1"}})
-	routers = append(routers, testinfo{"/api/projects/:pid/members/?:mid", "/api/projects/1/members/2", map[string]string{":pid": "1", ":mid": "2"}})
+	routers = append(routers, testInfo{"/v1/shop/:id:int", "/v1/shop/123", map[string]string{":id": "123"}})
+	routers = append(routers, testInfo{"/v1/shop/:id\\((a|b|c)\\)", "/v1/shop/123(a)", map[string]string{":id": "123"}})
+	routers = append(routers, testInfo{"/v1/shop/:id\\((a|b|c)\\)", "/v1/shop/123(b)", map[string]string{":id": "123"}})
+	routers = append(routers, testInfo{"/v1/shop/:id\\((a|b|c)\\)", "/v1/shop/123(c)", map[string]string{":id": "123"}})
+	routers = append(routers, testInfo{"/:year:int/:month:int/:id/:endid", "/1111/111/aaa/aaa", map[string]string{":year": "1111", ":month": "111", ":id": "aaa", ":endid": "aaa"}})
+	routers = append(routers, testInfo{"/v1/shop/:id/:name", "/v1/shop/123/nike", map[string]string{":id": "123", ":name": "nike"}})
+	routers = append(routers, testInfo{"/v1/shop/:id/account", "/v1/shop/123/account", map[string]string{":id": "123"}})
+	routers = append(routers, testInfo{"/v1/shop/:name:string", "/v1/shop/nike", map[string]string{":name": "nike"}})
+	routers = append(routers, testInfo{"/v1/shop/:id([0-9]+)", "/v1/shop//123", map[string]string{":id": "123"}})
+	routers = append(routers, testInfo{"/v1/shop/:id([0-9]+)_:name", "/v1/shop/123_nike", map[string]string{":id": "123", ":name": "nike"}})
+	routers = append(routers, testInfo{"/v1/shop/:id(.+)_cms.html", "/v1/shop/123_cms.html", map[string]string{":id": "123"}})
+	routers = append(routers, testInfo{"/v1/shop/cms_:id(.+)_:page(.+).html", "/v1/shop/cms_123_1.html", map[string]string{":id": "123", ":page": "1"}})
+	routers = append(routers, testInfo{"/v1/:v/cms/aaa_:id(.+)_:page(.+).html", "/v1/2/cms/aaa_123_1.html", map[string]string{":v": "2", ":id": "123", ":page": "1"}})
+	routers = append(routers, testInfo{"/v1/:v/cms_:id(.+)_:page(.+).html", "/v1/2/cms_123_1.html", map[string]string{":v": "2", ":id": "123", ":page": "1"}})
+	routers = append(routers, testInfo{"/v1/:v(.+)_cms/ttt_:id(.+)_:page(.+).html", "/v1/2_cms/ttt_123_1.html", map[string]string{":v": "2", ":id": "123", ":page": "1"}})
+	routers = append(routers, testInfo{"/api/projects/:pid/members/?:mid", "/api/projects/1/members", map[string]string{":pid": "1"}})
+	routers = append(routers, testInfo{"/api/projects/:pid/members/?:mid", "/api/projects/1/members/2", map[string]string{":pid": "1", ":mid": "2"}})
 }
 
 func TestTreeRouters(t *testing.T) {
 	for _, r := range routers {
 		tr := NewTree()
-		tr.AddRouter(r.url, "GNURub")
+		tr.AddRouter(r.url, "asana")
 		ctx := context.NewContext()
 		obj := tr.Match(r.requestUrl, ctx)
-		if obj == nil || obj.(string) != "GNURub" {
+		if obj == nil || obj.(string) != "asana" {
 			t.Fatal(r.url+" can't get obj, Expect ", r.requestUrl)
 		}
 		if r.params != nil {
@@ -114,13 +114,13 @@ func TestStaticPath(t *testing.T) {
 
 func TestAddTree(t *testing.T) {
 	tr := NewTree()
-	tr.AddRouter("/shop/:id/account", "GNURub")
-	tr.AddRouter("/shop/:sd/ttt_:id(.+)_:page(.+).html", "GNURub")
+	tr.AddRouter("/shop/:id/account", "asana")
+	tr.AddRouter("/shop/:sd/ttt_:id(.+)_:page(.+).html", "asana")
 	t1 := NewTree()
 	t1.AddTree("/v1/zl", tr)
 	ctx := context.NewContext()
 	obj := t1.Match("/v1/zl/shop/123/account", ctx)
-	if obj == nil || obj.(string) != "GNURub" {
+	if obj == nil || obj.(string) != "asana" {
 		t.Fatal("/v1/zl/shop/:id/account can't get obj ")
 	}
 	if ctx.Input.ParamsLen() == 0 {
@@ -131,7 +131,7 @@ func TestAddTree(t *testing.T) {
 	}
 	ctx.Input.Reset(ctx)
 	obj = t1.Match("/v1/zl/shop/123/ttt_1_12.html", ctx)
-	if obj == nil || obj.(string) != "GNURub" {
+	if obj == nil || obj.(string) != "asana" {
 		t.Fatal("/v1/zl//shop/:sd/ttt_:id(.+)_:page(.+).html can't get obj ")
 	}
 	if ctx.Input.ParamsLen() == 0 {
@@ -145,7 +145,7 @@ func TestAddTree(t *testing.T) {
 	t2.AddTree("/v1/:shopid", tr)
 	ctx.Input.Reset(ctx)
 	obj = t2.Match("/v1/zl/shop/123/account", ctx)
-	if obj == nil || obj.(string) != "GNURub" {
+	if obj == nil || obj.(string) != "asana" {
 		t.Fatal("/v1/:shopid/shop/:id/account can't get obj ")
 	}
 	if ctx.Input.ParamsLen() == 0 {
@@ -156,7 +156,7 @@ func TestAddTree(t *testing.T) {
 	}
 	ctx.Input.Reset(ctx)
 	obj = t2.Match("/v1/zl/shop/123/ttt_1_12.html", ctx)
-	if obj == nil || obj.(string) != "GNURub" {
+	if obj == nil || obj.(string) != "asana" {
 		t.Fatal("/v1/:shopid/shop/:sd/ttt_:id(.+)_:page(.+).html can't get obj ")
 	}
 	if ctx.Input.ParamsLen() == 0 {
@@ -169,13 +169,13 @@ func TestAddTree(t *testing.T) {
 
 func TestAddTree2(t *testing.T) {
 	tr := NewTree()
-	tr.AddRouter("/shop/:id/account", "GNURub")
-	tr.AddRouter("/shop/:sd/ttt_:id(.+)_:page(.+).html", "GNURub")
+	tr.AddRouter("/shop/:id/account", "asana")
+	tr.AddRouter("/shop/:sd/ttt_:id(.+)_:page(.+).html", "asana")
 	t3 := NewTree()
 	t3.AddTree("/:version(v1|v2)/:prefix", tr)
 	ctx := context.NewContext()
 	obj := t3.Match("/v1/zl/shop/123/account", ctx)
-	if obj == nil || obj.(string) != "GNURub" {
+	if obj == nil || obj.(string) != "asana" {
 		t.Fatal("/:version(v1|v2)/:prefix/shop/:id/account can't get obj ")
 	}
 	if ctx.Input.ParamsLen() == 0 {
@@ -188,13 +188,13 @@ func TestAddTree2(t *testing.T) {
 
 func TestAddTree3(t *testing.T) {
 	tr := NewTree()
-	tr.AddRouter("/create", "GNURub")
-	tr.AddRouter("/shop/:sd/account", "GNURub")
+	tr.AddRouter("/create", "asana")
+	tr.AddRouter("/shop/:sd/account", "asana")
 	t3 := NewTree()
 	t3.AddTree("/table/:num", tr)
 	ctx := context.NewContext()
 	obj := t3.Match("/table/123/shop/123/account", ctx)
-	if obj == nil || obj.(string) != "GNURub" {
+	if obj == nil || obj.(string) != "asana" {
 		t.Fatal("/table/:num/shop/:sd/account can't get obj ")
 	}
 	if ctx.Input.ParamsLen() == 0 {
@@ -205,20 +205,20 @@ func TestAddTree3(t *testing.T) {
 	}
 	ctx.Input.Reset(ctx)
 	obj = t3.Match("/table/123/create", ctx)
-	if obj == nil || obj.(string) != "GNURub" {
+	if obj == nil || obj.(string) != "asana" {
 		t.Fatal("/table/:num/create can't get obj ")
 	}
 }
 
 func TestAddTree4(t *testing.T) {
 	tr := NewTree()
-	tr.AddRouter("/create", "GNURub")
-	tr.AddRouter("/shop/:sd/:account", "GNURub")
+	tr.AddRouter("/create", "asana")
+	tr.AddRouter("/shop/:sd/:account", "asana")
 	t4 := NewTree()
 	t4.AddTree("/:info:int/:num/:id", tr)
 	ctx := context.NewContext()
 	obj := t4.Match("/12/123/456/shop/123/account", ctx)
-	if obj == nil || obj.(string) != "GNURub" {
+	if obj == nil || obj.(string) != "asana" {
 		t.Fatal("/:info:int/:num/:id/shop/:sd/:account can't get obj ")
 	}
 	if ctx.Input.ParamsLen() == 0 {
@@ -231,7 +231,7 @@ func TestAddTree4(t *testing.T) {
 	}
 	ctx.Input.Reset(ctx)
 	obj = t4.Match("/12/123/456/create", ctx)
-	if obj == nil || obj.(string) != "GNURub" {
+	if obj == nil || obj.(string) != "asana" {
 		t.Fatal("/:info:int/:num/:id/create can't get obj ")
 	}
 }

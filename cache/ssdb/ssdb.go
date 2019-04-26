@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/GNURub/beego/cache"
-	"github.com/GNURub/beego/encoder/json"
+	"github.com/goasana/framework/cache"
+	"github.com/goasana/framework/encoder/json"
 	"github.com/ssdb/gossdb/ssdb"
 )
 

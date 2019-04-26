@@ -1,6 +1,6 @@
-# beego orm
+# asana orm
 
-[![Build Status](https://drone.io/github.com/GNURub/beego/status.png)](https://drone.io/github.com/GNURub/beego/latest)
+[![Build Status](https://drone.io/github.com/asana/asana/status.png)](https://drone.io/github.com/asana/asana/latest)
 
 A powerful orm framework for go.
 
@@ -27,7 +27,7 @@ more features please read the docs
 
 **Install:**
 
-	go get github.com/GNURub/beego/orm
+	go get github.com/asana/asana/orm
 
 ## Changelog
 
@@ -45,7 +45,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/GNURub/beego/orm"
+	"github.com/asana/asana/orm"
 	_ "github.com/go-sql-driver/mysql" // import your used driver
 )
 
@@ -75,7 +75,7 @@ func main() {
 	id, err := o.Insert(&user)
 
 	// update
-	user.Name = "GNURub"
+	user.Name = "asana"
 	num, err := o.Update(&user)
 
 	// read one
@@ -155,5 +155,5 @@ note: not recommend use this in product env.
 
 more details and examples in docs and test
 
-[documents](http://beego.me/docs/mvc/model/overview.md)
+[documents](http://asana.me/docs/mvc/model/overview.md)
 

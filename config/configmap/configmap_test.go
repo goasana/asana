@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,13 +19,13 @@ import (
 	"os"
 	"testing"
 
-	"github.com/GNURub/beego/config"
-	"github.com/GNURub/beego/encoder/json"
+	"github.com/goasana/framework/config"
+	"github.com/goasana/framework/encoder/json"
 )
 
-// Is needed add to kubernetes ex: kubectl get configmap beego --namespace default {"appname": "beeapi", ...}
+// Is needed add to kubernetes ex: kubectl get configmap asana --namespace default {"appname": "asanaapi", ...}
 var jsoncontext = `{
-		"appname": "beeapi",
+		"appname": "asanaapi",
 		"httpport": "8080",
 		"mysqlport": "3600",
 		"PI": "3.1415976",
@@ -49,11 +49,11 @@ func TestConfigMap(t *testing.T) {
 		j, _ := json.Encode(jsoncontext, true)
 		jsonconf, err = config.NewConfigData("configMap", j)
 	} else {
-		jsonconf, err = config.NewConfig("configMap", "beego")
+		jsonconf, err = config.NewConfig("configMap", "asana")
 	}
 
 	var keyValue = map[string]interface{}{
-		"appname":         "beeapi",
+		"appname":         "asanaapi",
 		"httpport":        8080,
 		"mysqlport":       int64(3600),
 		"PI":              3.1415976,
@@ -110,10 +110,10 @@ func TestConfigMap(t *testing.T) {
 		}
 	}
 
-	if err = jsonconf.Set("name", "GNURub"); err != nil {
+	if err = jsonconf.Set("name", "asana"); err != nil {
 		t.Fatal(err)
 	}
-	if jsonconf.String("name") != "GNURub" {
+	if jsonconf.String("name") != "asana" {
 		t.Fatal("get name error")
 	}
 }

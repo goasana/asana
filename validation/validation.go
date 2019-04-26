@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 // Package validation for validations
 //
 //	import (
-//		"github.com/GNURub/beego/validation"
+//		"github.com/goasana/framework/validation"
 //		"log"
 //	)
 //
@@ -43,7 +43,7 @@
 //		}
 //	}
 //
-// more info: http://beego.me/docs/mvc/controller/validation.md
+// more info: http://asana.me/docs/mvc/controller/validation.md
 package validation
 
 import (

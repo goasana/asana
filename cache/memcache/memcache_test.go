@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/GNURub/beego/cache"
+	"github.com/goasana/framework/cache"
 )
 
 func TestMemcacheCache(t *testing.T) {
@@ -30,67 +30,67 @@ func TestMemcacheCache(t *testing.T) {
 		t.Error("init err")
 	}
 	timeoutDuration := 10 * time.Second
-	if err = bm.Put("GNURub", "1", timeoutDuration); err != nil {
+	if err = bm.Put("asana", "1", timeoutDuration); err != nil {
 		t.Error("set Error", err)
 	}
-	if !bm.IsExist("GNURub") {
+	if !bm.IsExist("asana") {
 		t.Error("check err")
 	}
 
 	time.Sleep(11 * time.Second)
 
-	if bm.IsExist("GNURub") {
+	if bm.IsExist("asana") {
 		t.Error("check err")
 	}
-	if err = bm.Put("GNURub", "1", timeoutDuration); err != nil {
+	if err = bm.Put("asana", "1", timeoutDuration); err != nil {
 		t.Error("set Error", err)
 	}
 
-	if v, err := strconv.Atoi(string(bm.Get("GNURub").([]byte))); err != nil || v != 1 {
+	if v, err := strconv.Atoi(string(bm.Get("asana").([]byte))); err != nil || v != 1 {
 		t.Error("get err")
 	}
 
-	if err = bm.Incr("GNURub"); err != nil {
+	if err = bm.Incr("asana"); err != nil {
 		t.Error("Incr Error", err)
 	}
 
-	if v, err := strconv.Atoi(string(bm.Get("GNURub").([]byte))); err != nil || v != 2 {
+	if v, err := strconv.Atoi(string(bm.Get("asana").([]byte))); err != nil || v != 2 {
 		t.Error("get err")
 	}
 
-	if err = bm.Decr("GNURub"); err != nil {
+	if err = bm.Decr("asana"); err != nil {
 		t.Error("Decr Error", err)
 	}
 
-	if v, err := strconv.Atoi(string(bm.Get("GNURub").([]byte))); err != nil || v != 1 {
+	if v, err := strconv.Atoi(string(bm.Get("asana").([]byte))); err != nil || v != 1 {
 		t.Error("get err")
 	}
-	_ = bm.Delete("GNURub")
-	if bm.IsExist("GNURub") {
+	_ = bm.Delete("asana")
+	if bm.IsExist("asana") {
 		t.Error("delete err")
 	}
 
 	//test string
-	if err = bm.Put("GNURub", "author", timeoutDuration); err != nil {
+	if err = bm.Put("asana", "author", timeoutDuration); err != nil {
 		t.Error("set Error", err)
 	}
-	if !bm.IsExist("GNURub") {
+	if !bm.IsExist("asana") {
 		t.Error("check err")
 	}
 
-	if v := bm.Get("GNURub").([]byte); string(v) != "author" {
+	if v := bm.Get("asana").([]byte); string(v) != "author" {
 		t.Error("get err")
 	}
 
 	//test GetMulti
-	if err = bm.Put("GNURub1", "author1", timeoutDuration); err != nil {
+	if err = bm.Put("asana1", "author1", timeoutDuration); err != nil {
 		t.Error("set Error", err)
 	}
-	if !bm.IsExist("GNURub1") {
+	if !bm.IsExist("asana1") {
 		t.Error("check err")
 	}
 
-	vv := bm.GetMulti([]string{"GNURub", "GNURub1"})
+	vv := bm.GetMulti([]string{"asana", "asana1"})
 	if len(vv) != 2 {
 		t.Error("GetMulti ERROR")
 	}

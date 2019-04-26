@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,66 +26,66 @@ func TestCache(t *testing.T) {
 		t.Error("init err")
 	}
 	timeoutDuration := 10 * time.Second
-	if err = bm.Put("GNURub", 1, timeoutDuration); err != nil {
+	if err = bm.Put("asana", 1, timeoutDuration); err != nil {
 		t.Error("set Error", err)
 	}
-	if !bm.IsExist("GNURub") {
+	if !bm.IsExist("asana") {
 		t.Error("check err")
 	}
 
-	if v := bm.Get("GNURub"); v.(int) != 1 {
+	if v := bm.Get("asana"); v.(int) != 1 {
 		t.Error("get err")
 	}
 
 	time.Sleep(30 * time.Second)
 
-	if bm.IsExist("GNURub") {
+	if bm.IsExist("asana") {
 		t.Error("check err")
 	}
 
-	if err = bm.Put("GNURub", 1, timeoutDuration); err != nil {
+	if err = bm.Put("asana", 1, timeoutDuration); err != nil {
 		t.Error("set Error", err)
 	}
 
-	if err = bm.Incr("GNURub"); err != nil {
+	if err = bm.Incr("asana"); err != nil {
 		t.Error("Incr Error", err)
 	}
 
-	if v := bm.Get("GNURub"); v.(int) != 2 {
+	if v := bm.Get("asana"); v.(int) != 2 {
 		t.Error("get err")
 	}
 
-	if err = bm.Decr("GNURub"); err != nil {
+	if err = bm.Decr("asana"); err != nil {
 		t.Error("Decr Error", err)
 	}
 
-	if v := bm.Get("GNURub"); v.(int) != 1 {
+	if v := bm.Get("asana"); v.(int) != 1 {
 		t.Error("get err")
 	}
-	bm.Delete("GNURub")
-	if bm.IsExist("GNURub") {
+	bm.Delete("asana")
+	if bm.IsExist("asana") {
 		t.Error("delete err")
 	}
 
 	//test GetMulti
-	if err = bm.Put("GNURub", "author", timeoutDuration); err != nil {
+	if err = bm.Put("asana", "author", timeoutDuration); err != nil {
 		t.Error("set Error", err)
 	}
-	if !bm.IsExist("GNURub") {
+	if !bm.IsExist("asana") {
 		t.Error("check err")
 	}
-	if v := bm.Get("GNURub"); v.(string) != "author" {
+	if v := bm.Get("asana"); v.(string) != "author" {
 		t.Error("get err")
 	}
 
-	if err = bm.Put("GNURub1", "author1", timeoutDuration); err != nil {
+	if err = bm.Put("asana1", "author1", timeoutDuration); err != nil {
 		t.Error("set Error", err)
 	}
-	if !bm.IsExist("GNURub1") {
+	if !bm.IsExist("asana1") {
 		t.Error("check err")
 	}
 
-	vv := bm.GetMulti([]string{"GNURub", "GNURub1"})
+	vv := bm.GetMulti([]string{"asana", "asana1"})
 	if len(vv) != 2 {
 		t.Error("GetMulti ERROR")
 	}
@@ -103,66 +103,66 @@ func TestGCache(t *testing.T) {
 		t.Error("init err")
 	}
 	timeoutDuration := 10 * time.Second
-	if err = bm.Put("GNURub", 1, timeoutDuration); err != nil {
+	if err = bm.Put("asana", 1, timeoutDuration); err != nil {
 		t.Error("set Error", err)
 	}
-	if !bm.IsExist("GNURub") {
+	if !bm.IsExist("asana") {
 		t.Error("check err")
 	}
 
-	if v := bm.Get("GNURub"); v.(int) != 1 {
+	if v := bm.Get("asana"); v.(int) != 1 {
 		t.Error("get err")
 	}
 
 	time.Sleep(30 * time.Second)
 
-	if bm.IsExist("GNURub") {
+	if bm.IsExist("asana") {
 		t.Error("check err")
 	}
 
-	if err = bm.Put("GNURub", 1, timeoutDuration); err != nil {
+	if err = bm.Put("asana", 1, timeoutDuration); err != nil {
 		t.Error("set Error", err)
 	}
 
-	if err = bm.Incr("GNURub"); err != nil {
+	if err = bm.Incr("asana"); err != nil {
 		t.Error("Incr Error", err)
 	}
 
-	if v := bm.Get("GNURub"); v.(int) != 2 {
+	if v := bm.Get("asana"); v.(int) != 2 {
 		t.Error("get err")
 	}
 
-	if err = bm.Decr("GNURub"); err != nil {
+	if err = bm.Decr("asana"); err != nil {
 		t.Error("Decr Error", err)
 	}
 
-	if v := bm.Get("GNURub"); v.(int) != 1 {
+	if v := bm.Get("asana"); v.(int) != 1 {
 		t.Error("get err")
 	}
-	bm.Delete("GNURub")
-	if bm.IsExist("GNURub") {
+	bm.Delete("asana")
+	if bm.IsExist("asana") {
 		t.Error("delete err")
 	}
 
 	//test GetMulti
-	if err = bm.Put("GNURub", "author", timeoutDuration); err != nil {
+	if err = bm.Put("asana", "author", timeoutDuration); err != nil {
 		t.Error("set Error", err)
 	}
-	if !bm.IsExist("GNURub") {
+	if !bm.IsExist("asana") {
 		t.Error("check err")
 	}
-	if v := bm.Get("GNURub"); v.(string) != "author" {
+	if v := bm.Get("asana"); v.(string) != "author" {
 		t.Error("get err")
 	}
 
-	if err = bm.Put("GNURub1", "author1", timeoutDuration); err != nil {
+	if err = bm.Put("asana1", "author1", timeoutDuration); err != nil {
 		t.Error("set Error", err)
 	}
-	if !bm.IsExist("GNURub1") {
+	if !bm.IsExist("asana1") {
 		t.Error("check err")
 	}
 
-	vv := bm.GetMulti([]string{"GNURub", "GNURub1"})
+	vv := bm.GetMulti([]string{"asana", "asana1"})
 	if len(vv) != 2 {
 		t.Error("GetMulti ERROR")
 	}
@@ -184,47 +184,47 @@ func TestSyncronizerCache(t *testing.T) {
 		t.Error("init err")
 	}
 	timeoutDuration := 10 * time.Second
-	if err = sync.Put("GNURub", 1, timeoutDuration); err != nil {
+	if err = sync.Put("asana", 1, timeoutDuration); err != nil {
 		t.Error("set Error", err)
 	}
-	if !sync.IsExist("GNURub") {
+	if !sync.IsExist("asana") {
 		t.Error("check err")
 	}
 
-	if v := sync.Get("GNURub", timeoutDuration); v.(int) != 1 {
+	if v := sync.Get("asana", timeoutDuration); v.(int) != 1 {
 		t.Error("get err")
 	}
 
 	time.Sleep(30 * time.Second)
 
-	if sync.IsExist("GNURub") {
+	if sync.IsExist("asana") {
 		t.Error("check err")
 	}
 
-	if err = sync.Put("GNURub", 1, timeoutDuration); err != nil {
+	if err = sync.Put("asana", 1, timeoutDuration); err != nil {
 		t.Error("set Error", err)
 	}
 
-	sync.Delete("GNURub")
-	if sync.IsExist("GNURub") {
+	sync.Delete("asana")
+	if sync.IsExist("asana") {
 		t.Error("delete err")
 	}
 
 	//test GetMulti
-	if err = sync.Put("GNURub", "author", timeoutDuration); err != nil {
+	if err = sync.Put("asana", "author", timeoutDuration); err != nil {
 		t.Error("set Error", err)
 	}
-	if !sync.IsExist("GNURub") {
+	if !sync.IsExist("asana") {
 		t.Error("check err")
 	}
-	if v := sync.Get("GNURub", 0); v.(string) != "author" {
+	if v := sync.Get("asana", 0); v.(string) != "author" {
 		t.Error("get err")
 	}
 
-	if err = sync.Put("GNURub1", "author1", timeoutDuration); err != nil {
+	if err = sync.Put("asana1", "author1", timeoutDuration); err != nil {
 		t.Error("set Error", err)
 	}
-	if !sync.IsExist("GNURub1") {
+	if !sync.IsExist("asana1") {
 		t.Error("check err")
 	}
 }
@@ -235,57 +235,57 @@ func TestFileCache(t *testing.T) {
 		t.Error("init err")
 	}
 	timeoutDuration := 10 * time.Second
-	if err = bm.Put("GNURub", 1, timeoutDuration); err != nil {
+	if err = bm.Put("asana", 1, timeoutDuration); err != nil {
 		t.Error("set Error", err)
 	}
-	if !bm.IsExist("GNURub") {
+	if !bm.IsExist("asana") {
 		t.Error("check err")
 	}
 
-	if v := bm.Get("GNURub"); v.(int) != 1 {
+	if v := bm.Get("asana"); v.(int) != 1 {
 		t.Error("get err")
 	}
 
-	if err = bm.Incr("GNURub"); err != nil {
+	if err = bm.Incr("asana"); err != nil {
 		t.Error("Incr Error", err)
 	}
 
-	if v := bm.Get("GNURub"); v.(int) != 2 {
+	if v := bm.Get("asana"); v.(int) != 2 {
 		t.Error("get err")
 	}
 
-	if err = bm.Decr("GNURub"); err != nil {
+	if err = bm.Decr("asana"); err != nil {
 		t.Error("Decr Error", err)
 	}
 
-	if v := bm.Get("GNURub"); v.(int) != 1 {
+	if v := bm.Get("asana"); v.(int) != 1 {
 		t.Error("get err")
 	}
-	bm.Delete("GNURub")
-	if bm.IsExist("GNURub") {
+	bm.Delete("asana")
+	if bm.IsExist("asana") {
 		t.Error("delete err")
 	}
 
 	//test string
-	if err = bm.Put("GNURub", "author", timeoutDuration); err != nil {
+	if err = bm.Put("asana", "author", timeoutDuration); err != nil {
 		t.Error("set Error", err)
 	}
-	if !bm.IsExist("GNURub") {
+	if !bm.IsExist("asana") {
 		t.Error("check err")
 	}
-	if v := bm.Get("GNURub"); v.(string) != "author" {
+	if v := bm.Get("asana"); v.(string) != "author" {
 		t.Error("get err")
 	}
 
 	//test GetMulti
-	if err = bm.Put("GNURub1", "author1", timeoutDuration); err != nil {
+	if err = bm.Put("asana1", "author1", timeoutDuration); err != nil {
 		t.Error("set Error", err)
 	}
-	if !bm.IsExist("GNURub1") {
+	if !bm.IsExist("asana1") {
 		t.Error("check err")
 	}
 
-	vv := bm.GetMulti([]string{"GNURub", "GNURub1"})
+	vv := bm.GetMulti([]string{"asana", "asana1"})
 	if len(vv) != 2 {
 		t.Error("GetMulti ERROR")
 	}

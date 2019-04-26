@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
 // Package context provide the context utils
 // Usage:
 //
-//	import "github.com/GNURub/beego/context"
+//	import "github.com/goasana/framework/context"
 //
 //	ctx := context.Context{Request:req,ResponseWriter:rw}
 //
-//  more docs http://beego.me/docs/module/context.md
+//  more docs http://asana.me/docs/module/context.md
 package context
 
 import (
@@ -35,7 +35,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/GNURub/beego/utils"
+	"github.com/goasana/framework/utils"
 )
 
 //commonly used mime-types
@@ -86,7 +86,7 @@ func (ctx *Context) Redirect(status int, localurl string) {
 }
 
 // Abort stops this request.
-// if beego.ErrorMaps exists, panic body.
+// if asana.ErrorMaps exists, panic body.
 func (ctx *Context) Abort(status int, body string) {
 	ctx.Output.SetStatus(status)
 	panic(body)

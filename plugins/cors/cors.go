@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 // Package cors provides handlers to enable CORS support.
 // Usage
 //	import (
-// 		"github.com/GNURub/beego"
-//		"github.com/GNURub/beego/plugins/cors"
+// 		"github.com/goasana/framework"
+//		"github.com/goasana/framework/plugins/cors"
 // )
 //
 //	func main() {
@@ -24,14 +24,14 @@
 //		// - PUT and PATCH methods
 //		// - Origin header
 //		// - Credentials share
-//		beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
+//		asana.InsertFilter("*", asana.BeforeRouter, cors.Allow(&cors.Options{
 //			AllowOrigins:     []string{"https://*.foo.com"},
 //			AllowMethods:     []string{"PUT", "PATCH"},
 //			AllowHeaders:     []string{"Origin"},
 //			ExposeHeaders:    []string{"Content-Length"},
 //			AllowCredentials: true,
 //		}))
-//		beego.Run()
+//		asana.Run()
 //	}
 package cors
 
@@ -42,8 +42,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/GNURub/beego"
-	"github.com/GNURub/beego/context"
+	"github.com/goasana/framework"
+	"github.com/goasana/framework/context"
 )
 
 const (
@@ -187,7 +187,7 @@ func (o *Options) IsOriginAllowed(origin string) (allowed bool) {
 }
 
 // Allow enables CORS for requests those match the provided options.
-func Allow(opts *Options) beego.FilterFunc {
+func Allow(opts *Options) asana.FilterFunc {
 	// Allow default headers if nothing is specified.
 	if len(opts.AllowHeaders) == 0 {
 		opts.AllowHeaders = defaultAllowHeaders

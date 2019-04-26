@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,11 +38,11 @@ func TestMem(t *testing.T) {
 		t.Fatal("set error,", err)
 	}
 	defer sess.SessionRelease(w)
-	err = sess.Set("username", "GNURub")
+	err = sess.Set("username", "asana")
 	if err != nil {
 		t.Fatal("set error,", err)
 	}
-	if username := sess.Get("username"); username != "GNURub" {
+	if username := sess.Get("username"); username != "asana" {
 		t.Fatal("get username error")
 	}
 	if cookiestr := w.Header().Get("Set-Cookie"); cookiestr == "" {

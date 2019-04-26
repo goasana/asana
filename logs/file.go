@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -92,7 +92,7 @@ func newFileWriter() Logger {
 // Init file logger with json config.
 // jsonConfig like:
 //  {
-//  "filename":"logs/beego.log",
+//  "filename":"logs/asana.log",
 //  "maxLines":10000,
 //  "maxsize":1024,
 //  "daily":true,

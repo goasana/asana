@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package beego
+package asana
 
 import (
 	"errors"
@@ -27,21 +27,21 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/GNURub/beego/logs"
-	"github.com/GNURub/beego/utils"
+	"github.com/goasana/framework/logs"
+	"github.com/goasana/framework/utils"
 )
 
 var (
-	beegoTplFuncMap           = make(template.FuncMap)
-	beeViewPathTemplateLocked = false
-	// beeViewPathTemplates caching map and supported template file extensions per view
-	beeViewPathTemplates = make(map[string]map[string]*template.Template)
-	templatesLock        sync.RWMutex
-	// beeTemplateExt stores the template extension which will build
-	beeTemplateExt = []string{"tpl", "html", "gohtml"}
-	// beeTemplatePreprocessors stores associations of extension -> preprocessor handler
-	beeTemplateEngines = map[string]templatePreProcessor{}
-	beeTemplateFS      = defaultFSFunc
+	asanaTplFuncMap             = make(template.FuncMap)
+	asanaViewPathTemplateLocked = false
+	// asanaViewPathTemplates caching map and supported template file extensions per view
+	asanaViewPathTemplates = make(map[string]map[string]*template.Template)
+	templatesLock          sync.RWMutex
+	// asanaTemplateExt stores the template extension which will build
+	asanaTemplateExt = []string{"tpl", "html", "gohtml"}
+	// asanaTemplatePreprocessors stores associations of extension -> preprocessor handler
+	asanaTemplateEngines = map[string]templatePreProcessor{}
+	asanaTemplateFS      = defaultFSFunc
 )
 
 // ExecuteTemplate applies the template with name  to the specified data object,
@@ -59,8 +59,8 @@ func ExecuteViewPathTemplate(wr io.Writer, name string, viewPath string, data in
 		templatesLock.RLock()
 		defer templatesLock.RUnlock()
 	}
-	if beeTemplates, ok := beeViewPathTemplates[viewPath]; ok {
-		if t, ok := beeTemplates[name]; ok {
+	if asanaTemplates, ok := asanaViewPathTemplates[viewPath]; ok {
+		if t, ok := asanaTemplates[name]; ok {
 			var err error
 			if t.Lookup(name) != nil {
 				err = t.ExecuteTemplate(wr, name, data)
@@ -78,37 +78,37 @@ func ExecuteViewPathTemplate(wr io.Writer, name string, viewPath string, data in
 }
 
 func init() {
-	beegoTplFuncMap["dateformat"] = DateFormat
-	beegoTplFuncMap["date"] = Date
-	beegoTplFuncMap["compare"] = Compare
-	beegoTplFuncMap["compare_not"] = CompareNot
-	beegoTplFuncMap["not_nil"] = NotNil
-	beegoTplFuncMap["not_null"] = NotNil
-	beegoTplFuncMap["substr"] = Substr
-	beegoTplFuncMap["html2str"] = HTML2str
-	beegoTplFuncMap["str2html"] = Str2html
-	beegoTplFuncMap["htmlquote"] = Htmlquote
-	beegoTplFuncMap["htmlunquote"] = Htmlunquote
-	beegoTplFuncMap["renderform"] = RenderForm
-	beegoTplFuncMap["assets_js"] = AssetsJs
-	beegoTplFuncMap["assets_css"] = AssetsCSS
-	beegoTplFuncMap["config"] = GetConfig
-	beegoTplFuncMap["map_get"] = MapGet
+	asanaTplFuncMap["dateformat"] = DateFormat
+	asanaTplFuncMap["date"] = Date
+	asanaTplFuncMap["compare"] = Compare
+	asanaTplFuncMap["compare_not"] = CompareNot
+	asanaTplFuncMap["not_nil"] = NotNil
+	asanaTplFuncMap["not_null"] = NotNil
+	asanaTplFuncMap["substr"] = Substr
+	asanaTplFuncMap["html2str"] = HTML2str
+	asanaTplFuncMap["str2html"] = Str2html
+	asanaTplFuncMap["htmlquote"] = Htmlquote
+	asanaTplFuncMap["htmlunquote"] = Htmlunquote
+	asanaTplFuncMap["renderform"] = RenderForm
+	asanaTplFuncMap["assets_js"] = AssetsJs
+	asanaTplFuncMap["assets_css"] = AssetsCSS
+	asanaTplFuncMap["config"] = GetConfig
+	asanaTplFuncMap["map_get"] = MapGet
 
 	// Comparisons
-	beegoTplFuncMap["eq"] = eq // ==
-	beegoTplFuncMap["ge"] = ge // >=
-	beegoTplFuncMap["gt"] = gt // >
-	beegoTplFuncMap["le"] = le // <=
-	beegoTplFuncMap["lt"] = lt // <
-	beegoTplFuncMap["ne"] = ne // !=
+	asanaTplFuncMap["eq"] = eq // ==
+	asanaTplFuncMap["ge"] = ge // >=
+	asanaTplFuncMap["gt"] = gt // >
+	asanaTplFuncMap["le"] = le // <=
+	asanaTplFuncMap["lt"] = lt // <
+	asanaTplFuncMap["ne"] = ne // !=
 
-	beegoTplFuncMap["urlfor"] = URLFor // build a URL to match a Controller and it's method
+	asanaTplFuncMap["urlfor"] = URLFor // build a URL to match a Controller and it's method
 }
 
 // AddFuncMap let user to register a func in the template.
 func AddFuncMap(key string, fn interface{}) error {
-	beegoTplFuncMap[key] = fn
+	asanaTplFuncMap[key] = fn
 	return nil
 }
 
@@ -142,9 +142,9 @@ func (tf *templateFile) visit(paths string, f os.FileInfo, err error) error {
 	return nil
 }
 
-// HasTemplateExt return this path contains supported template extension of beego or not.
+// HasTemplateExt return this path contains supported template extension of asana or not.
 func HasTemplateExt(paths string) bool {
-	for _, v := range beeTemplateExt {
+	for _, v := range asanaTemplateExt {
 		if strings.HasSuffix(paths, "."+v) {
 			return true
 		}
@@ -154,37 +154,37 @@ func HasTemplateExt(paths string) bool {
 
 // AddTemplateExt add new extension for template.
 func AddTemplateExt(ext string) {
-	for _, v := range beeTemplateExt {
+	for _, v := range asanaTemplateExt {
 		if v == ext {
 			return
 		}
 	}
-	beeTemplateExt = append(beeTemplateExt, ext)
+	asanaTemplateExt = append(asanaTemplateExt, ext)
 }
 
 // AddViewPath adds a new path to the supported view paths.
 //Can later be used by setting a controller ViewPath to this folder
-//will panic if called after beego.Run()
+//will panic if called after asana.Run()
 func AddViewPath(viewPath string) error {
-	if beeViewPathTemplateLocked {
-		if _, exist := beeViewPathTemplates[viewPath]; exist {
+	if asanaViewPathTemplateLocked {
+		if _, exist := asanaViewPathTemplates[viewPath]; exist {
 			return nil //Ignore if viewpath already exists
 		}
-		panic("Can not add new view paths after beego.Run()")
+		panic("Can not add new view paths after asana.Run()")
 	}
-	beeViewPathTemplates[viewPath] = make(map[string]*template.Template)
+	asanaViewPathTemplates[viewPath] = make(map[string]*template.Template)
 	return BuildTemplate(viewPath)
 }
 
 func lockViewPaths() {
-	beeViewPathTemplateLocked = true
+	asanaViewPathTemplateLocked = true
 }
 
 // BuildTemplate will build all template files in a directory.
-// it makes beego can render any template file in view directory.
+// it makes asana can render any template file in view directory.
 func BuildTemplate(dir string, files ...string) error {
 	var err error
-	fs := beeTemplateFS()
+	fs := asanaTemplateFS()
 	f, err := fs.Open(dir)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -194,7 +194,7 @@ func BuildTemplate(dir string, files ...string) error {
 	}
 	defer f.Close()
 
-	beeTemplates, ok := beeViewPathTemplates[dir]
+	asanaTemplates, ok := asanaViewPathTemplates[dir]
 	if !ok {
 		panic("Unknown view path: " + dir)
 	}
@@ -218,8 +218,8 @@ func BuildTemplate(dir string, files ...string) error {
 				var t *template.Template
 				if len(ext) == 0 {
 					t, err = getTemplate(self.root, fs, file, v...)
-				} else if fn, ok := beeTemplateEngines[ext[1:]]; ok {
-					t, err = fn(self.root, file, beegoTplFuncMap)
+				} else if fn, ok := asanaTemplateEngines[ext[1:]]; ok {
+					t, err = fn(self.root, file, asanaTplFuncMap)
 				} else {
 					t, err = getTemplate(self.root, fs, file, v...)
 				}
@@ -228,7 +228,7 @@ func BuildTemplate(dir string, files ...string) error {
 					templatesLock.Unlock()
 					return err
 				}
-				beeTemplates[file] = t
+				asanaTemplates[file] = t
 				templatesLock.Unlock()
 			}
 		}
@@ -281,7 +281,7 @@ func getTplDeep(root string, fs http.FileSystem, file string, parent string, t *
 }
 
 func getTemplate(root string, fs http.FileSystem, file string, others ...string) (t *template.Template, err error) {
-	t = template.New(file).Delims(BConfig.WebConfig.TemplateLeft, BConfig.WebConfig.TemplateRight).Funcs(beegoTplFuncMap)
+	t = template.New(file).Delims(BConfig.WebConfig.TemplateLeft, BConfig.WebConfig.TemplateRight).Funcs(asanaTplFuncMap)
 	var subMods [][]string
 	t, subMods, err = getTplDeep(root, fs, file, "", t)
 	if err != nil {
@@ -364,17 +364,17 @@ func defaultFSFunc() http.FileSystem {
 
 // SetTemplateFSFunc set default filesystem function
 func SetTemplateFSFunc(fnt templateFSFunc) {
-	beeTemplateFS = fnt
+	asanaTemplateFS = fnt
 }
 
-// SetViewsPath sets view directory path in beego application.
+// SetViewsPath sets view directory path in asana application.
 func SetViewsPath(path string) *App {
 	BConfig.WebConfig.ViewsPath = path
 	return BeeApp
 }
 
-// SetStaticPath sets static directory path and proper url pattern in beego application.
-// if beego.SetStaticPath("static","public"), visit /static/* to load static file in folder "public".
+// SetStaticPath sets static directory path and proper url pattern in asana application.
+// if asana.SetStaticPath("static","public"), visit /static/* to load static file in folder "public".
 func SetStaticPath(url string, path string) *App {
 	if !strings.HasPrefix(url, "/") {
 		url = "/" + url
@@ -386,7 +386,7 @@ func SetStaticPath(url string, path string) *App {
 	return BeeApp
 }
 
-// DelStaticPath removes the static folder setting in this url pattern in beego application.
+// DelStaticPath removes the static folder setting in this url pattern in asana application.
 func DelStaticPath(url string) *App {
 	if !strings.HasPrefix(url, "/") {
 		url = "/" + url
@@ -401,6 +401,6 @@ func DelStaticPath(url string) *App {
 // AddTemplateEngine add a new templatePreProcessor which support extension
 func AddTemplateEngine(extension string, fn templatePreProcessor) *App {
 	AddTemplateExt(extension)
-	beeTemplateEngines[extension] = fn
+	asanaTemplateEngines[extension] = fn
 	return BeeApp
 }

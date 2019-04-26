@@ -1,4 +1,4 @@
-// Copyright 2014 beego Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
 //
 // Usage:
 // import(
-//   _ "github.com/GNURub/beego/session/redis_sentinel"
-//   "github.com/GNURub/beego/session"
+//   _ "github.com/goasana/framework/session/redis_sentinel"
+//   "github.com/goasana/framework/session"
 // )
 //
 //	func init() {
@@ -33,7 +33,7 @@
 package redis_sentinel
 
 import (
-	"github.com/GNURub/beego/session"
+	"github.com/goasana/framework/session"
 	"github.com/go-redis/redis"
 	"net/http"
 	"strconv"
