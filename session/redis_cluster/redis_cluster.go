@@ -37,12 +37,10 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"github.com/goasana/framework/session"
-	rediss "github.com/go-redis/redis"
 	"time"
 
-	"github.com/goasana/framework/session"
 	"github.com/go-redis/redis"
+	"github.com/goasana/framework/session"
 )
 
 var redispder = &Provider{}

@@ -51,7 +51,7 @@ func NewAliLS() logs.Logger {
 // Init parse config and init struct
 func (c *aliLSWriter) Init(jsonConfig string) (err error) {
 
-	_ = json.Unmarshal([]byte(jsonConfig), c)
+	_ = json.Decode([]byte(jsonConfig), c)
 
 	if c.FlushWhen > CacheSize {
 		c.FlushWhen = CacheSize

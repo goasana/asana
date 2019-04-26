@@ -63,7 +63,7 @@ func TestCookie(t *testing.T) {
 func TestDestorySessionCookie(t *testing.T) {
 	config := `{"cookieName":"gosessionid","enableSetCookie":true,"gclifetime":3600,"ProviderConfig":"{\"cookieName\":\"gosessionid\",\"securityKey\":\"asanacookiehashkey\"}"}`
 	conf := new(ManagerConfig)
-	if err := json.Unmarshal([]byte(config), conf); err != nil {
+	if err := json.Decode([]byte(config), conf); err != nil {
 		t.Fatal("json decode error", err)
 	}
 	globalSessions, err := NewManager("cookie", conf)

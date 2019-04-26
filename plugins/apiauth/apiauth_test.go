@@ -6,7 +6,7 @@ import (
 )
 
 func TestSignature(t *testing.T) {
-	appsecret := "asana secret"
+	appSecret := "asana secret"
 	method := "GET"
 	RequestURL := "http://localhost/test/url"
 	params := make(url.Values)

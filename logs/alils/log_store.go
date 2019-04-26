@@ -105,7 +105,7 @@ func (s *LogStore) PutLogs(lg *LogGroup) (err error) {
 
 	if r.StatusCode != http.StatusOK {
 		errMsg := &errorMessage{}
-		err = json.Unmarshal(buf, errMsg)
+		err = json.Decode(buf, errMsg)
 		if err != nil {
 			err = fmt.Errorf("failed to put logs")
 			dump, _ := httputil.DumpResponse(r, true)
@@ -141,7 +141,7 @@ func (s *LogStore) GetCursor(shardID int, from string) (cursor string, err error
 
 	if r.StatusCode != http.StatusOK {
 		errMsg := &errorMessage{}
-		err = json.Unmarshal(buf, errMsg)
+		err = json.Decode(buf, errMsg)
 		if err != nil {
 			err = fmt.Errorf("failed to get cursor")
 			dump, _ := httputil.DumpResponse(r, true)
@@ -157,7 +157,7 @@ func (s *LogStore) GetCursor(shardID int, from string) (cursor string, err error
 	}
 	body := &Body{}
 
-	err = json.Unmarshal(buf, body)
+	err = json.Decode(buf, body)
 	if err != nil {
 		return
 	}
@@ -192,7 +192,7 @@ func (s *LogStore) GetLogsBytes(shardID int, cursor string,
 
 	if r.StatusCode != http.StatusOK {
 		errMsg := &errorMessage{}
-		err = json.Unmarshal(buf, errMsg)
+		err = json.Decode(buf, errMsg)
 		if err != nil {
 			err = fmt.Errorf("failed to get cursor")
 			dump, _ := httputil.DumpResponse(r, true)
