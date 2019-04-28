@@ -230,7 +230,7 @@ func TestSyncronizerCache(t *testing.T) {
 }
 
 func TestFileCache(t *testing.T) {
-	bm, err := NewCache(FileProvider, `{"CachePath":"cache","FileSuffix":".bin","DirectoryLevel":2,"EmbedExpiry":0}`)
+	bm, err := NewCache(FileProvider, `{"CachePath":"cache","FileSuffix":".bin","DirectoryLevel":"2","EmbedExpiry":"0"}`)
 	if err != nil {
 		t.Error("init err")
 	}

@@ -63,11 +63,14 @@ func NewFileCache() Cache {
 }
 
 // StartAndGC will start and begin gc for file cache.
-// the config need to be like {CachePath:"/cache","FileSuffix":".bin","DirectoryLevel":2,"EmbedExpiry":0}
+// the config need to be like {CachePath:"/cache","FileSuffix":".bin","DirectoryLevel":"2","EmbedExpiry":"0"}
 func (fc *FileCache) StartAndGC(config string) error {
 
 	cfg := make(map[string]string)
-	_ = json.Decode([]byte(config), &cfg)
+	err := json.Decode([]byte(config), &cfg)
+	if err != nil {
+		return err
+	}
 	if _, ok := cfg["CachePath"]; !ok {
 		cfg["CachePath"] = FileCachePath
 	}
@@ -143,12 +146,12 @@ func (fc *FileCache) GetMulti(keys []string) []interface{} {
 
 // Put value into file cache.
 // timeout means how long to keep this file, unit of ms.
-// if timeout equals FileCacheEmbedExpiry(default is 0), cache this item forever.
+// if timeout equals fc.EmbedExpiry(default is 0), cache this item forever.
 func (fc *FileCache) Put(key string, val interface{}, timeout time.Duration) error {
 	gob.Register(val)
 
 	item := FileCacheItem{Data: val}
-	if timeout == FileCacheEmbedExpiry {
+	if timeout == time.Duration(fc.EmbedExpiry) {
 		item.Expired = time.Now().Add((86400 * 365 * 10) * time.Second) // ten years
 	} else {
 		item.Expired = time.Now().Add(timeout)
@@ -180,7 +183,7 @@ func (fc *FileCache) Incr(key string) error {
 	} else {
 		incr = data.(int) + 1
 	}
-	_ = fc.Put(key, incr, FileCacheEmbedExpiry)
+	_ = fc.Put(key, incr, time.Duration(fc.EmbedExpiry))
 	return nil
 }
 
@@ -193,7 +196,7 @@ func (fc *FileCache) Decr(key string) error {
 	} else {
 		decr = data.(int) - 1
 	}
-	_ = fc.Put(key, decr, FileCacheEmbedExpiry)
+	_ = fc.Put(key, decr, time.Duration(fc.EmbedExpiry))
 	return nil
 }
 
