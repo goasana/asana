@@ -160,7 +160,7 @@ func TestWithUserAgent(t *testing.T) {
 
 func TestWithSetting(t *testing.T) {
 	v := "asana"
-	var setting BeegoHTTPSettings
+	var setting AsanaHTTPSettings
 	setting.EnableCookie = true
 	setting.UserAgent = v
 	setting.Transport = &http.Transport{

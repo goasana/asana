@@ -45,13 +45,13 @@ func TestMem(t *testing.T) {
 	if username := sess.Get("username"); username != "asana" {
 		t.Fatal("get username error")
 	}
-	if cookiestr := w.Header().Get("Set-Cookie"); cookiestr == "" {
+	if cookieStr := w.Header().Get("Set-Cookie"); cookieStr == "" {
 		t.Fatal("setcookie error")
 	} else {
-		parts := strings.Split(strings.TrimSpace(cookiestr), ";")
+		parts := strings.Split(strings.TrimSpace(cookieStr), ";")
 		for k, v := range parts {
-			nameval := strings.Split(v, "=")
-			if k == 0 && nameval[0] != "gosessionid" {
+			nameVal := strings.Split(v, "=")
+			if k == 0 && nameVal[0] != "gosessionid" {
 				t.Fatal("error")
 			}
 		}

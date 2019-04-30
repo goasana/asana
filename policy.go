@@ -73,7 +73,7 @@ func (p *ControllerRegister) addToPolicy(method, pattern string, r ...PolicyFunc
 
 // Policy Register new policy in asana
 func Policy(pattern, method string, policy ...PolicyFunc) {
-	BeeApp.Handlers.addToPolicy(method, pattern, policy...)
+	AsanaApp.Handlers.addToPolicy(method, pattern, policy...)
 }
 
 // Find policies and execute if were found

@@ -69,7 +69,7 @@ func Run(params ...string) {
 		BConfig.Listen.Domains = params
 	}
 
-	BeeApp.Run()
+	AsanaApp.Run()
 }
 
 // RunWithMiddleWares Run asana application with middlewares.
@@ -85,7 +85,7 @@ func RunWithMiddleWares(addr string, mws ...MiddleWare) {
 		BConfig.Listen.HTTPPort, _ = strconv.Atoi(strs[1])
 	}
 
-	BeeApp.Run(mws...)
+	AsanaApp.Run(mws...)
 }
 
 func initBeforeHTTPRun() {
@@ -106,15 +106,15 @@ func initBeforeHTTPRun() {
 	}
 }
 
-// TestBeegoInit is for test package init
-func TestBeegoInit(ap string) {
+// TestAsanaInit is for test package init
+func TestAsanaInit(ap string) {
 	path := filepath.Join(ap, "conf", "app.json")
 	_ = os.Chdir(ap)
-	InitBeegoBeforeTest(path)
+	InitAsanaBeforeTest(path)
 }
 
-// InitBeegoBeforeTest is for test package init
-func InitBeegoBeforeTest(appConfigPath string) {
+// InitAsanaBeforeTest is for test package init
+func InitAsanaBeforeTest(appConfigPath string) {
 	if err := LoadAppConfig(appConfigProvider, appConfigPath); err != nil {
 		panic(err)
 	}

@@ -52,8 +52,8 @@ func newSMTPWriter() Logger {
 //		"sendTos":["email1","email2"],
 //		"level":LevelError
 //	}
-func (s *SMTPWriter) Init(jsonconfig string) error {
-	return json.Decode([]byte(jsonconfig), s)
+func (s *SMTPWriter) Init(jsonConfig string) error {
+	return json.Decode([]byte(jsonConfig), s)
 }
 
 func (s *SMTPWriter) getSMTPAuth(host string) smtp.Auth {
@@ -131,10 +131,10 @@ func (s *SMTPWriter) WriteMsg(when time.Time, msg string, level int) error {
 	// Connect to the server, authenticate, set the sender and recipient,
 	// and send the email all in one step.
 	contentType := "Content-Type: text/plain" + "; charset=UTF-8"
-	mailmsg := []byte("To: " + strings.Join(s.RecipientAddresses, ";") + "\r\nFrom: " + s.FromAddress + "<" + s.FromAddress +
+	mailMsg := []byte("To: " + strings.Join(s.RecipientAddresses, ";") + "\r\nFrom: " + s.FromAddress + "<" + s.FromAddress +
 		">\r\nSubject: " + s.Subject + "\r\n" + contentType + "\r\n\r\n" + fmt.Sprintf(".%s", when.Format("2006-01-02 15:04:05")) + msg)
 
-	return s.sendMail(s.Host, auth, s.FromAddress, s.RecipientAddresses, mailmsg)
+	return s.sendMail(s.Host, auth, s.FromAddress, s.RecipientAddresses, mailMsg)
 }
 
 // Flush implementing method. empty.

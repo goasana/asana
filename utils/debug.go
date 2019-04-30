@@ -55,13 +55,13 @@ func display(displayed bool, data ...interface{}) string {
 
 	var buf = new(bytes.Buffer)
 
-	fmt.Fprintf(buf, "[Debug] at %s() [%s:%d]\n", function(pc), file, line)
+	_, _ = fmt.Fprintf(buf, "[Debug] at %s() [%s:%d]\n", function(pc), file, line)
 
-	fmt.Fprintf(buf, "\n[Variables]\n")
+	_, _ = fmt.Fprintf(buf, "\n[Variables]\n")
 
 	for i := 0; i < len(data); i += 2 {
-		var output = fomateinfo(len(data[i].(string))+3, data[i+1])
-		fmt.Fprintf(buf, "%s = %s", data[i], output)
+		var output = fomateInfo(len(data[i].(string))+3, data[i+1])
+		_, _ = fmt.Fprintf(buf, "%s = %s", data[i], output)
 	}
 
 	if displayed {
@@ -71,15 +71,15 @@ func display(displayed bool, data ...interface{}) string {
 }
 
 // return data dump and format bytes
-func fomateinfo(headlen int, data ...interface{}) []byte {
+func fomateInfo(_ int, data ...interface{}) []byte {
 	var buf = new(bytes.Buffer)
 
 	if len(data) > 1 {
-		fmt.Fprint(buf, "    ")
+		_, _ = fmt.Fprint(buf, "    ")
 
-		fmt.Fprint(buf, "[")
+		_, _ = fmt.Fprint(buf, "[")
 
-		fmt.Fprintln(buf)
+		_, _ = fmt.Fprintln(buf)
 	}
 
 	for k, v := range data {
@@ -90,20 +90,20 @@ func fomateinfo(headlen int, data ...interface{}) []byte {
 		printKeyValue(buf2, reflect.ValueOf(v), &pointers, &interfaces, nil, true, "    ", 1)
 
 		if k < len(data)-1 {
-			fmt.Fprint(buf2, ", ")
+			_, _ = fmt.Fprint(buf2, ", ")
 		}
 
-		fmt.Fprintln(buf2)
+		_, _ = fmt.Fprintln(buf2)
 
 		buf.Write(buf2.Bytes())
 	}
 
 	if len(data) > 1 {
-		fmt.Fprintln(buf)
+		_, _ = fmt.Fprintln(buf)
 
-		fmt.Fprint(buf, "    ")
+		_, _ = fmt.Fprint(buf, "    ")
 
-		fmt.Fprint(buf, "]")
+		_, _ = fmt.Fprint(buf, "]")
 	}
 
 	return buf.Bytes()
@@ -166,20 +166,20 @@ func printKeyValue(buf *bytes.Buffer, val reflect.Value, pointers **pointerInfo,
 
 	switch t {
 	case reflect.Bool:
-		fmt.Fprint(buf, val.Bool())
+		_, _ = fmt.Fprint(buf, val.Bool())
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		fmt.Fprint(buf, val.Int())
+		_, _ = fmt.Fprint(buf, val.Int())
 	case reflect.Uint8, reflect.Uint16, reflect.Uint, reflect.Uint32, reflect.Uint64:
-		fmt.Fprint(buf, val.Uint())
+		_, _ = fmt.Fprint(buf, val.Uint())
 	case reflect.Float32, reflect.Float64:
-		fmt.Fprint(buf, val.Float())
+		_, _ = fmt.Fprint(buf, val.Float())
 	case reflect.Complex64, reflect.Complex128:
-		fmt.Fprint(buf, val.Complex())
+		_, _ = fmt.Fprint(buf, val.Complex())
 	case reflect.UnsafePointer:
-		fmt.Fprintf(buf, "unsafe.Pointer(0x%X)", val.Pointer())
+		_, _ = fmt.Fprintf(buf, "unsafe.Pointer(0x%X)", val.Pointer())
 	case reflect.Ptr:
 		if val.IsNil() {
-			fmt.Fprint(buf, "nil")
+			_, _ = fmt.Fprint(buf, "nil")
 			return
 		}
 
@@ -188,7 +188,7 @@ func printKeyValue(buf *bytes.Buffer, val reflect.Value, pointers **pointerInfo,
 		for p := *pointers; p != nil; p = p.prev {
 			if addr == p.addr {
 				p.used = append(p.used, buf.Len())
-				fmt.Fprintf(buf, "0x%X", addr)
+				_, _ = fmt.Fprintf(buf, "0x%X", addr)
 				return
 			}
 		}
@@ -200,20 +200,20 @@ func printKeyValue(buf *bytes.Buffer, val reflect.Value, pointers **pointerInfo,
 			used: make([]int, 0),
 		}
 
-		fmt.Fprint(buf, "&")
+		_, _ = fmt.Fprint(buf, "&")
 
 		printKeyValue(buf, val.Elem(), pointers, interfaces, structFilter, formatOutput, indent, level)
 	case reflect.String:
-		fmt.Fprint(buf, "\"", val.String(), "\"")
+		_, _ = fmt.Fprint(buf, "\"", val.String(), "\"")
 	case reflect.Interface:
 		var value = val.Elem()
 
 		if !value.IsValid() {
-			fmt.Fprint(buf, "nil")
+			_, _ = fmt.Fprint(buf, "nil")
 		} else {
 			for _, in := range *interfaces {
 				if reflect.DeepEqual(in, val) {
-					fmt.Fprint(buf, "repeat")
+					_, _ = fmt.Fprint(buf, "repeat")
 					return
 				}
 			}
@@ -225,50 +225,50 @@ func printKeyValue(buf *bytes.Buffer, val reflect.Value, pointers **pointerInfo,
 	case reflect.Struct:
 		var t = val.Type()
 
-		fmt.Fprint(buf, t)
-		fmt.Fprint(buf, "{")
+		_, _ = fmt.Fprint(buf, t)
+		_, _ = fmt.Fprint(buf, "{")
 
 		for i := 0; i < val.NumField(); i++ {
 			if formatOutput {
-				fmt.Fprintln(buf)
+				_, _ = fmt.Fprintln(buf)
 			} else {
-				fmt.Fprint(buf, " ")
+				_, _ = fmt.Fprint(buf, " ")
 			}
 
 			var name = t.Field(i).Name
 
 			if formatOutput {
 				for ind := 0; ind < level; ind++ {
-					fmt.Fprint(buf, indent)
+					_, _ = fmt.Fprint(buf, indent)
 				}
 			}
 
-			fmt.Fprint(buf, name)
-			fmt.Fprint(buf, ": ")
+			_, _ = fmt.Fprint(buf, name)
+			_, _ = fmt.Fprint(buf, ": ")
 
 			if structFilter != nil && structFilter(t.String(), name) {
-				fmt.Fprint(buf, "ignore")
+				_, _ = fmt.Fprint(buf, "ignore")
 			} else {
 				printKeyValue(buf, val.Field(i), pointers, interfaces, structFilter, formatOutput, indent, level+1)
 			}
 
-			fmt.Fprint(buf, ",")
+			_, _ = fmt.Fprint(buf, ",")
 		}
 
 		if formatOutput {
-			fmt.Fprintln(buf)
+			_, _ = fmt.Fprintln(buf)
 
 			for ind := 0; ind < level-1; ind++ {
-				fmt.Fprint(buf, indent)
+				_, _ = fmt.Fprint(buf, indent)
 			}
 		} else {
-			fmt.Fprint(buf, " ")
+			_, _ = fmt.Fprint(buf, " ")
 		}
 
-		fmt.Fprint(buf, "}")
+		_, _ = fmt.Fprint(buf, "}")
 	case reflect.Array, reflect.Slice:
-		fmt.Fprint(buf, val.Type())
-		fmt.Fprint(buf, "{")
+		_, _ = fmt.Fprint(buf, val.Type())
+		_, _ = fmt.Fprint(buf, "{")
 
 		var allSimple = true
 
@@ -282,41 +282,41 @@ func printKeyValue(buf *bytes.Buffer, val reflect.Value, pointers **pointerInfo,
 			}
 
 			if formatOutput && !isSimple {
-				fmt.Fprintln(buf)
+				_, _ = fmt.Fprintln(buf)
 			} else {
-				fmt.Fprint(buf, " ")
+				_, _ = fmt.Fprint(buf, " ")
 			}
 
 			if formatOutput && !isSimple {
 				for ind := 0; ind < level; ind++ {
-					fmt.Fprint(buf, indent)
+					_, _ = fmt.Fprint(buf, indent)
 				}
 			}
 
 			printKeyValue(buf, elem, pointers, interfaces, structFilter, formatOutput, indent, level+1)
 
 			if i != val.Len()-1 || !allSimple {
-				fmt.Fprint(buf, ",")
+				_, _ = fmt.Fprint(buf, ",")
 			}
 		}
 
 		if formatOutput && !allSimple {
-			fmt.Fprintln(buf)
+			_, _ = fmt.Fprintln(buf)
 
 			for ind := 0; ind < level-1; ind++ {
-				fmt.Fprint(buf, indent)
+				_, _ = fmt.Fprint(buf, indent)
 			}
 		} else {
-			fmt.Fprint(buf, " ")
+			_, _ = fmt.Fprint(buf, " ")
 		}
 
-		fmt.Fprint(buf, "}")
+		_, _ = fmt.Fprint(buf, "}")
 	case reflect.Map:
 		var t = val.Type()
 		var keys = val.MapKeys()
 
-		fmt.Fprint(buf, t)
-		fmt.Fprint(buf, "{")
+		_, _ = fmt.Fprint(buf, t)
+		_, _ = fmt.Fprint(buf, "{")
 
 		var allSimple = true
 
@@ -330,48 +330,48 @@ func printKeyValue(buf *bytes.Buffer, val reflect.Value, pointers **pointerInfo,
 			}
 
 			if formatOutput && !isSimple {
-				fmt.Fprintln(buf)
+				_, _ = fmt.Fprintln(buf)
 			} else {
-				fmt.Fprint(buf, " ")
+				_, _ = fmt.Fprint(buf, " ")
 			}
 
 			if formatOutput && !isSimple {
 				for ind := 0; ind <= level; ind++ {
-					fmt.Fprint(buf, indent)
+					_, _ = fmt.Fprint(buf, indent)
 				}
 			}
 
 			printKeyValue(buf, keys[i], pointers, interfaces, structFilter, formatOutput, indent, level+1)
-			fmt.Fprint(buf, ": ")
+			_, _ = fmt.Fprint(buf, ": ")
 			printKeyValue(buf, elem, pointers, interfaces, structFilter, formatOutput, indent, level+1)
 
 			if i != val.Len()-1 || !allSimple {
-				fmt.Fprint(buf, ",")
+				_, _ = fmt.Fprint(buf, ",")
 			}
 		}
 
 		if formatOutput && !allSimple {
-			fmt.Fprintln(buf)
+			_, _ = fmt.Fprintln(buf)
 
 			for ind := 0; ind < level-1; ind++ {
-				fmt.Fprint(buf, indent)
+				_, _ = fmt.Fprint(buf, indent)
 			}
 		} else {
-			fmt.Fprint(buf, " ")
+			_, _ = fmt.Fprint(buf, " ")
 		}
 
-		fmt.Fprint(buf, "}")
+		_, _ = fmt.Fprint(buf, "}")
 	case reflect.Chan:
-		fmt.Fprint(buf, val.Type())
+		_, _ = fmt.Fprint(buf, val.Type())
 	case reflect.Invalid:
-		fmt.Fprint(buf, "invalid")
+		_, _ = fmt.Fprint(buf, "invalid")
 	default:
-		fmt.Fprint(buf, "unknow")
+		_, _ = fmt.Fprint(buf, "unknow")
 	}
 }
 
 // PrintPointerInfo dump pointer value
-func PrintPointerInfo(buf *bytes.Buffer, headlen int, pointers *pointerInfo) {
+func PrintPointerInfo(buf *bytes.Buffer, headLen int, pointers *pointerInfo) {
 	var anyused = false
 	var pointerNum = 0
 
@@ -387,7 +387,7 @@ func PrintPointerInfo(buf *bytes.Buffer, headlen int, pointers *pointerInfo) {
 		var pointerBufs = make([][]rune, pointerNum+1)
 
 		for i := 0; i < len(pointerBufs); i++ {
-			var pointerBuf = make([]rune, buf.Len()+headlen)
+			var pointerBuf = make([]rune, buf.Len()+headLen)
 
 			for j := 0; j < len(pointerBuf); j++ {
 				pointerBuf[j] = ' '
@@ -400,33 +400,33 @@ func PrintPointerInfo(buf *bytes.Buffer, headlen int, pointers *pointerInfo) {
 			for p := pointers; p != nil; p = p.prev {
 				if len(p.used) > 0 && p.n >= pn {
 					if pn == p.n {
-						pointerBufs[pn][p.pos+headlen] = '└'
+						pointerBufs[pn][p.pos+headLen] = '└'
 
-						var maxpos = 0
+						var maxPos = 0
 
 						for i, pos := range p.used {
 							if i < len(p.used)-1 {
-								pointerBufs[pn][pos+headlen] = '┴'
+								pointerBufs[pn][pos+headLen] = '┴'
 							} else {
-								pointerBufs[pn][pos+headlen] = '┘'
+								pointerBufs[pn][pos+headLen] = '┘'
 							}
 
-							maxpos = pos
+							maxPos = pos
 						}
 
-						for i := 0; i < maxpos-p.pos-1; i++ {
-							if pointerBufs[pn][i+p.pos+headlen+1] == ' ' {
-								pointerBufs[pn][i+p.pos+headlen+1] = '─'
+						for i := 0; i < maxPos-p.pos-1; i++ {
+							if pointerBufs[pn][i+p.pos+headLen+1] == ' ' {
+								pointerBufs[pn][i+p.pos+headLen+1] = '─'
 							}
 						}
 					} else {
-						pointerBufs[pn][p.pos+headlen] = '│'
+						pointerBufs[pn][p.pos+headLen] = '│'
 
 						for _, pos := range p.used {
-							if pointerBufs[pn][pos+headlen] == ' ' {
-								pointerBufs[pn][pos+headlen] = '│'
+							if pointerBufs[pn][pos+headLen] == ' ' {
+								pointerBufs[pn][pos+headLen] = '│'
 							} else {
-								pointerBufs[pn][pos+headlen] = '┼'
+								pointerBufs[pn][pos+headLen] = '┼'
 							}
 						}
 					}
@@ -451,7 +451,7 @@ func Stack(skip int, indent string) []byte {
 
 		buf.WriteString(indent)
 
-		fmt.Fprintf(buf, "at %s() [%s:%d]\n", function(pc), file, line)
+		_, _ = fmt.Fprintf(buf, "at %s() [%s:%d]\n", function(pc), file, line)
 	}
 
 	return buf.Bytes()

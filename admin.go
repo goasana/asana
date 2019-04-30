@@ -30,7 +30,7 @@ import (
 	"github.com/goasana/framework/utils"
 )
 
-// BeeAdminApp is the default adminApp used by admin module.
+// AsanaAdminApp is the default adminApp used by admin module.
 var asanaAdminApp *adminApp
 
 // FilterMonitorFunc is default monitor filter when admin module is enable.
@@ -93,10 +93,10 @@ func qpsIndex(rw http.ResponseWriter, _ *http.Request) {
 // ListConf is the http.Handler of displaying all asana configuration values as key/value pair.
 // it's registered with url pattern "/listconf" in admin module.
 func listConf(rw http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
+	_ = r.ParseForm()
 	command := r.Form.Get("command")
 	if command == "" {
-		rw.Write([]byte("command not support"))
+		_, _ = rw.Write([]byte("command not support"))
 		return
 	}
 
@@ -113,7 +113,7 @@ func listConf(rw http.ResponseWriter, r *http.Request) {
 
 		data["Content"] = m
 
-		tmpl.Execute(rw, data)
+		_ = tmpl.Execute(rw, data)
 
 	case "router":
 		content := PrintTree()
@@ -133,11 +133,11 @@ func listConf(rw http.ResponseWriter, r *http.Request) {
 					"Filter Function",
 				},
 			}
-			filterTypes    = []string{}
+			filterTypes    []string
 			filterTypeData = make(M)
 		)
 
-		if BeeApp.Handlers.enableFilter {
+		if AsanaApp.Handlers.enableFilter {
 			var filterType string
 			for k, fr := range map[int]string{
 				BeforeStatic: "Before Static",
@@ -145,7 +145,7 @@ func listConf(rw http.ResponseWriter, r *http.Request) {
 				BeforeExec:   "Before Exec",
 				AfterExec:    "After Exec",
 				FinishRouter: "Finish Router"} {
-				if bf := BeeApp.Handlers.filters[k]; len(bf) > 0 {
+				if bf := AsanaApp.Handlers.filters[k]; len(bf) > 0 {
 					filterType = fr
 					filterTypes = append(filterTypes, filterType)
 					resultList := new([][]string)
@@ -168,7 +168,7 @@ func listConf(rw http.ResponseWriter, r *http.Request) {
 		data["Title"] = "Filters"
 		execTpl(rw, data, routerAndFilterTpl, defaultScriptsTpl)
 	default:
-		rw.Write([]byte("command not support"))
+		_, _ = rw.Write([]byte("command not support"))
 	}
 }
 
@@ -198,10 +198,10 @@ func list(root string, p interface{}, m M) {
 func PrintTree() M {
 	var (
 		content     = M{}
-		methods     = []string{}
+		methods     []string
 		methodsData = make(M)
 	)
-	for method, t := range BeeApp.Handlers.routers {
+	for method, t := range AsanaApp.Handlers.routers {
 
 		resultList := new([][]string)
 
@@ -217,15 +217,15 @@ func PrintTree() M {
 }
 
 func printTree(resultList *[][]string, t *Tree) {
-	for _, tr := range t.fixrouters {
+	for _, tr := range t.fixRouters {
 		printTree(resultList, tr)
 	}
-	if t.wildcard != nil {
-		printTree(resultList, t.wildcard)
+	if t.wildCard != nil {
+		printTree(resultList, t.wildCard)
 	}
 	for _, l := range t.leaves {
 		if v, ok := l.runObject.(*ControllerInfo); ok {
-			if v.routerType == routerTypeBeego {
+			if v.routerType == routerTypeAsana {
 				var result = []string{
 					v.pattern,
 					fmt.Sprintf("%s", v.methods),
@@ -254,7 +254,7 @@ func printTree(resultList *[][]string, t *Tree) {
 // ProfIndex is a http.Handler for showing profile command.
 // it's in url pattern "/prof" in admin module.
 func profIndex(rw http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
+	_ = r.ParseForm()
 	command := r.Form.Get("command")
 	if command == "" {
 		return
@@ -276,7 +276,7 @@ func profIndex(rw http.ResponseWriter, r *http.Request) {
 		}
 
 		rw.Header().Set("Content-Type", "application/json")
-		rw.Write(dataJSON)
+		_, _ = rw.Write(dataJSON)
 		return
 	}
 
@@ -352,9 +352,9 @@ func taskStatus(rw http.ResponseWriter, req *http.Request) {
 		"Last Time",
 		"",
 	}
-	for tname, tk := range toolbox.AdminTaskList {
+	for tName, tk := range toolbox.AdminTaskList {
 		result := []string{
-			tname,
+			tName,
 			tk.GetSpec(),
 			tk.GetStatus(),
 			tk.GetPrev().String(),
@@ -374,7 +374,7 @@ func execTpl(rw http.ResponseWriter, data map[interface{}]interface{}, tpls ...s
 	for _, tpl := range tpls {
 		tmpl = template.Must(tmpl.Parse(tpl))
 	}
-	tmpl.Execute(rw, data)
+	_ = tmpl.Execute(rw, data)
 }
 
 // adminApp is an http.HandlerFunc map used as asanaAdminApp.

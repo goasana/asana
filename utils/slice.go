@@ -19,8 +19,8 @@ import (
 	"time"
 )
 
-type reducetype func(interface{}) interface{}
-type filtertype func(interface{}) bool
+type reduceType func(interface{}) interface{}
+type filterType func(interface{}) bool
 
 // InSlice checks given string in string slice or not.
 func InSlice(v string, sl []string) bool {
@@ -64,7 +64,7 @@ func SliceMerge(slice1, slice2 []interface{}) (c []interface{}) {
 }
 
 // SliceReduce generates a new slice after parsing every value by reduce function
-func SliceReduce(slice []interface{}, a reducetype) (dslice []interface{}) {
+func SliceReduce(slice []interface{}, a reduceType) (dslice []interface{}) {
 	for _, v := range slice {
 		dslice = append(dslice, a(v))
 	}
@@ -73,21 +73,21 @@ func SliceReduce(slice []interface{}, a reducetype) (dslice []interface{}) {
 
 // SliceRand returns random one from slice.
 func SliceRand(a []interface{}) (b interface{}) {
-	randnum := rand.Intn(len(a))
-	b = a[randnum]
+	randNum := rand.Intn(len(a))
+	b = a[randNum]
 	return
 }
 
 // SliceSum sums all values in int64 slice.
-func SliceSum(intslice []int64) (sum int64) {
-	for _, v := range intslice {
+func SliceSum(intSlice []int64) (sum int64) {
+	for _, v := range intSlice {
 		sum += v
 	}
 	return
 }
 
 // SliceFilter generates a new slice after filter function.
-func SliceFilter(slice []interface{}, a filtertype) (ftslice []interface{}) {
+func SliceFilter(slice []interface{}, a filterType) (ftslice []interface{}) {
 	for _, v := range slice {
 		if a(v) {
 			ftslice = append(ftslice, v)

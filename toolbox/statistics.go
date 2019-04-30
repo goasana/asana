@@ -33,8 +33,8 @@ type Statistics struct {
 // URLMap contains several statistics struct to log different data
 type URLMap struct {
 	lock        sync.RWMutex
-	LengthLimit int //limit the urlmap's length if it's equal to 0 there's no limit
-	urlmap      map[string]map[string]*Statistics
+	LengthLimit int //limit the urlMap's length if it's equal to 0 there's no limit
+	urlMap      map[string]map[string]*Statistics
 }
 
 // AddStatistics add statistics task.
@@ -42,7 +42,7 @@ type URLMap struct {
 func (m *URLMap) AddStatistics(requestMethod, requestURL, requestController string, requesttime time.Duration) {
 	m.lock.Lock()
 	defer m.lock.Unlock()
-	if method, ok := m.urlmap[requestURL]; ok {
+	if method, ok := m.urlMap[requestURL]; ok {
 		if s, ok := method[requestMethod]; ok {
 			s.RequestNum++
 			if s.MaxTime < requesttime {
@@ -61,14 +61,14 @@ func (m *URLMap) AddStatistics(requestMethod, requestURL, requestController stri
 				MaxTime:           requesttime,
 				TotalTime:         requesttime,
 			}
-			m.urlmap[requestURL][requestMethod] = nb
+			m.urlMap[requestURL][requestMethod] = nb
 		}
 
 	} else {
-		if m.LengthLimit > 0 && m.LengthLimit <= len(m.urlmap) {
+		if m.LengthLimit > 0 && m.LengthLimit <= len(m.urlMap) {
 			return
 		}
-		methodmap := make(map[string]*Statistics)
+		methodMap := make(map[string]*Statistics)
 		nb := &Statistics{
 			RequestURL:        requestURL,
 			RequestController: requestController,
@@ -77,8 +77,8 @@ func (m *URLMap) AddStatistics(requestMethod, requestURL, requestController stri
 			MaxTime:           requesttime,
 			TotalTime:         requesttime,
 		}
-		methodmap[requestMethod] = nb
-		m.urlmap[requestURL] = methodmap
+		methodMap[requestMethod] = nb
+		m.urlMap[requestURL] = methodMap
 	}
 }
 
@@ -93,7 +93,7 @@ func (m *URLMap) GetMap() map[string]interface{} {
 	content := make(map[string]interface{})
 	content["Fields"] = fields
 
-	for k, v := range m.urlmap {
+	for k, v := range m.urlMap {
 		for kk, vv := range v {
 			result := []string{
 				fmt.Sprintf("% -50s", k),
@@ -122,7 +122,7 @@ func (m *URLMap) GetMapData() []map[string]interface{} {
 
 	var resultLists []map[string]interface{}
 
-	for k, v := range m.urlmap {
+	for k, v := range m.urlMap {
 		for kk, vv := range v {
 			result := map[string]interface{}{
 				"request_url": k,
@@ -144,6 +144,6 @@ var StatisticsMap *URLMap
 
 func init() {
 	StatisticsMap = &URLMap{
-		urlmap: make(map[string]map[string]*Statistics),
+		urlMap: make(map[string]map[string]*Statistics),
 	}
 }

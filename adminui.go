@@ -16,7 +16,7 @@ package asana
 
 var indexTpl = `
 {{define "content"}}
-<h1>Beego Admin Dashboard</h1>
+<h1>Asana Admin Dashboard</h1>
 <p>
 For detail usage please check our document:
 </p>
@@ -249,7 +249,7 @@ var dashboardTpl = `
 
 <title>
 
-Welcome to Beego Admin Dashboard
+Welcome to Asana Admin Dashboard
 
 </title>
 

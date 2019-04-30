@@ -26,7 +26,7 @@
 //  cnf, err := NewConfig(config.ConsulProvider, "myConfAppName")
 //
 //More docs http://asana.me/docs/module/md
-package configmap
+package consul
 
 import (
 	"context"
@@ -174,8 +174,8 @@ func makeMap(e encoder.Encoder, kv api.KVPairs, stripPrefix string) (map[string]
 }
 
 func getClient(option config.Option) (*api.Config, string, string, *api.Client) {
-	// use default config
-	config := api.DefaultConfig()
+	// use default conf
+	conf := api.DefaultConfig()
 	// check if there are any addrs
 	a, ok := option.Context.Value(addressKey{}).(string)
 	if ok {
@@ -183,18 +183,18 @@ func getClient(option config.Option) (*api.Config, string, string, *api.Client) 
 		if ae, ok := err.(*net.AddrError); ok && ae.Err == "missing port in address" {
 			port = "8500"
 			addr = a
-			config.Address = fmt.Sprintf("%s:%s", addr, port)
+			conf.Address = fmt.Sprintf("%s:%s", addr, port)
 		} else if err == nil {
-			config.Address = fmt.Sprintf("%s:%s", addr, port)
+			conf.Address = fmt.Sprintf("%s:%s", addr, port)
 		}
 	}
 	dc, ok := option.Context.Value(dcKey{}).(string)
 	if ok {
-		config.Datacenter = dc
+		conf.Datacenter = dc
 	}
 	token, ok := option.Context.Value(tokenKey{}).(string)
 	if ok {
-		config.Token = token
+		conf.Token = token
 	}
 	prefix := option.ConfigName
 	sp := ""
@@ -206,6 +206,6 @@ func getClient(option config.Option) (*api.Config, string, string, *api.Client) 
 		sp = prefix
 	}
 	// create the client
-	client, _ := api.NewClient(config)
-	return config, prefix, sp, client
+	client, _ := api.NewClient(conf)
+	return conf, prefix, sp, client
 }

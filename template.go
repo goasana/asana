@@ -322,12 +322,12 @@ func _getTemplate(t0 *template.Template, root string, fs http.FileSystem, subMod
 				fileAbsPath := filepath.Join(root, otherFile)
 				f, err := fs.Open(fileAbsPath)
 				if err != nil {
-					f.Close()
+					_ = f.Close()
 					logs.Trace("template file parse error, not success open file:", err)
 					continue
 				}
 				data, err = ioutil.ReadAll(f)
-				f.Close()
+				_ = f.Close()
 				if err != nil {
 					logs.Trace("template file parse error, not success read file:", err)
 					continue
@@ -370,7 +370,7 @@ func SetTemplateFSFunc(fnt templateFSFunc) {
 // SetViewsPath sets view directory path in asana application.
 func SetViewsPath(path string) *App {
 	BConfig.WebConfig.ViewsPath = path
-	return BeeApp
+	return AsanaApp
 }
 
 // SetStaticPath sets static directory path and proper url pattern in asana application.
@@ -383,7 +383,7 @@ func SetStaticPath(url string, path string) *App {
 		url = strings.TrimRight(url, "/")
 	}
 	BConfig.WebConfig.StaticDir[url] = path
-	return BeeApp
+	return AsanaApp
 }
 
 // DelStaticPath removes the static folder setting in this url pattern in asana application.
@@ -395,12 +395,12 @@ func DelStaticPath(url string) *App {
 		url = strings.TrimRight(url, "/")
 	}
 	delete(BConfig.WebConfig.StaticDir, url)
-	return BeeApp
+	return AsanaApp
 }
 
 // AddTemplateEngine add a new templatePreProcessor which support extension
 func AddTemplateEngine(extension string, fn templatePreProcessor) *App {
 	AddTemplateExt(extension)
 	asanaTemplateEngines[extension] = fn
-	return BeeApp
+	return AsanaApp
 }

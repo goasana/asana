@@ -76,13 +76,13 @@ func (c *connWriter) Flush() {
 // Destroy destroy connection writer and close tcp listener.
 func (c *connWriter) Destroy() {
 	if c.innerWriter != nil {
-		c.innerWriter.Close()
+		_ = c.innerWriter.Close()
 	}
 }
 
 func (c *connWriter) connect() error {
 	if c.innerWriter != nil {
-		c.innerWriter.Close()
+		_ = c.innerWriter.Close()
 		c.innerWriter = nil
 	}
 
@@ -92,7 +92,7 @@ func (c *connWriter) connect() error {
 	}
 
 	if tcpConn, ok := conn.(*net.TCPConn); ok {
-		tcpConn.SetKeepAlive(true)
+		_ = tcpConn.SetKeepAlive(true)
 	}
 
 	c.innerWriter = conn

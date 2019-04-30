@@ -27,8 +27,8 @@ type siprng struct {
 	k0, k1, ctr uint64
 }
 
-// siphash implements SipHash-2-4, accepting a uint64 as a message.
-func siphash(k0, k1, m uint64) uint64 {
+// sipHash implements SipHash-2-4, accepting a uint64 as a message.
+func sipHash(k0, k1, m uint64) uint64 {
 	// Initialization.
 	v0 := k0 ^ 0x736f6d6570736575
 	v1 := k1 ^ 0x646f72616e646f6d
@@ -222,7 +222,7 @@ func (p *siprng) Uint64() uint64 {
 	if p.ctr == 0 || p.ctr > 8*1024*1024 {
 		p.rekey()
 	}
-	v := siphash(p.k0, p.k1, p.ctr)
+	v := sipHash(p.k0, p.k1, p.ctr)
 	p.ctr++
 	p.mu.Unlock()
 	return v

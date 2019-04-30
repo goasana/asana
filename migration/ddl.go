@@ -115,10 +115,10 @@ func (m *Migration) UniCol(uni, name string) *Column {
 }
 
 //ForeignCol creates a new foreign column and returns the instance of column
-func (m *Migration) ForeignCol(colname, foreigncol, foreigntable string) (foreign *Foreign) {
+func (m *Migration) ForeignCol(colName, foreignCol, foreignTable string) (foreign *Foreign) {
 
-	foreign = &Foreign{ForeignColumn: foreigncol, ForeignTable: foreigntable}
-	foreign.Name = colname
+	foreign = &Foreign{ForeignColumn: foreignCol, ForeignTable: foreignTable}
+	foreign.Name = colName
 	m.AddForeign(foreign)
 	return foreign
 }

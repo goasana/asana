@@ -140,7 +140,7 @@ func encodeCookie(block cipher.Block, hashKey, name string, value map[interface{
 	return string(b), nil
 }
 
-func decodeCookie(block cipher.Block, hashKey, name, value string, gcmaxlifetime int64) (map[interface{}]interface{}, error) {
+func decodeCookie(block cipher.Block, hashKey, name, value string, gcMaxLifeTime int64) (map[interface{}]interface{}, error) {
 	// 1. Decode from base64.
 	b, err := decode([]byte(value))
 	if err != nil {
@@ -168,7 +168,7 @@ func decodeCookie(block cipher.Block, hashKey, name, value string, gcmaxlifetime
 	if t1 > t2 {
 		return nil, errors.New("decode: timestamp is too new")
 	}
-	if t1 < t2-gcmaxlifetime {
+	if t1 < t2-gcMaxLifeTime {
 		return nil, errors.New("decode: expired timestamp")
 	}
 	// 4. Decrypt (optional).

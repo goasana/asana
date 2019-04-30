@@ -36,7 +36,6 @@ import (
 	"compress/gzip"
 	"context"
 	"crypto/tls"
-	"github.com/goasana/framework/encoder/yaml"
 	"io"
 	"io/ioutil"
 	"log"
@@ -53,9 +52,10 @@ import (
 
 	"github.com/goasana/framework/encoder/json"
 	"github.com/goasana/framework/encoder/xml"
+	"github.com/goasana/framework/encoder/yaml"
 )
 
-var defaultSetting = BeegoHTTPSettings{
+var defaultSetting = AsanaHTTPSettings{
 	UserAgent:        "asanaServer",
 	ConnectTimeout:   60 * time.Second,
 	ReadWriteTimeout: 60 * time.Second,
@@ -74,16 +74,16 @@ func createDefaultCookie() {
 }
 
 // SetDefaultSetting Overwrite default settings
-func SetDefaultSetting(setting BeegoHTTPSettings) {
+func SetDefaultSetting(setting AsanaHTTPSettings) {
 	settingMutex.Lock()
 	defer settingMutex.Unlock()
 	defaultSetting = setting
 }
 
-// NewBeegoRequest return *BeegoHttpRequest with specific method
-func NewBeegoRequest(rawurl, method string) *BeegoHTTPRequest {
+// NewAsanaRequest return *AsanaHttpRequest with specific method
+func NewAsanaRequest(rawUrl, method string) *AsanaHTTPRequest {
 	var resp http.Response
-	u, err := url.Parse(rawurl)
+	u, err := url.Parse(rawUrl)
 	if err != nil {
 		log.Println("Httplib:", err)
 	}
@@ -95,8 +95,8 @@ func NewBeegoRequest(rawurl, method string) *BeegoHTTPRequest {
 		ProtoMajor: 1,
 		ProtoMinor: 1,
 	}
-	return &BeegoHTTPRequest{
-		url:     rawurl,
+	return &AsanaHTTPRequest{
+		url:     rawUrl,
 		req:     &req,
 		params:  map[string][]string{},
 		files:   map[string]string{},
@@ -105,33 +105,33 @@ func NewBeegoRequest(rawurl, method string) *BeegoHTTPRequest {
 	}
 }
 
-// Get returns *BeegoHttpRequest with GET method.
-func Get(url string) *BeegoHTTPRequest {
-	return NewBeegoRequest(url, "GET")
+// Get returns *AsanaHttpRequest with GET method.
+func Get(url string) *AsanaHTTPRequest {
+	return NewAsanaRequest(url, "GET")
 }
 
-// Post returns *BeegoHttpRequest with POST method.
-func Post(url string) *BeegoHTTPRequest {
-	return NewBeegoRequest(url, "POST")
+// Post returns *AsanaHttpRequest with POST method.
+func Post(url string) *AsanaHTTPRequest {
+	return NewAsanaRequest(url, "POST")
 }
 
-// Put returns *BeegoHttpRequest with PUT method.
-func Put(url string) *BeegoHTTPRequest {
-	return NewBeegoRequest(url, "PUT")
+// Put returns *AsanaHttpRequest with PUT method.
+func Put(url string) *AsanaHTTPRequest {
+	return NewAsanaRequest(url, "PUT")
 }
 
-// Delete returns *BeegoHttpRequest DELETE method.
-func Delete(url string) *BeegoHTTPRequest {
-	return NewBeegoRequest(url, "DELETE")
+// Delete returns *AsanaHttpRequest DELETE method.
+func Delete(url string) *AsanaHTTPRequest {
+	return NewAsanaRequest(url, "DELETE")
 }
 
-// Head returns *BeegoHttpRequest with HEAD method.
-func Head(url string) *BeegoHTTPRequest {
-	return NewBeegoRequest(url, "HEAD")
+// Head returns *AsanaHttpRequest with HEAD method.
+func Head(url string) *AsanaHTTPRequest {
+	return NewAsanaRequest(url, "HEAD")
 }
 
-// BeegoHTTPSettings is the http.Client setting
-type BeegoHTTPSettings struct {
+// AsanaHTTPSettings is the http.Client setting
+type AsanaHTTPSettings struct {
 	ShowDebug        bool
 	UserAgent        string
 	ConnectTimeout   time.Duration
@@ -146,49 +146,49 @@ type BeegoHTTPSettings struct {
 	Retries          int // if set to -1 means will retry forever
 }
 
-// BeegoHTTPRequest provides more useful methods for requesting one url than http.Request.
-type BeegoHTTPRequest struct {
+// AsanaHTTPRequest provides more useful methods for requesting one url than http.Request.
+type AsanaHTTPRequest struct {
 	url     string
 	req     *http.Request
 	params  map[string][]string
 	files   map[string]string
-	setting BeegoHTTPSettings
+	setting AsanaHTTPSettings
 	resp    *http.Response
 	body    []byte
 	dump    []byte
 }
 
 // GetRequest return the request object
-func (b *BeegoHTTPRequest) GetRequest() *http.Request {
+func (b *AsanaHTTPRequest) GetRequest() *http.Request {
 	return b.req
 }
 
 // Setting Change request settings
-func (b *BeegoHTTPRequest) Setting(setting BeegoHTTPSettings) *BeegoHTTPRequest {
+func (b *AsanaHTTPRequest) Setting(setting AsanaHTTPSettings) *AsanaHTTPRequest {
 	b.setting = setting
 	return b
 }
 
 // SetBasicAuth sets the request's Authorization header to use HTTP Basic Authentication with the provided username and password.
-func (b *BeegoHTTPRequest) SetBasicAuth(username, password string) *BeegoHTTPRequest {
+func (b *AsanaHTTPRequest) SetBasicAuth(username, password string) *AsanaHTTPRequest {
 	b.req.SetBasicAuth(username, password)
 	return b
 }
 
 // SetEnableCookie sets enable/disable cookiejar
-func (b *BeegoHTTPRequest) SetEnableCookie(enable bool) *BeegoHTTPRequest {
+func (b *AsanaHTTPRequest) SetEnableCookie(enable bool) *AsanaHTTPRequest {
 	b.setting.EnableCookie = enable
 	return b
 }
 
 // SetUserAgent sets User-Agent header field
-func (b *BeegoHTTPRequest) SetUserAgent(useragent string) *BeegoHTTPRequest {
+func (b *AsanaHTTPRequest) SetUserAgent(useragent string) *AsanaHTTPRequest {
 	b.setting.UserAgent = useragent
 	return b
 }
 
 // Debug sets show debug or not when executing request.
-func (b *BeegoHTTPRequest) Debug(isdebug bool) *BeegoHTTPRequest {
+func (b *AsanaHTTPRequest) Debug(isdebug bool) *AsanaHTTPRequest {
 	b.setting.ShowDebug = isdebug
 	return b
 }
@@ -197,50 +197,50 @@ func (b *BeegoHTTPRequest) Debug(isdebug bool) *BeegoHTTPRequest {
 // default is 0 means no retried.
 // -1 means retried forever.
 // others means retried times.
-func (b *BeegoHTTPRequest) Retries(times int) *BeegoHTTPRequest {
+func (b *AsanaHTTPRequest) Retries(times int) *AsanaHTTPRequest {
 	b.setting.Retries = times
 	return b
 }
 
 // DumpBody setting whether need to Dump the Body.
-func (b *BeegoHTTPRequest) DumpBody(isdump bool) *BeegoHTTPRequest {
+func (b *AsanaHTTPRequest) DumpBody(isdump bool) *AsanaHTTPRequest {
 	b.setting.DumpBody = isdump
 	return b
 }
 
 // DumpRequest return the DumpRequest
-func (b *BeegoHTTPRequest) DumpRequest() []byte {
+func (b *AsanaHTTPRequest) DumpRequest() []byte {
 	return b.dump
 }
 
-// SetTimeout sets connect time out and read-write time out for BeegoRequest.
-func (b *BeegoHTTPRequest) SetTimeout(connectTimeout, readWriteTimeout time.Duration) *BeegoHTTPRequest {
+// SetTimeout sets connect time out and read-write time out for AsanaRequest.
+func (b *AsanaHTTPRequest) SetTimeout(connectTimeout, readWriteTimeout time.Duration) *AsanaHTTPRequest {
 	b.setting.ConnectTimeout = connectTimeout
 	b.setting.ReadWriteTimeout = readWriteTimeout
 	return b
 }
 
 // SetTLSClientConfig sets tls connection configurations if visiting https url.
-func (b *BeegoHTTPRequest) SetTLSClientConfig(config *tls.Config) *BeegoHTTPRequest {
+func (b *AsanaHTTPRequest) SetTLSClientConfig(config *tls.Config) *AsanaHTTPRequest {
 	b.setting.TLSClientConfig = config
 	return b
 }
 
 // Header add header item string in request.
-func (b *BeegoHTTPRequest) Header(key, value string) *BeegoHTTPRequest {
+func (b *AsanaHTTPRequest) Header(key, value string) *AsanaHTTPRequest {
 	b.req.Header.Set(key, value)
 	return b
 }
 
 // SetHost set the request host
-func (b *BeegoHTTPRequest) SetHost(host string) *BeegoHTTPRequest {
+func (b *AsanaHTTPRequest) SetHost(host string) *AsanaHTTPRequest {
 	b.req.Host = host
 	return b
 }
 
 // SetProtocolVersion Set the protocol version for incoming requests.
 // Client requests always use HTTP/1.1.
-func (b *BeegoHTTPRequest) SetProtocolVersion(vers string) *BeegoHTTPRequest {
+func (b *AsanaHTTPRequest) SetProtocolVersion(vers string) *AsanaHTTPRequest {
 	if len(vers) == 0 {
 		vers = "HTTP/1.1"
 	}
@@ -256,13 +256,13 @@ func (b *BeegoHTTPRequest) SetProtocolVersion(vers string) *BeegoHTTPRequest {
 }
 
 // SetCookie add cookie into request.
-func (b *BeegoHTTPRequest) SetCookie(cookie *http.Cookie) *BeegoHTTPRequest {
+func (b *AsanaHTTPRequest) SetCookie(cookie *http.Cookie) *AsanaHTTPRequest {
 	b.req.Header.Add("Cookie", cookie.String())
 	return b
 }
 
 // SetTransport set the setting transport
-func (b *BeegoHTTPRequest) SetTransport(transport http.RoundTripper) *BeegoHTTPRequest {
+func (b *AsanaHTTPRequest) SetTransport(transport http.RoundTripper) *AsanaHTTPRequest {
 	b.setting.Transport = transport
 	return b
 }
@@ -274,7 +274,7 @@ func (b *BeegoHTTPRequest) SetTransport(transport http.RoundTripper) *BeegoHTTPR
 // 		u, _ := url.ParseRequestURI("http://127.0.0.1:8118")
 // 		return u, nil
 // 	}
-func (b *BeegoHTTPRequest) SetProxy(proxy func(*http.Request) (*url.URL, error)) *BeegoHTTPRequest {
+func (b *AsanaHTTPRequest) SetProxy(proxy func(*http.Request) (*url.URL, error)) *AsanaHTTPRequest {
 	b.setting.Proxy = proxy
 	return b
 }
@@ -283,14 +283,14 @@ func (b *BeegoHTTPRequest) SetProxy(proxy func(*http.Request) (*url.URL, error))
 //
 // If CheckRedirect is nil, the Client uses its default policy,
 // which is to stop after 10 consecutive requests.
-func (b *BeegoHTTPRequest) SetCheckRedirect(redirect func(req *http.Request, via []*http.Request) error) *BeegoHTTPRequest {
+func (b *AsanaHTTPRequest) SetCheckRedirect(redirect func(req *http.Request, via []*http.Request) error) *AsanaHTTPRequest {
 	b.setting.CheckRedirect = redirect
 	return b
 }
 
 // Param adds query param in to request.
 // params build query string as ?key1=value1&key2=value2...
-func (b *BeegoHTTPRequest) Param(key, value string) *BeegoHTTPRequest {
+func (b *AsanaHTTPRequest) Param(key, value string) *AsanaHTTPRequest {
 	if param, ok := b.params[key]; ok {
 		b.params[key] = append(param, value)
 	} else {
@@ -300,14 +300,14 @@ func (b *BeegoHTTPRequest) Param(key, value string) *BeegoHTTPRequest {
 }
 
 // PostFile add a post file to the request
-func (b *BeegoHTTPRequest) PostFile(formname, filename string) *BeegoHTTPRequest {
+func (b *AsanaHTTPRequest) PostFile(formname, filename string) *AsanaHTTPRequest {
 	b.files[formname] = filename
 	return b
 }
 
 // Body adds request raw body.
 // it supports string and []byte.
-func (b *BeegoHTTPRequest) Body(data interface{}) *BeegoHTTPRequest {
+func (b *AsanaHTTPRequest) Body(data interface{}) *AsanaHTTPRequest {
 	switch t := data.(type) {
 	case string:
 		bf := bytes.NewBufferString(t)
@@ -322,7 +322,7 @@ func (b *BeegoHTTPRequest) Body(data interface{}) *BeegoHTTPRequest {
 }
 
 // XMLBody adds request raw body encoding by XML.
-func (b *BeegoHTTPRequest) XMLBody(obj interface{}) (*BeegoHTTPRequest, error) {
+func (b *AsanaHTTPRequest) XMLBody(obj interface{}) (*AsanaHTTPRequest, error) {
 	if b.req.Body == nil && obj != nil {
 		byts, err := xml.Encode(obj, false)
 		if err != nil {
@@ -336,7 +336,7 @@ func (b *BeegoHTTPRequest) XMLBody(obj interface{}) (*BeegoHTTPRequest, error) {
 }
 
 // YAMLBody adds request raw body encoding by YAML.
-func (b *BeegoHTTPRequest) YAMLBody(obj interface{}) (*BeegoHTTPRequest, error) {
+func (b *AsanaHTTPRequest) YAMLBody(obj interface{}) (*AsanaHTTPRequest, error) {
 	if b.req.Body == nil && obj != nil {
 		byts, err := yaml.Encode(obj)
 		if err != nil {
@@ -344,13 +344,13 @@ func (b *BeegoHTTPRequest) YAMLBody(obj interface{}) (*BeegoHTTPRequest, error) 
 		}
 		b.req.Body = ioutil.NopCloser(bytes.NewReader(byts))
 		b.req.ContentLength = int64(len(byts))
-		b.req.Header.Set("Content-Type", "application/x+yaml")
+		b.req.Header.Set("Content-Type", "application/x-yaml")
 	}
 	return b, nil
 }
 
 // JSONBody adds request raw body encoding by JSON.
-func (b *BeegoHTTPRequest) JSONBody(obj interface{}) (*BeegoHTTPRequest, error) {
+func (b *AsanaHTTPRequest) JSONBody(obj interface{}) (*AsanaHTTPRequest, error) {
 	if b.req.Body == nil && obj != nil {
 		byts, err := json.Encode(obj, false)
 		if err != nil {
@@ -363,7 +363,7 @@ func (b *BeegoHTTPRequest) JSONBody(obj interface{}) (*BeegoHTTPRequest, error) 
 	return b, nil
 }
 
-func (b *BeegoHTTPRequest) buildURL(paramBody string) {
+func (b *AsanaHTTPRequest) buildURL(paramBody string) {
 	// build GET url with query string
 	if b.req.Method == "GET" && len(paramBody) > 0 {
 		if strings.Contains(b.url, "?") {
@@ -381,8 +381,8 @@ func (b *BeegoHTTPRequest) buildURL(paramBody string) {
 			pr, pw := io.Pipe()
 			bodyWriter := multipart.NewWriter(pw)
 			go func() {
-				for formname, filename := range b.files {
-					fileWriter, err := bodyWriter.CreateFormFile(formname, filename)
+				for formName, filename := range b.files {
+					fileWriter, err := bodyWriter.CreateFormFile(formName, filename)
 					if err != nil {
 						log.Println("Httplib:", err)
 					}
@@ -392,7 +392,7 @@ func (b *BeegoHTTPRequest) buildURL(paramBody string) {
 					}
 					// iocopy
 					_, err = io.Copy(fileWriter, fh)
-					fh.Close()
+					_ = fh.Close()
 					if err != nil {
 						log.Println("Httplib:", err)
 					}
@@ -418,7 +418,7 @@ func (b *BeegoHTTPRequest) buildURL(paramBody string) {
 	}
 }
 
-func (b *BeegoHTTPRequest) getResponse() (*http.Response, error) {
+func (b *AsanaHTTPRequest) getResponse() (*http.Response, error) {
 	if b.resp.StatusCode != 0 {
 		return b.resp, nil
 	}
@@ -431,7 +431,7 @@ func (b *BeegoHTTPRequest) getResponse() (*http.Response, error) {
 }
 
 // DoRequest will do the client.Do
-func (b *BeegoHTTPRequest) DoRequest() (resp *http.Response, err error) {
+func (b *AsanaHTTPRequest) DoRequest() (resp *http.Response, err error) {
 	var paramBody string
 	if len(b.params) > 0 {
 		var buf bytes.Buffer
@@ -522,7 +522,7 @@ func (b *BeegoHTTPRequest) DoRequest() (resp *http.Response, err error) {
 
 // String returns the body string in response.
 // it calls Response inner.
-func (b *BeegoHTTPRequest) String() (string, error) {
+func (b *AsanaHTTPRequest) String() (string, error) {
 	data, err := b.Bytes()
 	if err != nil {
 		return "", err
@@ -533,7 +533,7 @@ func (b *BeegoHTTPRequest) String() (string, error) {
 
 // Bytes returns the body []byte in response.
 // it calls Response inner.
-func (b *BeegoHTTPRequest) Bytes() ([]byte, error) {
+func (b *AsanaHTTPRequest) Bytes() ([]byte, error) {
 	if b.body != nil {
 		return b.body, nil
 	}
@@ -559,7 +559,7 @@ func (b *BeegoHTTPRequest) Bytes() ([]byte, error) {
 
 // ToFile saves the body data in response to one file.
 // it calls Response inner.
-func (b *BeegoHTTPRequest) ToFile(filename string) error {
+func (b *AsanaHTTPRequest) ToFile(filename string) error {
 	f, err := os.Create(filename)
 	if err != nil {
 		return err
@@ -580,7 +580,7 @@ func (b *BeegoHTTPRequest) ToFile(filename string) error {
 
 // ToJSON returns the map that marshals from the body bytes as json in response .
 // it calls Response inner.
-func (b *BeegoHTTPRequest) ToJSON(v interface{}) error {
+func (b *AsanaHTTPRequest) ToJSON(v interface{}) error {
 	data, err := b.Bytes()
 	if err != nil {
 		return err
@@ -590,7 +590,7 @@ func (b *BeegoHTTPRequest) ToJSON(v interface{}) error {
 
 // ToXML returns the map that marshals from the body bytes as xml in response .
 // it calls Response inner.
-func (b *BeegoHTTPRequest) ToXML(v interface{}) error {
+func (b *AsanaHTTPRequest) ToXML(v interface{}) error {
 	data, err := b.Bytes()
 	if err != nil {
 		return err
@@ -600,7 +600,7 @@ func (b *BeegoHTTPRequest) ToXML(v interface{}) error {
 
 // ToYAML returns the map that marshals from the body bytes as yaml in response .
 // it calls Response inner.
-func (b *BeegoHTTPRequest) ToYAML(v interface{}) error {
+func (b *AsanaHTTPRequest) ToYAML(v interface{}) error {
 	data, err := b.Bytes()
 	if err != nil {
 		return err
@@ -609,7 +609,7 @@ func (b *BeegoHTTPRequest) ToYAML(v interface{}) error {
 }
 
 // Response executes request client gets response mannually.
-func (b *BeegoHTTPRequest) Response() (*http.Response, error) {
+func (b *AsanaHTTPRequest) Response() (*http.Response, error) {
 	return b.getResponse()
 }
 

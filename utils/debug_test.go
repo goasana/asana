@@ -18,9 +18,9 @@ import (
 	"testing"
 )
 
-type mytype struct {
-	next *mytype
-	prev *mytype
+type myType struct {
+	next *myType
+	prev *myType
 }
 
 func TestPrint(t *testing.T) {
@@ -28,8 +28,8 @@ func TestPrint(t *testing.T) {
 }
 
 func TestPrintPoint(t *testing.T) {
-	var v1 = new(mytype)
-	var v2 = new(mytype)
+	var v1 = new(myType)
+	var v2 = new(myType)
 
 	v1.prev = nil
 	v1.next = v2

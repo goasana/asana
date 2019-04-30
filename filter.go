@@ -14,7 +14,9 @@
 
 package asana
 
-import "github.com/goasana/framework/context"
+import (
+	"github.com/goasana/framework/context"
+)
 
 // FilterFunc defines a filter function which is invoked before the controller handler is executed.
 type FilterFunc func(*context.Context)

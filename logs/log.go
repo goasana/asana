@@ -107,9 +107,9 @@ func Register(name string, log newLoggerFunc) {
 	adapters[name] = log
 }
 
-// BeeLogger is default logger in asana application.
+// AsanaLogger is default logger in asana application.
 // it can contain several providers and log message into all providers.
-type BeeLogger struct {
+type AsanaLogger struct {
 	lock                sync.Mutex
 	level               int
 	init                bool
@@ -139,11 +139,11 @@ type logMsg struct {
 
 var logMsgPool *sync.Pool
 
-// NewLogger returns a new BeeLogger.
+// NewLogger returns a new AsanaLogger.
 // channelLen means the number of messages in chan(used where asynchronous is true).
 // if the buffering chan is full, logger adapters write to file or other way.
-func NewLogger(channelLens ...int64) *BeeLogger {
-	bl := new(BeeLogger)
+func NewLogger(channelLens ...int64) *AsanaLogger {
+	bl := new(AsanaLogger)
 	bl.level = LevelDebug
 	bl.loggerFuncCallDepth = 2
 	bl.msgChanLen = append(channelLens, 0)[0]
@@ -156,7 +156,7 @@ func NewLogger(channelLens ...int64) *BeeLogger {
 }
 
 // Async set the log to asynchronous and start the goroutine
-func (bl *BeeLogger) Async(msgLen ...int64) *BeeLogger {
+func (bl *AsanaLogger) Async(msgLen ...int64) *AsanaLogger {
 	bl.lock.Lock()
 	defer bl.lock.Unlock()
 	if bl.asynchronous {
@@ -177,9 +177,9 @@ func (bl *BeeLogger) Async(msgLen ...int64) *BeeLogger {
 	return bl
 }
 
-// SetLogger provides a given logger adapter into BeeLogger with config string.
+// SetLogger provides a given logger adapter into AsanaLogger with config string.
 // config need to be correct JSON as string: {"interval":360}.
-func (bl *BeeLogger) setLogger(adapterName string, configs ...string) error {
+func (bl *AsanaLogger) setLogger(adapterName string, configs ...string) error {
 	config := append(configs, "{}")[0]
 	for _, l := range bl.outputs {
 		if l.name == adapterName {
@@ -195,16 +195,16 @@ func (bl *BeeLogger) setLogger(adapterName string, configs ...string) error {
 	lg := logAdapter()
 	err := lg.Init(config)
 	if err != nil {
-		_, _ = fmt.Fprintln(os.Stderr, "logs.BeeLogger.SetLogger: "+err.Error())
+		_, _ = fmt.Fprintln(os.Stderr, "logs.AsanaLogger.SetLogger: "+err.Error())
 		return err
 	}
 	bl.outputs = append(bl.outputs, &nameLogger{name: adapterName, Logger: lg})
 	return nil
 }
 
-// SetLogger provides a given logger adapter into BeeLogger with config string.
+// SetLogger provides a given logger adapter into AsanaLogger with config string.
 // config need to be correct JSON as string: {"interval":360}.
-func (bl *BeeLogger) SetLogger(adapterName string, configs ...string) error {
+func (bl *AsanaLogger) SetLogger(adapterName string, configs ...string) error {
 	bl.lock.Lock()
 	defer bl.lock.Unlock()
 	if !bl.init {
@@ -214,8 +214,8 @@ func (bl *BeeLogger) SetLogger(adapterName string, configs ...string) error {
 	return bl.setLogger(adapterName, configs...)
 }
 
-// DelLogger remove a logger adapter in BeeLogger.
-func (bl *BeeLogger) DelLogger(adapterName string) error {
+// DelLogger remove a logger adapter in AsanaLogger.
+func (bl *AsanaLogger) DelLogger(adapterName string) error {
 	bl.lock.Lock()
 	defer bl.lock.Unlock()
 	var outputs []*nameLogger
@@ -233,7 +233,7 @@ func (bl *BeeLogger) DelLogger(adapterName string) error {
 	return nil
 }
 
-func (bl *BeeLogger) writeToLoggers(when time.Time, msg string, level int) {
+func (bl *AsanaLogger) writeToLoggers(when time.Time, msg string, level int) {
 	for _, l := range bl.outputs {
 		err := l.WriteMsg(when, msg, level)
 		if err != nil {
@@ -242,7 +242,7 @@ func (bl *BeeLogger) writeToLoggers(when time.Time, msg string, level int) {
 	}
 }
 
-func (bl *BeeLogger) Write(p []byte) (n int, err error) {
+func (bl *AsanaLogger) Write(p []byte) (n int, err error) {
 	if len(p) == 0 {
 		return 0, nil
 	}
@@ -258,7 +258,7 @@ func (bl *BeeLogger) Write(p []byte) (n int, err error) {
 	return 0, err
 }
 
-func (bl *BeeLogger) writeMsg(logLevel int, msg string, v ...interface{}) error {
+func (bl *AsanaLogger) writeMsg(logLevel int, msg string, v ...interface{}) error {
 	if !bl.init {
 		bl.lock.Lock()
 		_ = bl.setLogger(AdapterConsole)
@@ -305,38 +305,38 @@ func (bl *BeeLogger) writeMsg(logLevel int, msg string, v ...interface{}) error 
 // SetLevel Set log message level.
 // If message level (such as LevelDebug) is higher than logger level (such as LevelWarning),
 // log providers will not even be sent the message.
-func (bl *BeeLogger) SetLevel(l int) {
+func (bl *AsanaLogger) SetLevel(l int) {
 	bl.level = l
 }
 
 // GetLevel Get Current log message level.
-func (bl *BeeLogger) GetLevel() int {
+func (bl *AsanaLogger) GetLevel() int {
 	return bl.level
 }
 
 // SetLogFuncCallDepth set log funcCallDepth
-func (bl *BeeLogger) SetLogFuncCallDepth(d int) {
+func (bl *AsanaLogger) SetLogFuncCallDepth(d int) {
 	bl.loggerFuncCallDepth = d
 }
 
 // GetLogFuncCallDepth return log funcCallDepth for wrapper
-func (bl *BeeLogger) GetLogFuncCallDepth() int {
+func (bl *AsanaLogger) GetLogFuncCallDepth() int {
 	return bl.loggerFuncCallDepth
 }
 
 // EnableFuncCallDepth enable log funcCallDepth
-func (bl *BeeLogger) EnableFuncCallDepth(b bool) {
+func (bl *AsanaLogger) EnableFuncCallDepth(b bool) {
 	bl.enableFuncCallDepth = b
 }
 
 // set prefix
-func (bl *BeeLogger) SetPrefix(s string) {
+func (bl *AsanaLogger) SetPrefix(s string) {
 	bl.prefix = s
 }
 
 // start logger chan reading.
 // when chan is not empty, write logs.
-func (bl *BeeLogger) startLogger() {
+func (bl *AsanaLogger) startLogger() {
 	gameOver := false
 	for {
 		select {
@@ -362,7 +362,7 @@ func (bl *BeeLogger) startLogger() {
 }
 
 // Emergency Log EMERGENCY level message.
-func (bl *BeeLogger) Emergency(format string, v ...interface{}) {
+func (bl *AsanaLogger) Emergency(format string, v ...interface{}) {
 	if LevelEmergency > bl.level {
 		return
 	}
@@ -370,7 +370,7 @@ func (bl *BeeLogger) Emergency(format string, v ...interface{}) {
 }
 
 // Alert Log ALERT level message.
-func (bl *BeeLogger) Alert(format string, v ...interface{}) {
+func (bl *AsanaLogger) Alert(format string, v ...interface{}) {
 	if LevelAlert > bl.level {
 		return
 	}
@@ -378,7 +378,7 @@ func (bl *BeeLogger) Alert(format string, v ...interface{}) {
 }
 
 // Critical Log CRITICAL level message.
-func (bl *BeeLogger) Critical(format string, v ...interface{}) {
+func (bl *AsanaLogger) Critical(format string, v ...interface{}) {
 	if LevelCritical > bl.level {
 		return
 	}
@@ -386,7 +386,7 @@ func (bl *BeeLogger) Critical(format string, v ...interface{}) {
 }
 
 // Error Log ERROR level message.
-func (bl *BeeLogger) Error(format string, v ...interface{}) {
+func (bl *AsanaLogger) Error(format string, v ...interface{}) {
 	if LevelError > bl.level {
 		return
 	}
@@ -394,7 +394,7 @@ func (bl *BeeLogger) Error(format string, v ...interface{}) {
 }
 
 // Warning Log WARNING level message.
-func (bl *BeeLogger) Warning(format string, v ...interface{}) {
+func (bl *AsanaLogger) Warning(format string, v ...interface{}) {
 	if LevelWarn > bl.level {
 		return
 	}
@@ -402,7 +402,7 @@ func (bl *BeeLogger) Warning(format string, v ...interface{}) {
 }
 
 // Notice Log NOTICE level message.
-func (bl *BeeLogger) Notice(format string, v ...interface{}) {
+func (bl *AsanaLogger) Notice(format string, v ...interface{}) {
 	if LevelNotice > bl.level {
 		return
 	}
@@ -410,7 +410,7 @@ func (bl *BeeLogger) Notice(format string, v ...interface{}) {
 }
 
 // Informational Log INFORMATIONAL level message.
-func (bl *BeeLogger) Informational(format string, v ...interface{}) {
+func (bl *AsanaLogger) Informational(format string, v ...interface{}) {
 	if LevelInfo > bl.level {
 		return
 	}
@@ -418,7 +418,7 @@ func (bl *BeeLogger) Informational(format string, v ...interface{}) {
 }
 
 // Debug Log DEBUG level message.
-func (bl *BeeLogger) Debug(format string, v ...interface{}) {
+func (bl *AsanaLogger) Debug(format string, v ...interface{}) {
 	if LevelDebug > bl.level {
 		return
 	}
@@ -427,7 +427,7 @@ func (bl *BeeLogger) Debug(format string, v ...interface{}) {
 
 // Warn Log WARN level message.
 // compatibility alias for Warning()
-func (bl *BeeLogger) Warn(format string, v ...interface{}) {
+func (bl *AsanaLogger) Warn(format string, v ...interface{}) {
 	if LevelWarn > bl.level {
 		return
 	}
@@ -436,7 +436,7 @@ func (bl *BeeLogger) Warn(format string, v ...interface{}) {
 
 // Info Log INFO level message.
 // compatibility alias for Informational()
-func (bl *BeeLogger) Info(format string, v ...interface{}) {
+func (bl *AsanaLogger) Info(format string, v ...interface{}) {
 	if LevelInfo > bl.level {
 		return
 	}
@@ -445,7 +445,7 @@ func (bl *BeeLogger) Info(format string, v ...interface{}) {
 
 // Trace Log TRACE level message.
 // compatibility alias for Debug()
-func (bl *BeeLogger) Trace(format string, v ...interface{}) {
+func (bl *AsanaLogger) Trace(format string, v ...interface{}) {
 	if LevelDebug > bl.level {
 		return
 	}
@@ -453,7 +453,7 @@ func (bl *BeeLogger) Trace(format string, v ...interface{}) {
 }
 
 // Flush flush all chan data.
-func (bl *BeeLogger) Flush() {
+func (bl *AsanaLogger) Flush() {
 	if bl.asynchronous {
 		bl.signalChan <- "flush"
 		bl.wg.Wait()
@@ -463,8 +463,8 @@ func (bl *BeeLogger) Flush() {
 	bl.flush()
 }
 
-// Close close logger, flush all chan data and destroy all adapters in BeeLogger.
-func (bl *BeeLogger) Close() {
+// Close close logger, flush all chan data and destroy all adapters in AsanaLogger.
+func (bl *AsanaLogger) Close() {
 	if bl.asynchronous {
 		bl.signalChan <- "close"
 		bl.wg.Wait()
@@ -480,7 +480,7 @@ func (bl *BeeLogger) Close() {
 }
 
 // Reset close all outputs, and set bl.outputs to nil
-func (bl *BeeLogger) Reset() {
+func (bl *AsanaLogger) Reset() {
 	bl.Flush()
 	for _, l := range bl.outputs {
 		l.Destroy()
@@ -488,7 +488,7 @@ func (bl *BeeLogger) Reset() {
 	bl.outputs = nil
 }
 
-func (bl *BeeLogger) flush() {
+func (bl *AsanaLogger) flush() {
 	if bl.asynchronous {
 		for {
 			if len(bl.msgChan) > 0 {
@@ -508,8 +508,8 @@ func (bl *BeeLogger) flush() {
 // asanaLogger references the used application logger.
 var asanaLogger = NewLogger()
 
-// GetBeeLogger returns the default BeeLogger
-func GetBeeLogger() *BeeLogger {
+// GetAsanaLogger returns the default AsanaLogger
+func GetAsanaLogger() *AsanaLogger {
 	return asanaLogger
 }
 
@@ -520,7 +520,7 @@ var asanaLoggerMap = struct {
 	logs: map[string]*log.Logger{},
 }
 
-// GetLogger returns the default BeeLogger
+// GetLogger returns the default AsanaLogger
 func GetLogger(prefixes ...string) *log.Logger {
 	prefix := append(prefixes, "")[0]
 	if prefix != "" {
@@ -548,8 +548,8 @@ func Reset() {
 	asanaLogger.Reset()
 }
 
-// Async set the beelogger with Async mode and hold msglen messages
-func Async(msgLen ...int64) *BeeLogger {
+// Async set the asanalogger with Async mode and hold msglen messages
+func Async(msgLen ...int64) *AsanaLogger {
 	return asanaLogger.Async(msgLen...)
 }
 

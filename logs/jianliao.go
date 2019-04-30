@@ -25,8 +25,8 @@ func newJLWriter() Logger {
 }
 
 // Init JLWriter with json config string
-func (s *JLWriter) Init(jsonconfig string) error {
-	return json.Decode([]byte(jsonconfig), s)
+func (s *JLWriter) Init(jsonConfig string) error {
+	return json.Decode([]byte(jsonConfig), s)
 }
 
 // WriteMsg write message in smtp writer.
@@ -55,7 +55,7 @@ func (s *JLWriter) WriteMsg(when time.Time, msg string, level int) error {
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("Post webhook failed %s %d", resp.Status, resp.StatusCode)
+		return fmt.Errorf("post webhook failed %s %d", resp.Status, resp.StatusCode)
 	}
 	return nil
 }

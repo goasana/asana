@@ -537,6 +537,7 @@ var mimemaps = map[string]string{
 	".potx":        "application/vnd.openxmlformats-officedocument.presentationml.template",
 	".potm":        "application/vnd.ms-powerpoint.template.macroEnabled.12",
 	".ppam":        "application/vnd.ms-powerpoint.addin.macroEnabled.12",
+	".proto":       "application/x-protobuf",
 	".sldx":        "application/vnd.openxmlformats-officedocument.presentationml.slide",
 	".sldm":        "application/vnd.ms-powerpoint.slide.macroEnabled.12",
 	".thmx":        "application/vnd.ms-officetheme",
@@ -553,4 +554,6 @@ var mimemaps = map[string]string{
 	".xpi":         "application/x-xpinstall",
 	".oex":         "application/x-opera-extension",
 	".mustache":    "text/html",
+	".yaml":        "application/x-yaml",
+	".yml":         "application/x-yaml",
 }

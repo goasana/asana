@@ -32,7 +32,7 @@ func TestNamespaceGet(t *testing.T) {
 		ctx.Output.Body([]byte("v1_user"))
 	})
 	AddNamespace(ns)
-	BeeApp.Handlers.ServeHTTP(w, r)
+	AsanaApp.Handlers.ServeHTTP(w, r)
 	if w.Body.String() != "v1_user" {
 		t.Errorf("TestNamespaceGet can't run, get the response is " + w.Body.String())
 	}
@@ -47,7 +47,7 @@ func TestNamespacePost(t *testing.T) {
 		ctx.Output.Body([]byte(ctx.Input.Param(":id")))
 	})
 	AddNamespace(ns)
-	BeeApp.Handlers.ServeHTTP(w, r)
+	AsanaApp.Handlers.ServeHTTP(w, r)
 	if w.Body.String() != "123" {
 		t.Errorf("TestNamespacePost can't run, get the response is " + w.Body.String())
 	}
@@ -65,7 +65,7 @@ func TestNamespaceNest(t *testing.T) {
 			}),
 	)
 	AddNamespace(ns)
-	BeeApp.Handlers.ServeHTTP(w, r)
+	AsanaApp.Handlers.ServeHTTP(w, r)
 	if w.Body.String() != "order" {
 		t.Errorf("TestNamespaceNest can't run, get the response is " + w.Body.String())
 	}
@@ -83,7 +83,7 @@ func TestNamespaceNestParam(t *testing.T) {
 			}),
 	)
 	AddNamespace(ns)
-	BeeApp.Handlers.ServeHTTP(w, r)
+	AsanaApp.Handlers.ServeHTTP(w, r)
 	if w.Body.String() != "123" {
 		t.Errorf("TestNamespaceNestParam can't run, get the response is " + w.Body.String())
 	}
@@ -96,7 +96,7 @@ func TestNamespaceRouter(t *testing.T) {
 	ns := NewNamespace("/v1")
 	ns.Router("/api/list", &TestController{}, "*:List")
 	AddNamespace(ns)
-	BeeApp.Handlers.ServeHTTP(w, r)
+	AsanaApp.Handlers.ServeHTTP(w, r)
 	if w.Body.String() != "i am list" {
 		t.Errorf("TestNamespaceRouter can't run, get the response is " + w.Body.String())
 	}
@@ -109,7 +109,7 @@ func TestNamespaceAutoFunc(t *testing.T) {
 	ns := NewNamespace("/v1")
 	ns.AutoRouter(&TestController{})
 	AddNamespace(ns)
-	BeeApp.Handlers.ServeHTTP(w, r)
+	AsanaApp.Handlers.ServeHTTP(w, r)
 	if w.Body.String() != "i am list" {
 		t.Errorf("user define func can't run")
 	}
@@ -127,7 +127,7 @@ func TestNamespaceFilter(t *testing.T) {
 			ctx.Output.Body([]byte(ctx.Input.Param(":id")))
 		})
 	AddNamespace(ns)
-	BeeApp.Handlers.ServeHTTP(w, r)
+	AsanaApp.Handlers.ServeHTTP(w, r)
 	if w.Body.String() != "this is Filter" {
 		t.Errorf("TestNamespaceFilter can't run, get the response is " + w.Body.String())
 	}
@@ -143,7 +143,7 @@ func TestNamespaceCond(t *testing.T) {
 	}).
 		AutoRouter(&TestController{})
 	AddNamespace(ns)
-	BeeApp.Handlers.ServeHTTP(w, r)
+	AsanaApp.Handlers.ServeHTTP(w, r)
 	if w.Code != 405 {
 		t.Errorf("TestNamespaceCond can't run get the result " + strconv.Itoa(w.Code))
 	}
@@ -161,7 +161,7 @@ func TestNamespaceInside(t *testing.T) {
 		),
 	)
 	AddNamespace(ns)
-	BeeApp.Handlers.ServeHTTP(w, r)
+	AsanaApp.Handlers.ServeHTTP(w, r)
 	if w.Body.String() != "123" {
 		t.Errorf("TestNamespaceInside can't run, get the response is " + w.Body.String())
 	}

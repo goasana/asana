@@ -19,7 +19,6 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"github.com/goasana/framework/encoder/json"
 	"io"
 	"mime"
 	"mime/multipart"
@@ -32,12 +31,14 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+
+	"github.com/goasana/framework/encoder/json"
 )
 
 const (
 	maxLineLength = 76
 
-	upperhex = "0123456789ABCDEF"
+	upperHex = "0123456789ABCDEF"
 )
 
 // Email is the type used for email messages
@@ -99,15 +100,15 @@ func (e *Email) Bytes() ([]byte, error) {
 
 	// Write the envelope headers (including any custom headers)
 	if err := headerToBytes(buff, e.Headers); err != nil {
-		return nil, fmt.Errorf("Failed to render message headers: %s", err)
+		return nil, fmt.Errorf("failed to render message headers: %s", err)
 	}
 
 	e.Headers.Set("Content-Type", fmt.Sprintf("multipart/mixed;\r\n boundary=%s\r\n", w.Boundary()))
-	fmt.Fprintf(buff, "%s:", "Content-Type")
-	fmt.Fprintf(buff, " %s\r\n", fmt.Sprintf("multipart/mixed;\r\n boundary=%s\r\n", w.Boundary()))
+	_, _ = fmt.Fprintf(buff, "%s:", "Content-Type")
+	_, _ = fmt.Fprintf(buff, " %s\r\n", fmt.Sprintf("multipart/mixed;\r\n boundary=%s\r\n", w.Boundary()))
 
 	// Start the multipart/mixed part
-	fmt.Fprintf(buff, "--%s\r\n", w.Boundary())
+	_, _ = fmt.Fprintf(buff, "--%s\r\n", w.Boundary())
 	header := textproto.MIMEHeader{}
 	// Check to see if there is a Text or HTML field
 	if e.Text != "" || e.HTML != "" {
@@ -116,7 +117,7 @@ func (e *Email) Bytes() ([]byte, error) {
 		header.Set("Content-Type", fmt.Sprintf("multipart/alternative;\r\n boundary=%s\r\n", subWriter.Boundary()))
 		// Write the header
 		if err := headerToBytes(buff, header); err != nil {
-			return nil, fmt.Errorf("Failed to render multipart message headers: %s", err)
+			return nil, fmt.Errorf("failed to render multipart message headers: %s", err)
 		}
 		// Create the body sections
 		if e.Text != "" {
@@ -163,7 +164,7 @@ func (e *Email) Bytes() ([]byte, error) {
 // AttachFile Add attach file to the send mail
 func (e *Email) AttachFile(args ...string) (a *Attachment, err error) {
 	if len(args) < 1 && len(args) > 2 {
-		err = errors.New("Must specify a file name and number of parameters can not exceed at least two")
+		err = errors.New("must specify a file name and number of parameters can not exceed at least two")
 		return
 	}
 	filename := args[0]
@@ -184,7 +185,7 @@ func (e *Email) AttachFile(args ...string) (a *Attachment, err error) {
 // Parameters include an io.Reader, the desired filename for the attachment, and the Content-Type.
 func (e *Email) Attach(r io.Reader, filename string, args ...string) (a *Attachment, err error) {
 	if len(args) < 1 && len(args) > 2 {
-		err = errors.New("Must specify the file type and number of parameters can not exceed at least two")
+		err = errors.New("must specify the file type and number of parameters can not exceed at least two")
 		return
 	}
 	c := args[0] //Content-Type
@@ -229,7 +230,7 @@ func (e *Email) Send() error {
 	to = append(append(append(to, e.To...), e.Cc...), e.Bcc...)
 	// Check to make sure there is at least one recipient and one "From" address
 	if len(to) == 0 {
-		return errors.New("Must specify at least one To address")
+		return errors.New("must specify at least one To address")
 	}
 
 	// Use the username if no From is provided
@@ -262,7 +263,7 @@ func quotePrintEncode(w io.Writer, s string) error {
 		// quoted-printble uses CRLF line breaks. (Literal CRs will become
 		// "=0D", but probably shouldn't be there to begin with!)
 		if c == '\n' {
-			io.WriteString(w, "\r\n")
+			_, _ = io.WriteString(w, "\r\n")
 			mc = 0
 			continue
 		}
@@ -291,7 +292,7 @@ func quotePrintEncode(w io.Writer, s string) error {
 	}
 	// No trailing end-of-line?? Soft line break, then. TODO: is this sane?
 	if mc > 0 {
-		io.WriteString(w, "=\r\n")
+		_, _ = io.WriteString(w, "=\r\n")
 	}
 	return nil
 }
@@ -340,7 +341,7 @@ func base64Wrap(w io.Writer, b []byte) {
 	// Process raw chunks until there's no longer enough to fill a line.
 	for len(b) >= maxRaw {
 		base64.StdEncoding.Encode(buffer[:], b[:maxRaw])
-		w.Write(buffer[:])
+		_, _ = w.Write(buffer[:])
 		b = b[maxRaw:]
 	}
 	// Handle the last chunk of bytes.
@@ -348,7 +349,7 @@ func base64Wrap(w io.Writer, b []byte) {
 		out := buffer[:base64.StdEncoding.EncodedLen(len(b))]
 		base64.StdEncoding.Encode(out, b)
 		out = append(out, "\r\n"...)
-		w.Write(out)
+		_, _ = w.Write(out)
 	}
 }
 
@@ -392,8 +393,8 @@ func encodeWord(charset, s string) string {
 			buf.WriteByte(b)
 		default:
 			enc[0] = '='
-			enc[1] = upperhex[b>>4]
-			enc[2] = upperhex[b&0x0f]
+			enc[1] = upperHex[b>>4]
+			enc[2] = upperHex[b&0x0f]
 			buf.Write(enc)
 		}
 	}

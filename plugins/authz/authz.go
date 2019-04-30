@@ -42,9 +42,9 @@ package authz
 import (
 	"net/http"
 
+	"github.com/casbin/casbin"
 	"github.com/goasana/framework"
 	"github.com/goasana/framework/context"
-	"github.com/casbin/casbin"
 )
 
 // NewAuthorizer returns the authorizer.

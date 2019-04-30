@@ -250,7 +250,7 @@ func Htmlunquote(text string) string {
 //
 //  more detail http://asana.me/docs/mvc/controller/urlbuilding.md
 func URLFor(endpoint string, values ...interface{}) string {
-	return BeeApp.Handlers.URLFor(endpoint, values...)
+	return AsanaApp.Handlers.URLFor(endpoint, values...)
 }
 
 // AssetsJs returns script tag with src string.

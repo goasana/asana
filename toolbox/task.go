@@ -36,7 +36,7 @@ var (
 	taskLock      sync.Mutex
 	stop          chan bool
 	changed       chan bool
-	isstart       bool
+	isStart       bool
 	seconds       = bounds{0, 59, nil}
 	minutes       = bounds{0, 59, nil}
 	hours         = bounds{0, 23, nil}
@@ -103,21 +103,21 @@ type taskerr struct {
 
 // Task task struct
 type Task struct {
-	Taskname string
+	TaskName string
 	Spec     *Schedule
 	SpecStr  string
 	DoFunc   TaskFunc
 	Prev     time.Time
 	Next     time.Time
-	Errlist  []*taskerr // like errtime:errinfo
+	ErrList  []*taskerr // like errtime:errinfo
 	ErrLimit int        // max length for the errlist, 0 stand for no limit
 }
 
 // NewTask add new task with name, time and func
-func NewTask(tname string, spec string, f TaskFunc) *Task {
+func NewTask(tName string, spec string, f TaskFunc) *Task {
 
 	task := &Task{
-		Taskname: tname,
+		TaskName: tName,
 		DoFunc:   f,
 		ErrLimit: 100,
 		SpecStr:  spec,
@@ -134,7 +134,7 @@ func (t *Task) GetSpec() string {
 // GetStatus get current task status
 func (t *Task) GetStatus() string {
 	var str string
-	for _, v := range t.Errlist {
+	for _, v := range t.ErrList {
 		str += v.t.String() + ":" + v.errinfo + "<br>"
 	}
 	return str
@@ -144,8 +144,8 @@ func (t *Task) GetStatus() string {
 func (t *Task) Run() error {
 	err := t.DoFunc()
 	if err != nil {
-		if t.ErrLimit > 0 && t.ErrLimit > len(t.Errlist) {
-			t.Errlist = append(t.Errlist, &taskerr{t: t.Next, errinfo: err.Error()})
+		if t.ErrLimit > 0 && t.ErrLimit > len(t.ErrList) {
+			t.ErrList = append(t.ErrList, &taskerr{t: t.Next, errinfo: err.Error()})
 		}
 	}
 	return err
@@ -393,11 +393,11 @@ func dayMatches(s *Schedule, t time.Time) bool {
 func StartTask() {
 	taskLock.Lock()
 	defer taskLock.Unlock()
-	if isstart {
+	if isStart {
 		//If already started， no need to start another goroutine.
 		return
 	}
-	isstart = true
+	isStart = true
 	go run()
 }
 
@@ -446,8 +446,8 @@ func run() {
 func StopTask() {
 	taskLock.Lock()
 	defer taskLock.Unlock()
-	if isstart {
-		isstart = false
+	if isStart {
+		isStart = false
 		stop <- true
 	}
 
@@ -459,7 +459,7 @@ func AddTask(taskName string, t Tasker) {
 	defer taskLock.Unlock()
 	t.SetNext(time.Now().Local())
 	AdminTaskList[taskName] = t
-	if isstart {
+	if isStart {
 		changed <- true
 	}
 }
@@ -469,7 +469,7 @@ func DeleteTask(taskName string) {
 	taskLock.Lock()
 	defer taskLock.Unlock()
 	delete(AdminTaskList, taskName)
-	if isstart {
+	if isStart {
 		changed <- true
 	}
 }
@@ -534,11 +534,11 @@ func getRange(expr string, r bounds) uint64 {
 		singleDigit      = len(lowAndHigh) == 1
 	)
 
-	var extrastar uint64
+	var extraStar uint64
 	if lowAndHigh[0] == "*" || lowAndHigh[0] == "?" {
 		start = r.min
 		end = r.max
-		extrastar = starBit
+		extraStar = starBit
 	} else {
 		start = parseIntOrName(lowAndHigh[0], r.names)
 		switch len(lowAndHigh) {
@@ -575,7 +575,7 @@ func getRange(expr string, r bounds) uint64 {
 		log.Panicf("Beginning of range (%d) beyond end of range (%d): %s", start, end, expr)
 	}
 
-	return getBits(start, end, step) | extrastar
+	return getBits(start, end, step) | extraStar
 }
 
 // parseIntOrName returns the (possibly-named) integer contained in expr.

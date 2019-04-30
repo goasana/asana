@@ -275,7 +275,7 @@ func (c *Controller) RenderBytes() ([]byte, error) {
 		}
 
 		buf.Reset()
-		ExecuteViewPathTemplate(&buf, c.Layout, c.viewPath(), c.Data)
+		_ = ExecuteViewPathTemplate(&buf, c.Layout, c.viewPath(), c.Data)
 	}
 	return buf.Bytes(), err
 }
@@ -301,7 +301,7 @@ func (c *Controller) renderTemplate() (bytes.Buffer, error) {
 				}
 			}
 		}
-		BuildTemplate(c.viewPath(), buildFiles...)
+		_ = BuildTemplate(c.viewPath(), buildFiles...)
 	}
 	return buf, ExecuteViewPathTemplate(&buf, c.TplName, c.viewPath(), c.Data)
 }
@@ -354,7 +354,7 @@ func (c *Controller) CustomAbort(status int, body string) {
 	}
 	// last panic user string
 	c.Ctx.ResponseWriter.WriteHeader(status)
-	c.Ctx.ResponseWriter.Write([]byte(body))
+	_, _ = c.Ctx.ResponseWriter.Write([]byte(body))
 	panic(ErrAbort)
 }
 
@@ -379,29 +379,29 @@ func (c *Controller) URLFor(endpoint string, values ...interface{}) string {
 func (c *Controller) ServeJSON(encoding ...bool) {
 	hasIndent := BConfig.RunMode != PROD
 	hasEncoding := len(encoding) > 0 && encoding[0]
-	c.Ctx.Output.JSON(c.Data["json"], hasIndent, hasEncoding)
+	_ = c.Ctx.Output.JSON(c.Data["json"], hasIndent, hasEncoding)
 }
 
 // ServeJSONP sends a jsonp response.
 func (c *Controller) ServeJSONP() {
 	hasIndent := BConfig.RunMode != PROD
-	c.Ctx.Output.JSONP(c.Data["jsonp"], hasIndent)
+	_ = c.Ctx.Output.JSONP(c.Data["jsonp"], hasIndent)
 }
 
 // ServeXML sends xml response.
 func (c *Controller) ServeXML() {
 	hasIndent := BConfig.RunMode != PROD
-	c.Ctx.Output.XML(c.Data["xml"], hasIndent)
+	_ = c.Ctx.Output.XML(c.Data["xml"], hasIndent)
 }
 
 // ServeYAML sends yaml response.
 func (c *Controller) ServeYAML() {
-	c.Ctx.Output.YAML(c.Data["yaml"])
+	_ = c.Ctx.Output.YAML(c.Data["yaml"])
 }
 
 // ServeProtoBuf sends protobuf response.
 func (c *Controller) ServeProtoBuf() {
-	c.Ctx.Output.ProtoBuf(c.Data["protobuf"])
+	_ = c.Ctx.Output.ProtoBuf(c.Data["protobuf"])
 }
 
 // ServeFormatted serve YAML, XML OR JSON, depending on the value of the Accept header
@@ -424,7 +424,7 @@ func (c *Controller) ServeFormatted(encoding ...bool) {
 // Input returns the input data map from POST or PUT request body and query string.
 func (c *Controller) Input() url.Values {
 	if c.Ctx.Request.Form == nil {
-		c.Ctx.Request.ParseForm()
+		_ = c.Ctx.Request.ParseForm()
 	}
 	return c.Ctx.Request.Form
 }
@@ -609,18 +609,18 @@ func (c *Controller) GetFiles(key string) ([]*multipart.FileHeader, error) {
 
 // SaveToFile saves uploaded file to new path.
 // it only operates the first one of mutil-upload form file field.
-func (c *Controller) SaveToFile(fromfile, tofile string) error {
-	file, _, err := c.Ctx.Request.FormFile(fromfile)
+func (c *Controller) SaveToFile(fromFile, toFile string) error {
+	file, _, err := c.Ctx.Request.FormFile(fromFile)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
-	f, err := os.OpenFile(tofile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	f, err := os.OpenFile(toFile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
-	io.Copy(f, file)
+	_, _ = io.Copy(f, file)
 	return nil
 }
 
@@ -637,7 +637,7 @@ func (c *Controller) SetSession(name interface{}, value interface{}) {
 	if c.CruSession == nil {
 		c.StartSession()
 	}
-	c.CruSession.Set(name, value)
+	_ = c.CruSession.Set(name, value)
 }
 
 // GetSession gets value from session.
@@ -653,7 +653,7 @@ func (c *Controller) DelSession(name interface{}) {
 	if c.CruSession == nil {
 		c.StartSession()
 	}
-	c.CruSession.Delete(name)
+	_ = c.CruSession.Delete(name)
 }
 
 // SessionRegenerateID regenerates session id for this session.
@@ -668,7 +668,7 @@ func (c *Controller) SessionRegenerateID() {
 
 // DestroySession cleans session data and session cookie.
 func (c *Controller) DestroySession() {
-	c.Ctx.Input.CruSession.Flush()
+	_ = c.Ctx.Input.CruSession.Flush()
 	c.Ctx.Input.CruSession = nil
 	GlobalSessions.SessionDestroy(c.Ctx.ResponseWriter, c.Ctx.Request)
 }

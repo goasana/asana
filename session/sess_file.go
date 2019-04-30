@@ -107,7 +107,7 @@ func (fs *FileSessionStore) SessionRelease(w http.ResponseWriter) {
 	_ = f.Truncate(0)
 	_, _ = f.Seek(0, 0)
 	_, _ = f.Write(b)
-	f.Close()
+	_ = f.Close()
 }
 
 // FileProvider File session provider

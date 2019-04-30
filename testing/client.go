@@ -24,12 +24,12 @@ var baseURL = "http://localhost:"
 
 // TestHTTPRequest asana test request client
 type TestHTTPRequest struct {
-	httplib.BeegoHTTPRequest
+	httplib.AsanaHTTPRequest
 }
 
 func getPort() string {
 	if port == "" {
-		conf, err := config.NewConfig("ini", "../conf/app.conf")
+		conf, err := config.NewConfig(config.FileProvider, "../conf/app.yaml")
 		if err != nil {
 			return "8080"
 		}

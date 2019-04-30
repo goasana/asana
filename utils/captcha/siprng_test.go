@@ -18,9 +18,9 @@ import "testing"
 
 func TestSiphash(t *testing.T) {
 	good := uint64(0xe849e8bb6ffe2567)
-	cur := siphash(0, 0, 0)
+	cur := sipHash(0, 0, 0)
 	if cur != good {
-		t.Fatalf("siphash: expected %x, got %x", good, cur)
+		t.Fatalf("sipHash: expected %x, got %x", good, cur)
 	}
 }
 

@@ -714,7 +714,7 @@ type ProtoBufController struct {
 }
 
 var expectedProtoObject = &protoexample.Test{
-	Name: "beego protobuf",
+	Name: "asana protobuf",
 }
 
 func (jc *ProtoBufController) Prepare() {

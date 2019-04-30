@@ -35,7 +35,7 @@ starts working on it.
 
 Also when filing an issue, make sure to answer these five questions:
 
-- What version of asana are you using (bee version)?
+- What version of asana are you using (asana version)?
 - What operating system and processor architecture are you using?
 - What did you do?
 - What did you expect to see?

@@ -12,8 +12,8 @@ func TestRedisSentinel(t *testing.T) {
 	sessionConfig := &session.ManagerConfig{
 		CookieName:      "gosessionid",
 		EnableSetCookie: true,
-		Gclifetime:      3600,
-		Maxlifetime:     3600,
+		GcLifeTime:      3600,
+		MaxLifeTime:     3600,
 		Secure:          false,
 		CookieLifeTime:  3600,
 		ProviderConfig:  "127.0.0.1:6379,100,,0,master",

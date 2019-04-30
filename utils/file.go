@@ -46,13 +46,13 @@ func FileExists(name string) bool {
 
 // SearchFile Search a file in paths.
 // this is often used in search config file in /etc ~/
-func SearchFile(filename string, paths ...string) (fullpath string, err error) {
+func SearchFile(filename string, paths ...string) (fullPath string, err error) {
 	for _, path := range paths {
-		if fullpath = filepath.Join(path, filename); FileExists(fullpath) {
+		if fullPath = filepath.Join(path, filename); FileExists(fullPath) {
 			return
 		}
 	}
-	err = errors.New(fullpath + " not found in paths")
+	err = errors.New(fullPath + " not found in paths")
 	return
 }
 

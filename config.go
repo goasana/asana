@@ -22,14 +22,13 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/goasana/framework/config"
-	"github.com/goasana/framework/config/base"
-	_ "github.com/goasana/framework/config/file"
 	"github.com/goasana/framework/context"
 	_ "github.com/goasana/framework/encoder/yaml"
 	"github.com/goasana/framework/logs"
 	"github.com/goasana/framework/session"
 	"github.com/goasana/framework/utils"
+	"github.com/micro/go-config"
+	"github.com/micro/go-config/source/file"
 )
 
 // Config is the main struct for BConfig
@@ -130,8 +129,6 @@ var (
 
 	// appConfigPath is the path to the config files
 	appConfigPath string
-	// appConfigProvider is the provider for the config, default is file
-	appConfigProvider = config.FileProvider
 )
 
 func init() {
@@ -145,14 +142,14 @@ func init() {
 		panic(err)
 	}
 	var filename = "app.yaml"
-	if os.Getenv("BEEGO_RUNMODE") != "" {
-		filename = os.Getenv("BEEGO_RUNMODE") + ".app.yaml"
+	if os.Getenv("ASANA_RUNMODE") != "" {
+		filename = os.Getenv("ASANA_RUNMODE") + ".app.yaml"
 	}
 	appConfigPath = filepath.Join(workPath, "conf", filename)
 	if !utils.FileExists(appConfigPath) {
 		appConfigPath = filepath.Join(AppPath, "conf", filename)
 		if !utils.FileExists(appConfigPath) {
-			AppConfig = &asanaAppConfig{Configer: base.NewBaseConfig()}
+			AppConfig = &asanaAppConfig{Config: config.NewConfig()}
 			return
 		}
 	}
@@ -234,8 +231,8 @@ func newBConfig() *Config {
 		WebConfig: WebConfig{
 			AutoRender:             true,
 			EnableDocs:             false,
-			FlashName:              "BEEGO_FLASH",
-			FlashSeparator:         "BEEGOFLASH",
+			FlashName:              "ASANA_FLASH",
+			FlashSeparator:         "ASANAFLASH",
 			DirectoryIndex:         false,
 			StaticDir:              map[string]string{"/static": "static"},
 			StaticExtensionsToGzip: []string{".css", ".js"},
@@ -256,7 +253,7 @@ func newBConfig() *Config {
 				SessionAutoSetCookie:         true,
 				SessionDomain:                "",
 				SessionEnableSidInHTTPHeader: false, // enable store/get the sessionId into/from http headers
-				SessionNameInHTTPHeader:      "Beegosessionid",
+				SessionNameInHTTPHeader:      "Asanasessionid",
 				SessionEnableSidInURLQuery:   false, // enable get the sessionId from Url Query params
 			},
 		},
@@ -272,25 +269,25 @@ func newBConfig() *Config {
 
 // now only support ini, next will support json.
 func parseConfig(appConfigPath string) (err error) {
-	AppConfig, err = newAppConfig(appConfigProvider, appConfigPath)
+	AppConfig, err = newAppConfig(appConfigPath)
 	if err != nil {
 		return err
 	}
 	return assignConfig(AppConfig)
 }
 
-func assignConfig(ac config.Configer) error {
+func assignConfig(ac config.Config) error {
 	for _, i := range []interface{}{BConfig, &BConfig.Listen, &BConfig.WebConfig, &BConfig.Log, &BConfig.WebConfig.Session} {
 		assignSingleConfig(i, ac)
 	}
 	// set the run mode first
-	if envRunMode := os.Getenv("BEEGO_RUNMODE"); envRunMode != "" {
+	if envRunMode := os.Getenv("ASANA_RUNMODE"); envRunMode != "" {
 		BConfig.RunMode = envRunMode
-	} else if runMode := ac.String("RunMode"); runMode != "" {
+	} else if runMode := ac.Get("RunMode").String(""); runMode != "" {
 		BConfig.RunMode = runMode
 	}
 
-	if sd := ac.String("StaticDir"); sd != "" {
+	if sd := ac.Get("StaticDir").String(""); sd != "" {
 		BConfig.WebConfig.StaticDir = map[string]string{}
 		sds := strings.Fields(sd)
 		for _, v := range sds {
@@ -302,7 +299,7 @@ func assignConfig(ac config.Configer) error {
 		}
 	}
 
-	if sgz := ac.String("StaticExtensionsToGzip"); sgz != "" {
+	if sgz := ac.Get("StaticExtensionsToGzip").String(""); sgz != "" {
 		extensions := strings.Split(sgz, ",")
 		var fileExts []string
 		for _, ext := range extensions {
@@ -320,7 +317,7 @@ func assignConfig(ac config.Configer) error {
 		}
 	}
 
-	if lo := ac.String("LogOutputs"); lo != "" {
+	if lo := ac.Get("LogOutputs").String(""); lo != "" {
 		// if lo is not nil or empty
 		// means user has set his own LogOutputs
 		// clear the default setting to BConfig.Log.Outputs
@@ -348,7 +345,7 @@ func assignConfig(ac config.Configer) error {
 	return nil
 }
 
-func assignSingleConfig(p interface{}, ac config.Configer) {
+func assignSingleConfig(p interface{}, ac config.Config) {
 	pt := reflect.TypeOf(p)
 	if pt.Kind() != reflect.Ptr {
 		return
@@ -367,12 +364,12 @@ func assignSingleConfig(p interface{}, ac config.Configer) {
 		name := pt.Field(i).Name
 		switch pf.Kind() {
 		case reflect.String:
-			pf.SetString(ac.DefaultString(pf.String(), name))
-		case reflect.Int, reflect.Int64:
-			pf.SetInt(ac.DefaultInt64(pf.Int(), name))
+			pf.SetString(ac.Get(name).String(pf.String()))
+		case reflect.Int:
+			pf.SetInt(int64(ac.Get(name).Int(int(pf.Int()))))
 		case reflect.Bool:
 			valDef := pf.Bool()
-			pf.SetBool(ac.DefaultBool(valDef, name))
+			pf.SetBool(ac.Get(name).Bool(valDef))
 		case reflect.Struct:
 		default:
 			//do nothing here
@@ -381,20 +378,23 @@ func assignSingleConfig(p interface{}, ac config.Configer) {
 }
 
 // LoadAppConfig allow developer to apply a config
-func LoadAppConfig(adapterName config.ConfigProvider, configName string) error {
-	appConfigProvider = adapterName
+func LoadAppConfig(configName string) error {
 	return parseConfig(configName)
 }
 
 type asanaAppConfig struct {
-	config.Configer
+	config.Config
 }
 
-func newAppConfig(appConfigProvider config.ConfigProvider, appConfigPath string) (*asanaAppConfig, error) {
-	ac, err := config.NewConfig(appConfigProvider, appConfigPath)
+func newAppConfig(appConfigPath string) (*asanaAppConfig, error) {
+	conf:= config.NewConfig()
+
+	err := conf.Load(file.NewSource(
+		file.WithPath(appConfigPath),
+	))
 
 	if err != nil {
 		return nil, err
 	}
-	return &asanaAppConfig{ac}, nil
+	return &asanaAppConfig{conf}, nil
 }

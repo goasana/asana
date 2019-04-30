@@ -15,13 +15,14 @@
 package authz
 
 import (
-	"github.com/goasana/framework"
-	"github.com/goasana/framework/context"
-	"github.com/goasana/framework/plugins/auth"
-	"github.com/casbin/casbin"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	
+	"github.com/casbin/casbin"
+	"github.com/goasana/framework"
+	"github.com/goasana/framework/context"
+	"github.com/goasana/framework/plugins/auth"
 )
 
 func testRequest(t *testing.T, handler *asana.ControllerRegister, user string, path string, method string, code int) {
@@ -38,8 +39,8 @@ func testRequest(t *testing.T, handler *asana.ControllerRegister, user string, p
 func TestBasic(t *testing.T) {
 	handler := asana.NewControllerRegister()
 
-	handler.InsertFilter("*", asana.BeforeRouter, auth.Basic("alice", "123"))
-	handler.InsertFilter("*", asana.BeforeRouter, NewAuthorizer(casbin.NewEnforcer("authz_model.conf", "authz_policy.csv")))
+	_ = handler.InsertFilter("*", asana.BeforeRouter, auth.Basic("alice", "123"))
+	_ = handler.InsertFilter("*", asana.BeforeRouter, NewAuthorizer(casbin.NewEnforcer("authz_model.conf", "authz_policy.csv")))
 
 	handler.Any("*", func(ctx *context.Context) {
 		ctx.Output.SetStatus(200)
@@ -54,8 +55,8 @@ func TestBasic(t *testing.T) {
 func TestPathWildcard(t *testing.T) {
 	handler := asana.NewControllerRegister()
 
-	handler.InsertFilter("*", asana.BeforeRouter, auth.Basic("bob", "123"))
-	handler.InsertFilter("*", asana.BeforeRouter, NewAuthorizer(casbin.NewEnforcer("authz_model.conf", "authz_policy.csv")))
+	_ = handler.InsertFilter("*", asana.BeforeRouter, auth.Basic("bob", "123"))
+	_ = handler.InsertFilter("*", asana.BeforeRouter, NewAuthorizer(casbin.NewEnforcer("authz_model.conf", "authz_policy.csv")))
 
 	handler.Any("*", func(ctx *context.Context) {
 		ctx.Output.SetStatus(200)
@@ -79,9 +80,9 @@ func TestPathWildcard(t *testing.T) {
 func TestRBAC(t *testing.T) {
 	handler := asana.NewControllerRegister()
 
-	handler.InsertFilter("*", asana.BeforeRouter, auth.Basic("cathy", "123"))
+	_ = handler.InsertFilter("*", asana.BeforeRouter, auth.Basic("cathy", "123"))
 	e := casbin.NewEnforcer("authz_model.conf", "authz_policy.csv")
-	handler.InsertFilter("*", asana.BeforeRouter, NewAuthorizer(e))
+	_ = handler.InsertFilter("*", asana.BeforeRouter, NewAuthorizer(e))
 
 	handler.Any("*", func(ctx *context.Context) {
 		ctx.Output.SetStatus(200)

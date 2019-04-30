@@ -27,18 +27,18 @@ var (
 	allowSuffixExt = []string{".json", ".xml", ".html"}
 )
 
-// Tree has three elements: FixRouter/wildcard/leaves
+// Tree has three elements: FixRouter/wildCard/leaves
 // fixRouter stores Fixed Router
-// wildcard stores params
+// wildCard stores params
 // leaves store the endpoint information
 type Tree struct {
 	//prefix set for static router
 	prefix string
 	//search fix route first
-	fixrouters []*Tree
-	//if set, failure to match fixrouters search then search wildcard
-	wildcard *Tree
-	//if set, failure to match wildcard search
+	fixRouters []*Tree
+	//if set, failure to match fixRouters search then search wildCard
+	wildCard *Tree
+	//if set, failure to match wildCard search
 	leaves []*leafInfo
 }
 
@@ -50,28 +50,28 @@ func NewTree() *Tree {
 // AddTree will add tree to the exist Tree
 // prefix should has no params
 func (t *Tree) AddTree(prefix string, tree *Tree) {
-	t.addtree(splitPath(prefix), tree, nil, "")
+	t.addTree(splitPath(prefix), tree, nil, "")
 }
 
-func (t *Tree) addtree(segments []string, tree *Tree, wildcards []string, reg string) {
+func (t *Tree) addTree(segments []string, tree *Tree, wildcards []string, reg string) {
 	if len(segments) == 0 {
 		panic("prefix should has path")
 	}
 	seg := segments[0]
-	iswild, params, regexpStr := splitSegment(seg)
+	isWild, params, regexpStr := splitSegment(seg)
 	// if it's ? meaning can igone this, so add one more rule for it
 	if len(params) > 0 && params[0] == ":" {
 		params = params[1:]
 		if len(segments[1:]) > 0 {
-			t.addtree(segments[1:], tree, append(wildcards, params...), reg)
+			t.addTree(segments[1:], tree, append(wildcards, params...), reg)
 		} else {
 			filterTreeWithPrefix(tree, wildcards, reg)
 		}
 	}
 	//Rule: /login/*/access match /login/2009/11/access
 	//if already has *, and when loop the access, should as a regexpStr
-	if !iswild && utils.InSlice(":splat", wildcards) {
-		iswild = true
+	if !isWild && utils.InSlice(":splat", wildcards) {
+		isWild = true
 		regexpStr = seg
 	}
 	//Rule: /user/:id/*
@@ -79,7 +79,7 @@ func (t *Tree) addtree(segments []string, tree *Tree, wildcards []string, reg st
 		regexpStr = "(.+)"
 	}
 	if len(segments) == 1 {
-		if iswild {
+		if isWild {
 			if regexpStr != "" {
 				if reg == "" {
 					rr := ""
@@ -108,19 +108,19 @@ func (t *Tree) addtree(segments []string, tree *Tree, wildcards []string, reg st
 			}
 			reg = strings.Trim(reg+"/"+regexpStr, "/")
 			filterTreeWithPrefix(tree, append(wildcards, params...), reg)
-			t.wildcard = tree
+			t.wildCard = tree
 		} else {
 			reg = strings.Trim(reg+"/"+regexpStr, "/")
 			filterTreeWithPrefix(tree, append(wildcards, params...), reg)
 			tree.prefix = seg
-			t.fixrouters = append(t.fixrouters, tree)
+			t.fixRouters = append(t.fixRouters, tree)
 		}
 		return
 	}
 
-	if iswild {
-		if t.wildcard == nil {
-			t.wildcard = NewTree()
+	if isWild {
+		if t.wildCard == nil {
+			t.wildCard = NewTree()
 		}
 		if regexpStr != "" {
 			if reg == "" {
@@ -151,21 +151,21 @@ func (t *Tree) addtree(segments []string, tree *Tree, wildcards []string, reg st
 			}
 		}
 		reg = strings.TrimRight(strings.TrimRight(reg, "/")+"/"+regexpStr, "/")
-		t.wildcard.addtree(segments[1:], tree, append(wildcards, params...), reg)
+		t.wildCard.addTree(segments[1:], tree, append(wildcards, params...), reg)
 	} else {
 		subTree := NewTree()
 		subTree.prefix = seg
-		t.fixrouters = append(t.fixrouters, subTree)
-		subTree.addtree(segments[1:], tree, append(wildcards, params...), reg)
+		t.fixRouters = append(t.fixRouters, subTree)
+		subTree.addTree(segments[1:], tree, append(wildcards, params...), reg)
 	}
 }
 
 func filterTreeWithPrefix(t *Tree, wildcards []string, reg string) {
-	for _, v := range t.fixrouters {
+	for _, v := range t.fixRouters {
 		filterTreeWithPrefix(v, wildcards, reg)
 	}
-	if t.wildcard != nil {
-		filterTreeWithPrefix(t.wildcard, wildcards, reg)
+	if t.wildCard != nil {
+		filterTreeWithPrefix(t.wildCard, wildcards, reg)
 	}
 	for _, l := range t.leaves {
 		if reg != "" {
@@ -199,14 +199,14 @@ func filterTreeWithPrefix(t *Tree, wildcards []string, reg string) {
 	}
 }
 
-// AddRouter call addseg function
+// AddRouter call addSeg function
 func (t *Tree) AddRouter(pattern string, runObject interface{}) {
-	t.addseg(splitPath(pattern), runObject, nil, "")
+	t.addSeg(splitPath(pattern), runObject, nil, "")
 }
 
 // "/"
 // "admin" ->
-func (t *Tree) addseg(segments []string, route interface{}, wildcards []string, reg string) {
+func (t *Tree) addSeg(segments []string, route interface{}, wildcards []string, reg string) {
 	if len(segments) == 0 {
 		if reg != "" {
 			t.leaves = append(t.leaves, &leafInfo{runObject: route, wildcards: wildcards, regexps: regexp.MustCompile("^" + reg + "$")})
@@ -215,25 +215,25 @@ func (t *Tree) addseg(segments []string, route interface{}, wildcards []string, 
 		}
 	} else {
 		seg := segments[0]
-		iswild, params, regexpStr := splitSegment(seg)
+		isWild, params, regexpStr := splitSegment(seg)
 		// if it's ? meaning can igone this, so add one more rule for it
 		if len(params) > 0 && params[0] == ":" {
-			t.addseg(segments[1:], route, wildcards, reg)
+			t.addSeg(segments[1:], route, wildcards, reg)
 			params = params[1:]
 		}
 		//Rule: /login/*/access match /login/2009/11/access
 		//if already has *, and when loop the access, should as a regexpStr
-		if !iswild && utils.InSlice(":splat", wildcards) {
-			iswild = true
+		if !isWild && utils.InSlice(":splat", wildcards) {
+			isWild = true
 			regexpStr = seg
 		}
 		//Rule: /user/:id/*
 		if seg == "*" && len(wildcards) > 0 && reg == "" {
 			regexpStr = "(.+)"
 		}
-		if iswild {
-			if t.wildcard == nil {
-				t.wildcard = NewTree()
+		if isWild {
+			if t.wildCard == nil {
+				t.wildCard = NewTree()
 			}
 			if regexpStr != "" {
 				if reg == "" {
@@ -263,10 +263,10 @@ func (t *Tree) addseg(segments []string, route interface{}, wildcards []string, 
 					params = params[1:]
 				}
 			}
-			t.wildcard.addseg(segments[1:], route, append(wildcards, params...), reg+regexpStr)
+			t.wildCard.addSeg(segments[1:], route, append(wildcards, params...), reg+regexpStr)
 		} else {
 			var subTree *Tree
-			for _, sub := range t.fixrouters {
+			for _, sub := range t.fixRouters {
 				if sub.prefix == seg {
 					subTree = sub
 					break
@@ -275,9 +275,9 @@ func (t *Tree) addseg(segments []string, route interface{}, wildcards []string, 
 			if subTree == nil {
 				subTree = NewTree()
 				subTree.prefix = seg
-				t.fixrouters = append(t.fixrouters, subTree)
+				t.fixRouters = append(t.fixRouters, subTree)
 			}
-			subTree.addseg(segments[1:], route, wildcards, reg)
+			subTree.addSeg(segments[1:], route, wildcards, reg)
 		}
 	}
 }
@@ -305,8 +305,8 @@ func (t *Tree) match(treePattern string, pattern string, wildcardValues []string
 				return l.runObject
 			}
 		}
-		if t.wildcard != nil {
-			for _, l := range t.wildcard.leaves {
+		if t.wildCard != nil {
+			for _, l := range t.wildCard.leaves {
 				if ok := l.match(treePattern, wildcardValues, ctx); ok {
 					return l.runObject
 				}
@@ -325,7 +325,7 @@ func (t *Tree) match(treePattern string, pattern string, wildcardValues []string
 		seg = pattern[:i]
 		pattern = pattern[i:]
 	}
-	for _, subTree := range t.fixrouters {
+	for _, subTree := range t.fixRouters {
 		if subTree.prefix == seg {
 			if len(pattern) != 0 && pattern[0] == '/' {
 				treePattern = pattern[1:]
@@ -338,11 +338,11 @@ func (t *Tree) match(treePattern string, pattern string, wildcardValues []string
 			}
 		}
 	}
-	if runObject == nil && len(t.fixrouters) > 0 {
+	if runObject == nil && len(t.fixRouters) > 0 {
 		// Filter the .json .xml .html extension
 		for _, str := range allowSuffixExt {
 			if strings.HasSuffix(seg, str) {
-				for _, subTree := range t.fixrouters {
+				for _, subTree := range t.fixRouters {
 					if subTree.prefix == seg[:len(seg)-len(str)] {
 						runObject = subTree.match(treePattern, pattern, wildcardValues, ctx)
 						if runObject != nil {
@@ -353,8 +353,8 @@ func (t *Tree) match(treePattern string, pattern string, wildcardValues []string
 			}
 		}
 	}
-	if runObject == nil && t.wildcard != nil {
-		runObject = t.wildcard.match(treePattern, pattern, append(wildcardValues, seg), ctx)
+	if runObject == nil && t.wildCard != nil {
+		runObject = t.wildCard.match(treePattern, pattern, append(wildcardValues, seg), ctx)
 	}
 
 	if runObject == nil && len(t.leaves) > 0 {
@@ -382,7 +382,7 @@ func (t *Tree) match(treePattern string, pattern string, wildcardValues []string
 }
 
 type leafInfo struct {
-	// names of wildcards that lead to this leaf. eg, ["id" "name"] for the wildcard ":id" and ":name"
+	// names of wildcards that lead to this leaf. eg, ["id" "name"] for the wildCard ":id" and ":name"
 	wildcards []string
 
 	// if the leaf is regexp
@@ -405,8 +405,8 @@ func (leaf *leafInfo) match(treePattern string, wildcardValues []string, ctx *co
 		// match *.* or :id
 		if len(leaf.wildcards) >= 2 && leaf.wildcards[len(leaf.wildcards)-2] == ":path" && leaf.wildcards[len(leaf.wildcards)-1] == ":ext" {
 			if len(leaf.wildcards) == 2 {
-				lastone := wildcardValues[len(wildcardValues)-1]
-				strs := strings.SplitN(lastone, ".", 2)
+				lastOne := wildcardValues[len(wildcardValues)-1]
+				strs := strings.SplitN(lastOne, ".", 2)
 				if len(strs) == 2 {
 					ctx.Input.SetParam(":ext", strs[1])
 				}
@@ -419,8 +419,8 @@ func (leaf *leafInfo) match(treePattern string, wildcardValues []string, ctx *co
 			for index = 0; index < len(leaf.wildcards)-2; index++ {
 				ctx.Input.SetParam(leaf.wildcards[index], wildcardValues[index])
 			}
-			lastone := wildcardValues[len(wildcardValues)-1]
-			strs := strings.SplitN(lastone, ".", 2)
+			lastOne := wildcardValues[len(wildcardValues)-1]
+			strs := strings.SplitN(lastOne, ".", 2)
 			if len(strs) == 2 {
 				ctx.Input.SetParam(":ext", strs[1])
 			}
@@ -487,15 +487,15 @@ func splitSegment(key string) (bool, []string, string) {
 		var paramsNum int
 		var out []rune
 		var start bool
-		var startexp bool
+		var startExp bool
 		var param []rune
 		var expt []rune
-		var skipnum int
+		var skipNum int
 		var params []string
 		reg := regexp.MustCompile(`[a-zA-Z0-9_]+`)
 		for i, v := range key {
-			if skipnum > 0 {
-				skipnum--
+			if skipNum > 0 {
+				skipNum--
 				continue
 			}
 			if start {
@@ -506,8 +506,8 @@ func splitSegment(key string) (bool, []string, string) {
 							out = append(out, []rune("([0-9]+)")...)
 							params = append(params, ":"+string(param))
 							start = false
-							startexp = false
-							skipnum = 3
+							startExp = false
+							skipNum = 3
 							param = make([]rune, 0)
 							paramsNum++
 							continue
@@ -519,8 +519,8 @@ func splitSegment(key string) (bool, []string, string) {
 							params = append(params, ":"+string(param))
 							paramsNum++
 							start = false
-							startexp = false
-							skipnum = 6
+							startExp = false
+							skipNum = 6
 							param = make([]rune, 0)
 							continue
 						}
@@ -537,10 +537,10 @@ func splitSegment(key string) (bool, []string, string) {
 					param = make([]rune, 0)
 					paramsNum++
 					start = false
-					startexp = false
+					startExp = false
 				}
 			}
-			if startexp {
+			if startExp {
 				if v != ')' {
 					expt = append(expt, v)
 					continue
@@ -553,7 +553,7 @@ func splitSegment(key string) (bool, []string, string) {
 				param = make([]rune, 0)
 				start = true
 			} else if v == '(' {
-				startexp = true
+				startExp = true
 				start = false
 				if len(param) > 0 {
 					params = append(params, ":"+string(param))
@@ -563,7 +563,7 @@ func splitSegment(key string) (bool, []string, string) {
 				expt = make([]rune, 0)
 				expt = append(expt, '(')
 			} else if v == ')' {
-				startexp = false
+				startExp = false
 				expt = append(expt, ')')
 				out = append(out, expt...)
 				param = make([]rune, 0)

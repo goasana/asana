@@ -110,10 +110,10 @@ func (rs *SessionStore) SessionRelease(w http.ResponseWriter) {
 type Provider struct {
 	maxLifeTime int64
 	savePath    string
-	poolsize    int
+	poolSize    int
 	password    string
 	dbNum       int
-	poollist    *redis.ClusterClient
+	poolList    *redis.ClusterClient
 }
 
 // SessionInit init redis_cluster session
@@ -128,12 +128,12 @@ func (rp *Provider) SessionInit(maxLifeTime int64, savePath string) error {
 	if len(configs) > 1 {
 		poolsize, err := strconv.Atoi(configs[1])
 		if err != nil || poolsize < 0 {
-			rp.poolsize = MaxPoolSize
+			rp.poolSize = MaxPoolSize
 		} else {
-			rp.poolsize = poolsize
+			rp.poolSize = poolsize
 		}
 	} else {
-		rp.poolsize = MaxPoolSize
+		rp.poolSize = MaxPoolSize
 	}
 	if len(configs) > 2 {
 		rp.password = configs[2]
@@ -149,18 +149,18 @@ func (rp *Provider) SessionInit(maxLifeTime int64, savePath string) error {
 		rp.dbNum = 0
 	}
 
-	rp.poollist = redis.NewClusterClient(&redis.ClusterOptions{
+	rp.poolList = redis.NewClusterClient(&redis.ClusterOptions{
 		Addrs:    strings.Split(rp.savePath, ";"),
 		Password: rp.password,
-		PoolSize: rp.poolsize,
+		PoolSize: rp.poolSize,
 	})
-	return rp.poollist.Ping().Err()
+	return rp.poolList.Ping().Err()
 }
 
 // SessionRead read redis_cluster session by sid
 func (rp *Provider) SessionRead(sid string) (session.Store, error) {
 	var kv map[interface{}]interface{}
-	kvs, err := rp.poollist.Get(sid).Result()
+	kvs, err := rp.poolList.Get(sid).Result()
 	if err != nil && err != redis.Nil {
 		return nil, err
 	}
@@ -172,13 +172,13 @@ func (rp *Provider) SessionRead(sid string) (session.Store, error) {
 		}
 	}
 
-	rs := &SessionStore{p: rp.poollist, sid: sid, values: kv, maxLifeTime: rp.maxLifeTime}
+	rs := &SessionStore{p: rp.poolList, sid: sid, values: kv, maxLifeTime: rp.maxLifeTime}
 	return rs, nil
 }
 
 // SessionExist check redis_cluster session exist by sid
 func (rp *Provider) SessionExist(sid string) bool {
-	c := rp.poollist
+	c := rp.poolList
 	if existed, err := c.Exists(sid).Result(); err != nil || existed == 0 {
 		return false
 	}
@@ -187,7 +187,7 @@ func (rp *Provider) SessionExist(sid string) bool {
 
 // SessionRegenerate generate new sid for redis_cluster session
 func (rp *Provider) SessionRegenerate(oldsid, sid string) (session.Store, error) {
-	c := rp.poollist
+	c := rp.poolList
 
 	if existed, err := c.Exists(oldsid).Result(); err != nil || existed == 0 {
 		// oldsid doesn't exists, set the new sid directly
@@ -203,7 +203,7 @@ func (rp *Provider) SessionRegenerate(oldsid, sid string) (session.Store, error)
 
 // SessionDestroy delete redis session by id
 func (rp *Provider) SessionDestroy(sid string) error {
-	c := rp.poollist
+	c := rp.poolList
 	c.Del(sid)
 	return nil
 }

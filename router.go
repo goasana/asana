@@ -43,7 +43,7 @@ const (
 )
 
 const (
-	routerTypeBeego = iota
+	routerTypeAsana = iota
 	routerTypeRESTFul
 	routerTypeHandler
 )
@@ -187,7 +187,7 @@ func (p *ControllerRegister) addWithMethodParams(pattern string, c ControllerInt
 	route := &ControllerInfo{}
 	route.pattern = pattern
 	route.methods = methods
-	route.routerType = routerTypeBeego
+	route.routerType = routerTypeAsana
 	route.controllerType = t
 	route.initialize = func() ControllerInterface {
 		vc := reflect.New(route.controllerType)
@@ -432,7 +432,7 @@ func (p *ControllerRegister) AddAutoPrefix(prefix string, c ControllerInterface)
 	for i := 0; i < rt.NumMethod(); i++ {
 		if !utils.InSlice(rt.Method(i).Name, exceptMethod) {
 			route := &ControllerInfo{}
-			route.routerType = routerTypeBeego
+			route.routerType = routerTypeAsana
 			route.methods = map[string]string{"*": rt.Method(i).Name}
 			route.controllerType = ct
 			pattern := path.Join(prefix, strings.ToLower(controllerName), strings.ToLower(rt.Method(i).Name), "*")
@@ -521,23 +521,23 @@ func (p *ControllerRegister) URLFor(endpoint string, values ...interface{}) stri
 }
 
 func (p *ControllerRegister) getURL(t *Tree, url, controllerName, methodName string, params map[string]string, httpMethod string) (bool, string) {
-	for _, subtree := range t.fixrouters {
+	for _, subtree := range t.fixRouters {
 		u := path.Join(url, subtree.prefix)
 		ok, u := p.getURL(subtree, u, controllerName, methodName, params, httpMethod)
 		if ok {
 			return ok, u
 		}
 	}
-	if t.wildcard != nil {
+	if t.wildCard != nil {
 		u := path.Join(url, urlPlaceholder)
-		ok, u := p.getURL(t.wildcard, u, controllerName, methodName, params, httpMethod)
+		ok, u := p.getURL(t.wildCard, u, controllerName, methodName, params, httpMethod)
 		if ok {
 			return ok, u
 		}
 	}
 	for _, l := range t.leaves {
 		if c, ok := l.runObject.(*ControllerInfo); ok {
-			if c.routerType == routerTypeBeego &&
+			if c.routerType == routerTypeAsana &&
 				strings.HasSuffix(path.Join(c.controllerType.PkgPath(), c.controllerType.Name()), controllerName) {
 				find := false
 				if HTTPMETHOD[strings.ToUpper(methodName)] {

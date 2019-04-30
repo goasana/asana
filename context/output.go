@@ -35,34 +35,34 @@ import (
 	"github.com/goasana/framework/encoder/yaml"
 )
 
-// BeegoOutput does work for sending response header.
-type BeegoOutput struct {
+// AsanaOutput does work for sending response header.
+type AsanaOutput struct {
 	Context    *Context
 	Status     int
 	EnableGzip bool
 }
 
-// NewOutput returns new BeegoOutput.
+// NewOutput returns new AsanaOutput.
 // it contains nothing now.
-func NewOutput() *BeegoOutput {
-	return &BeegoOutput{}
+func NewOutput() *AsanaOutput {
+	return &AsanaOutput{}
 }
 
-// Reset init BeegoOutput
-func (output *BeegoOutput) Reset(ctx *Context) {
+// Reset init AsanaOutput
+func (output *AsanaOutput) Reset(ctx *Context) {
 	output.Context = ctx
 	output.Status = 0
 }
 
 // Header sets response header item string via given key.
-func (output *BeegoOutput) Header(key, val string) {
+func (output *AsanaOutput) Header(key, val string) {
 	output.Context.ResponseWriter.Header().Set(key, val)
 }
 
 // Body sets response body content.
 // if EnableGzip, compress content string.
 // it sends out response body directly.
-func (output *BeegoOutput) Body(content []byte) error {
+func (output *AsanaOutput) Body(content []byte) error {
 	var encoding string
 	var buf = &bytes.Buffer{}
 	if output.EnableGzip {
@@ -88,7 +88,7 @@ func (output *BeegoOutput) Body(content []byte) error {
 
 // Cookie sets cookie value via given key.
 // others are ordered as cookie's max age time, path,domain, secure and httponly.
-func (output *BeegoOutput) Cookie(name string, value string, others ...interface{}) {
+func (output *AsanaOutput) Cookie(name string, value string, others ...interface{}) {
 	var b bytes.Buffer
 	_, _ = fmt.Fprintf(&b, "%s=%s", sanitizeName(name), sanitizeValue(value))
 
@@ -190,7 +190,7 @@ func getContentTypeHead(contentType string) string {
 
 // JSON writes json to response body.
 // if encoding is true, it converts utf-8 to \u0000 type.
-func (output *BeegoOutput) JSON(data interface{}, hasIndent bool, encoding bool) error {
+func (output *AsanaOutput) JSON(data interface{}, hasIndent bool, encoding bool) error {
 	output.Header("Content-Type", getContentTypeHead(ApplicationJSON))
 	content, err := json.Encode(data, hasIndent)
 	if err != nil {
@@ -204,7 +204,7 @@ func (output *BeegoOutput) JSON(data interface{}, hasIndent bool, encoding bool)
 }
 
 // ProtoBuf writes protobuf to response body.
-func (output *BeegoOutput) ProtoBuf(data interface{}) error {
+func (output *AsanaOutput) ProtoBuf(data interface{}) error {
 	output.Header("Content-Type", getContentTypeHead(ApplicationProtoBuf))
 	content, err := proto.Encode(data)
 	if err != nil {
@@ -215,7 +215,7 @@ func (output *BeegoOutput) ProtoBuf(data interface{}) error {
 }
 
 // YAML writes yaml to response body.
-func (output *BeegoOutput) YAML(data interface{}) error {
+func (output *AsanaOutput) YAML(data interface{}) error {
 	output.Header("Content-Type", getContentTypeHead(ApplicationYAML))
 	content, err := yaml.Encode(data)
 	if err != nil {
@@ -226,7 +226,7 @@ func (output *BeegoOutput) YAML(data interface{}) error {
 }
 
 // JSONP writes jsonp to response body.
-func (output *BeegoOutput) JSONP(data interface{}, hasIndent bool) error {
+func (output *AsanaOutput) JSONP(data interface{}, hasIndent bool) error {
 	output.Header("Content-Type", getContentTypeHead(ApplicationJSONP))
 	content, err := json.Encode(data, hasIndent)
 	if err != nil {
@@ -246,7 +246,7 @@ func (output *BeegoOutput) JSONP(data interface{}, hasIndent bool) error {
 }
 
 // XML writes xml string to response body.
-func (output *BeegoOutput) XML(data interface{}, hasIndent bool) error {
+func (output *AsanaOutput) XML(data interface{}, hasIndent bool) error {
 	output.Header("Content-Type", getContentTypeHead(ApplicationXML))
 	content, err := xml.Encode(data, hasIndent)
 	if err != nil {
@@ -257,7 +257,7 @@ func (output *BeegoOutput) XML(data interface{}, hasIndent bool) error {
 }
 
 // ServeFormatted serve YAML, XML OR JSON, depending on the value of the Accept header
-func (output *BeegoOutput) ServeFormatted(data interface{}, hasIndent bool, hasEncode ...bool) {
+func (output *AsanaOutput) ServeFormatted(data interface{}, hasIndent bool, hasEncode ...bool) {
 	accept := output.Context.Input.Header("Accept")
 	switch accept {
 	case ApplicationYAML:
@@ -275,7 +275,7 @@ func (output *BeegoOutput) ServeFormatted(data interface{}, hasIndent bool, hasE
 
 // Download forces response for download file.
 // it prepares the download response header automatically.
-func (output *BeegoOutput) Download(file string, filename ...string) {
+func (output *AsanaOutput) Download(file string, filename ...string) {
 	// check get file error, file not found or other error.
 	if _, err := os.Stat(file); err != nil {
 		http.ServeFile(output.Context.ResponseWriter, output.Context.Request, file)
@@ -313,7 +313,7 @@ func (output *BeegoOutput) Download(file string, filename ...string) {
 
 // ContentType sets the content type from ext string.
 // MIME type is given in mime package.
-func (output *BeegoOutput) ContentType(ext string) {
+func (output *AsanaOutput) ContentType(ext string) {
 	if !strings.HasPrefix(ext, ".") {
 		ext = "." + ext
 	}
@@ -325,61 +325,61 @@ func (output *BeegoOutput) ContentType(ext string) {
 
 // SetStatus sets response status code.
 // It writes response header directly.
-func (output *BeegoOutput) SetStatus(status int) {
+func (output *AsanaOutput) SetStatus(status int) {
 	output.Status = status
 }
 
 // IsCachable returns boolean of this request is cached.
 // HTTP 304 means cached.
-func (output *BeegoOutput) IsCachable() bool {
+func (output *AsanaOutput) IsCachable() bool {
 	return output.Status >= 200 && output.Status < 300 || output.Status == 304
 }
 
 // IsEmpty returns boolean of this request is empty.
 // HTTP 201，204 and 304 means empty.
-func (output *BeegoOutput) IsEmpty() bool {
+func (output *AsanaOutput) IsEmpty() bool {
 	return output.Status == 201 || output.Status == 204 || output.Status == 304
 }
 
 // IsOk returns boolean of this request runs well.
 // HTTP 200 means ok.
-func (output *BeegoOutput) IsOk() bool {
+func (output *AsanaOutput) IsOk() bool {
 	return output.Status == 200
 }
 
 // IsSuccessful returns boolean of this request runs successfully.
 // HTTP 2xx means ok.
-func (output *BeegoOutput) IsSuccessful() bool {
+func (output *AsanaOutput) IsSuccessful() bool {
 	return output.Status >= 200 && output.Status < 300
 }
 
 // IsRedirect returns boolean of this request is redirection header.
 // HTTP 301,302,307 means redirection.
-func (output *BeegoOutput) IsRedirect() bool {
+func (output *AsanaOutput) IsRedirect() bool {
 	return output.Status == 301 || output.Status == 302 || output.Status == 303 || output.Status == 307
 }
 
 // IsForbidden returns boolean of this request is forbidden.
 // HTTP 403 means forbidden.
-func (output *BeegoOutput) IsForbidden() bool {
+func (output *AsanaOutput) IsForbidden() bool {
 	return output.Status == 403
 }
 
 // IsNotFound returns boolean of this request is not found.
 // HTTP 404 means not found.
-func (output *BeegoOutput) IsNotFound() bool {
+func (output *AsanaOutput) IsNotFound() bool {
 	return output.Status == 404
 }
 
 // IsClientError returns boolean of this request client sends error data.
 // HTTP 4xx means client error.
-func (output *BeegoOutput) IsClientError() bool {
+func (output *AsanaOutput) IsClientError() bool {
 	return output.Status >= 400 && output.Status < 500
 }
 
 // IsServerError returns boolean of this server handler errors.
 // HTTP 5xx means server internal error.
-func (output *BeegoOutput) IsServerError() bool {
+func (output *AsanaOutput) IsServerError() bool {
 	return output.Status >= 500 && output.Status < 600
 }
 
@@ -403,6 +403,6 @@ func stringsToJSON(str string) string {
 }
 
 // Session sets session item value with given key.
-func (output *BeegoOutput) Session(name interface{}, value interface{}) {
+func (output *AsanaOutput) Session(name interface{}, value interface{}) {
 	_ = output.Context.Input.CruSession.Set(name, value)
 }

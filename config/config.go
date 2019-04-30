@@ -56,6 +56,7 @@ type ConfigProvider string
 const (
 	FileProvider       ConfigProvider = "file"
 	ConsulProvider     ConfigProvider = "consul"
+	EtcdProvider       ConfigProvider = "etcd"
 	KConfigMapProvider ConfigProvider = "kConfigMap"
 )
 

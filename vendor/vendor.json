@@ -28,6 +28,12 @@
 			"revisionTime": "2019-04-26T20:43:34Z"
 		},
 		{
+			"checksumSHA1": "6FlMDXp4iNa9H+P9ZtN+ehN5SOM=",
+			"path": "github.com/astaxie/beego/logs",
+			"revision": "772f48af818db4ebb0a5b0f83b262c7528633ff6",
+			"revisionTime": "2019-04-25T18:54:13Z"
+		},
+		{
 			"checksumSHA1": "8O0xts7dLItO4mlwwbtyVpHKNds=",
 			"path": "github.com/bluele/gcache",
 			"revision": "79ae3b2d8680cbc7ad3dba9db66b8a648575221c",
@@ -671,6 +677,54 @@
 			"path": "github.com/syndtr/goleveldb/leveldb/util",
 			"revision": "8ceb77e66a9234dc460f28234390a5896a96a584",
 			"revisionTime": "2019-02-02T13:41:19Z"
+		},
+		{
+			"checksumSHA1": "1+Wy/KQ2nltKNLx/KfA7XgvC1Pw=",
+			"path": "go.uber.org/atomic",
+			"revision": "5a6ca662548f17725b236433764681f0f028bb38",
+			"revisionTime": "2019-04-29T20:45:39Z"
+		},
+		{
+			"checksumSHA1": "+EWyJYcB1u0jXO4tGsDEF9+wMic=",
+			"path": "go.uber.org/multierr",
+			"revision": "bd075f90b08f5274a0bc63bcffacd6c64b60ac55",
+			"revisionTime": "2019-04-29T21:01:00Z"
+		},
+		{
+			"checksumSHA1": "PoePMF5h04bp7sn6DWpStJhmr8c=",
+			"path": "go.uber.org/zap",
+			"revision": "27376062155ad36be76b0f12cf1572a221d3a48c",
+			"revisionTime": "2019-04-30T01:48:40Z"
+		},
+		{
+			"checksumSHA1": "eC/XVln77aRfE/VocbN0NWdlRdg=",
+			"path": "go.uber.org/zap/buffer",
+			"revision": "27376062155ad36be76b0f12cf1572a221d3a48c",
+			"revisionTime": "2019-04-30T01:48:40Z"
+		},
+		{
+			"checksumSHA1": "MuxOAtZEsJitlWBzhmpm2vGiHok=",
+			"path": "go.uber.org/zap/internal/bufferpool",
+			"revision": "27376062155ad36be76b0f12cf1572a221d3a48c",
+			"revisionTime": "2019-04-30T01:48:40Z"
+		},
+		{
+			"checksumSHA1": "uC0L9eCSAYcCWNC8udJk/t1vvIU=",
+			"path": "go.uber.org/zap/internal/color",
+			"revision": "27376062155ad36be76b0f12cf1572a221d3a48c",
+			"revisionTime": "2019-04-30T01:48:40Z"
+		},
+		{
+			"checksumSHA1": "b80CJExrVpXu3SA1iCQ6uLqTn2c=",
+			"path": "go.uber.org/zap/internal/exit",
+			"revision": "27376062155ad36be76b0f12cf1572a221d3a48c",
+			"revisionTime": "2019-04-30T01:48:40Z"
+		},
+		{
+			"checksumSHA1": "XYqOwXtEzGU1vN7VEMRttpROO+s=",
+			"path": "go.uber.org/zap/zapcore",
+			"revision": "27376062155ad36be76b0f12cf1572a221d3a48c",
+			"revisionTime": "2019-04-30T01:48:40Z"
 		},
 		{
 			"checksumSHA1": "31Q46st1pd0VJJmD7yQFHKB8jrE=",

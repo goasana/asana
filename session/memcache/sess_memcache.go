@@ -99,7 +99,7 @@ func (rs *SessionStore) SessionRelease(w http.ResponseWriter) {
 		return
 	}
 	item := memcache.Item{Key: rs.sid, Value: b, Expiration: int32(rs.maxLifeTime)}
-	client.Set(&item)
+	_ = client.Set(&item)
 }
 
 // MemProvider memcache session provider
@@ -176,7 +176,7 @@ func (rp *MemProvider) SessionRegenerate(oldsid, sid string) (session.Store, err
 		item.Key = sid
 		item.Value = []byte("")
 		item.Expiration = int32(rp.maxLifeTime)
-		client.Set(item)
+		_ = client.Set(item)
 	} else {
 		_ = client.Delete(oldsid)
 		item.Key = sid

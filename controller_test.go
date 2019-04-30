@@ -125,8 +125,8 @@ func TestGetUint64(t *testing.T) {
 }
 
 func TestAdditionalViewPaths(t *testing.T) {
-	dir1 := "_beeTmp"
-	dir2 := "_beeTmp2"
+	dir1 := "_asanaTmp"
+	dir2 := "_asanaTmp2"
 	defer os.RemoveAll(dir1)
 	defer os.RemoveAll(dir2)
 

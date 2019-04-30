@@ -94,8 +94,8 @@ func GetProvider(name string) (Provider, error) {
 type ManagerConfig struct {
 	CookieName              string `json:"cookieName"`
 	EnableSetCookie         bool   `json:"enableSetCookie,omitempty"`
-	Gclifetime              int64  `json:"gclifetime"`
-	Maxlifetime             int64  `json:"maxLifetime"`
+	GcLifeTime              int64  `json:"gclifetime"`
+	MaxLifeTime             int64  `json:"maxLifetime"`
 	DisableHTTPOnly         bool   `json:"disableHTTPOnly"`
 	Secure                  bool   `json:"secure"`
 	CookieLifeTime          int    `json:"cookieLifeTime"`
@@ -132,8 +132,8 @@ func NewManager(provideName string, cf *ManagerConfig) (*Manager, error) {
 		return nil, fmt.Errorf("session: unknown provide %q (forgotten import?)", provideName)
 	}
 
-	if cf.Maxlifetime == 0 {
-		cf.Maxlifetime = cf.Gclifetime
+	if cf.MaxLifeTime == 0 {
+		cf.MaxLifeTime = cf.GcLifeTime
 	}
 
 	if cf.EnableSidInHTTPHeader {
@@ -148,7 +148,7 @@ func NewManager(provideName string, cf *ManagerConfig) (*Manager, error) {
 		}
 	}
 
-	err := provider.SessionInit(cf.Maxlifetime, cf.ProviderConfig)
+	err := provider.SessionInit(cf.MaxLifeTime, cf.ProviderConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -286,7 +286,7 @@ func (manager *Manager) GetSessionStore(sid string) (sessions Store, err error) 
 // it can do gc in times after gc lifetime.
 func (manager *Manager) GC() {
 	manager.provider.SessionGC()
-	time.AfterFunc(time.Duration(manager.config.Gclifetime)*time.Second, func() { manager.GC() })
+	time.AfterFunc(time.Duration(manager.config.GcLifeTime)*time.Second, func() { manager.GC() })
 }
 
 // SessionRegenerateID Regenerate a session id for this SessionStore who's id is saving in http request.

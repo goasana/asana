@@ -24,10 +24,10 @@ import (
 	"github.com/goasana/framework/utils"
 )
 
-var env *utils.BeeMap
+var env *utils.AsanaMap
 
 func init() {
-	env = utils.NewBeeMap()
+	env = utils.NewAsanaMap()
 	for _, e := range os.Environ() {
 		splits := strings.Split(e, "=")
 		env.Set(splits[0], os.Getenv(splits[0]))

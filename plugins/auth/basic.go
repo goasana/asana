@@ -29,7 +29,7 @@
 // Advanced Usage:
 //
 //	func SecretAuth(username, password string) bool {
-//		return username == "asana" && password == "helloBeego"
+//		return username == "asana" && password == "helloAsana"
 //	}
 //	authPlugin := auth.NewBasicAuthenticator(SecretAuth, "Authorization Required")
 //	asana.InsertFilter("*", asana.BeforeRouter,authPlugin)

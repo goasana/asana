@@ -33,13 +33,14 @@
 package redis_sentinel
 
 import (
-	"github.com/goasana/framework/session"
-	"github.com/go-redis/redis"
 	"net/http"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/go-redis/redis"
+	"github.com/goasana/framework/session"
 )
 
 var redispder = &Provider{}
@@ -53,7 +54,7 @@ type SessionStore struct {
 	sid         string
 	lock        sync.RWMutex
 	values      map[interface{}]interface{}
-	maxlifetime int64
+	maxLifeTime int64
 }
 
 // Set value in redis_sentinel session
@@ -102,25 +103,25 @@ func (rs *SessionStore) SessionRelease(w http.ResponseWriter) {
 		return
 	}
 	c := rs.p
-	c.Set(rs.sid, string(b), time.Duration(rs.maxlifetime)*time.Second)
+	c.Set(rs.sid, string(b), time.Duration(rs.maxLifeTime)*time.Second)
 }
 
 // Provider redis_sentinel session provider
 type Provider struct {
-	maxlifetime int64
+	maxLifeTime int64
 	savePath    string
-	poolsize    int
+	poolSize    int
 	password    string
 	dbNum       int
-	poollist    *redis.Client
+	poolList    *redis.Client
 	masterName  string
 }
 
 // SessionInit init redis_sentinel session
 // savepath like redis sentinel addr,pool size,password,dbnum,masterName
 // e.g. 127.0.0.1:26379;127.0.0.2:26379,100,1qaz2wsx,0,mymaster
-func (rp *Provider) SessionInit(maxlifetime int64, savePath string) error {
-	rp.maxlifetime = maxlifetime
+func (rp *Provider) SessionInit(maxLifeTime int64, savePath string) error {
+	rp.maxLifeTime = maxLifeTime
 	configs := strings.Split(savePath, ",")
 	if len(configs) > 0 {
 		rp.savePath = configs[0]
@@ -128,12 +129,12 @@ func (rp *Provider) SessionInit(maxlifetime int64, savePath string) error {
 	if len(configs) > 1 {
 		poolsize, err := strconv.Atoi(configs[1])
 		if err != nil || poolsize < 0 {
-			rp.poolsize = DefaultPoolSize
+			rp.poolSize = DefaultPoolSize
 		} else {
-			rp.poolsize = poolsize
+			rp.poolSize = poolsize
 		}
 	} else {
-		rp.poolsize = DefaultPoolSize
+		rp.poolSize = DefaultPoolSize
 	}
 	if len(configs) > 2 {
 		rp.password = configs[2]
@@ -158,21 +159,21 @@ func (rp *Provider) SessionInit(maxlifetime int64, savePath string) error {
 		rp.masterName = "mymaster"
 	}
 
-	rp.poollist = redis.NewFailoverClient(&redis.FailoverOptions{
+	rp.poolList = redis.NewFailoverClient(&redis.FailoverOptions{
 		SentinelAddrs: strings.Split(rp.savePath, ";"),
 		Password:      rp.password,
-		PoolSize:      rp.poolsize,
+		PoolSize:      rp.poolSize,
 		DB:            rp.dbNum,
 		MasterName:    rp.masterName,
 	})
 
-	return rp.poollist.Ping().Err()
+	return rp.poolList.Ping().Err()
 }
 
 // SessionRead read redis_sentinel session by sid
 func (rp *Provider) SessionRead(sid string) (session.Store, error) {
 	var kv map[interface{}]interface{}
-	kvs, err := rp.poollist.Get(sid).Result()
+	kvs, err := rp.poolList.Get(sid).Result()
 	if err != nil && err != redis.Nil {
 		return nil, err
 	}
@@ -184,13 +185,13 @@ func (rp *Provider) SessionRead(sid string) (session.Store, error) {
 		}
 	}
 
-	rs := &SessionStore{p: rp.poollist, sid: sid, values: kv, maxlifetime: rp.maxlifetime}
+	rs := &SessionStore{p: rp.poolList, sid: sid, values: kv, maxLifeTime: rp.maxLifeTime}
 	return rs, nil
 }
 
 // SessionExist check redis_sentinel session exist by sid
 func (rp *Provider) SessionExist(sid string) bool {
-	c := rp.poollist
+	c := rp.poolList
 	if existed, err := c.Exists(sid).Result(); err != nil || existed == 0 {
 		return false
 	}
@@ -199,23 +200,23 @@ func (rp *Provider) SessionExist(sid string) bool {
 
 // SessionRegenerate generate new sid for redis_sentinel session
 func (rp *Provider) SessionRegenerate(oldsid, sid string) (session.Store, error) {
-	c := rp.poollist
+	c := rp.poolList
 
 	if existed, err := c.Exists(oldsid).Result(); err != nil || existed == 0 {
 		// oldsid doesn't exists, set the new sid directly
 		// ignore error here, since if it return error
 		// the existed value will be 0
-		c.Set(sid, "", time.Duration(rp.maxlifetime)*time.Second)
+		c.Set(sid, "", time.Duration(rp.maxLifeTime)*time.Second)
 	} else {
 		c.Rename(oldsid, sid)
-		c.Expire(sid, time.Duration(rp.maxlifetime)*time.Second)
+		c.Expire(sid, time.Duration(rp.maxLifeTime)*time.Second)
 	}
 	return rp.SessionRead(sid)
 }
 
 // SessionDestroy delete redis session by id
 func (rp *Provider) SessionDestroy(sid string) error {
-	c := rp.poollist
+	c := rp.poolList
 	c.Del(sid)
 	return nil
 }

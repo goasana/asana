@@ -34,15 +34,15 @@ import (
 	"strings"
 	"time"
 
+	"github.com/bradfitz/gomemcache/memcache"
 	"github.com/goasana/framework/cache"
 	"github.com/goasana/framework/encoder/json"
-	"github.com/bradfitz/gomemcache/memcache"
 )
 
 // Cache Memcache adapter.
 type Cache struct {
 	conn     *memcache.Client
-	conninfo []string
+	connInfo []string
 }
 
 // NewMemCache create new memcache adapter.
@@ -174,7 +174,7 @@ func (rc *Cache) StartAndGC(config string) error {
 	if _, ok := cf["conn"]; !ok {
 		return errors.New("config has no conn key")
 	}
-	rc.conninfo = strings.Split(cf["conn"], ";")
+	rc.connInfo = strings.Split(cf["conn"], ";")
 	if rc.conn == nil {
 		if err := rc.connectInit(); err != nil {
 			return err
@@ -185,7 +185,7 @@ func (rc *Cache) StartAndGC(config string) error {
 
 // connect to memcache and keep the connection.
 func (rc *Cache) connectInit() error {
-	rc.conn = memcache.New(rc.conninfo...)
+	rc.conn = memcache.New(rc.connInfo...)
 	return nil
 }
 

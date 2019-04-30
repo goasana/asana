@@ -128,11 +128,11 @@ func (rp *Provider) SessionInit(maxLifeTime int64, savePath string) error {
 		rp.savePath = configs[0]
 	}
 	if len(configs) > 1 {
-		poolsize, err := strconv.Atoi(configs[1])
-		if err != nil || poolsize < 0 {
+		poolSize, err := strconv.Atoi(configs[1])
+		if err != nil || poolSize < 0 {
 			rp.poolsize = MaxPoolSize
 		} else {
-			rp.poolsize = poolsize
+			rp.poolsize = poolSize
 		}
 	} else {
 		rp.poolsize = MaxPoolSize

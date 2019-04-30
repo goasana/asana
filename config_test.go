@@ -25,11 +25,11 @@ import (
 )
 
 func TestDefaults(t *testing.T) {
-	if BConfig.WebConfig.FlashName != "BEEGO_FLASH" {
+	if BConfig.WebConfig.FlashName != "ASANA_FLASH" {
 		t.Errorf("FlashName was not set to default.")
 	}
 
-	if BConfig.WebConfig.FlashSeparator != "BEEGOFLASH" {
+	if BConfig.WebConfig.FlashSeparator != "ASANAFLASH" {
 		t.Errorf("FlashName was not set to default.")
 	}
 }

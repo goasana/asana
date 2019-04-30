@@ -7,8 +7,8 @@ import (
 	"net/http/httputil"
 	"strconv"
 
-	"github.com/goasana/framework/encoder/json"
 	lz4 "github.com/cloudflare/golz4"
+	"github.com/goasana/framework/encoder/json"
 	"github.com/gogo/protobuf/proto"
 )
 

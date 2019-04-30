@@ -46,7 +46,7 @@ func TestFlashHeader(t *testing.T) {
 	// get the Set-Cookie value
 	sc := w.Header().Get("Set-Cookie")
 	// match for the expected header
-	res := strings.Contains(sc, "BEEGO_FLASH=%00notice%23BEEGOFLASH%23TestFlashString%00")
+	res := strings.Contains(sc, "ASANA_FLASH=%00notice%23ASANAFLASH%23TestFlashString%00")
 	// validate the assertion
 	if !res {
 		t.Errorf("TestFlashHeader() unable to validate flash message")

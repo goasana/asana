@@ -99,7 +99,7 @@ var menu = `<div class="menu">
 var user = `<!DOCTYPE html>
 <html>
   <head>
-    <title>beego welcome template</title>
+    <title>asana welcome template</title>
   </head>
   <body>
 {{template "../public/menu.tpl"}}
@@ -272,7 +272,7 @@ func (d TestingFileSystem) Open(name string) (http.File, error) {
 var outputBinData = `<!DOCTYPE html>
 <html>
   <head>
-    <title>beego welcome template</title>
+    <title>asana welcome template</title>
   </head>
   <body>
 
@@ -280,7 +280,7 @@ var outputBinData = `<!DOCTYPE html>
 <h1>Hello, blocks!</h1>
 
 	
-<h1>Hello, astaxie!</h1>
+<h1>Hello, asana!</h1>
 
 	
 

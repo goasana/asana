@@ -34,13 +34,13 @@ import (
 )
 
 var (
-	// BeeApp is an application instance
-	BeeApp *App
+	// AsanaApp is an application instance
+	AsanaApp *App
 )
 
 func init() {
 	// create asana application
-	BeeApp = NewApp()
+	AsanaApp = NewApp()
 }
 
 // App defines asana application with a new PatternServeMux.
@@ -239,7 +239,7 @@ func (app *App) Run(mws ...MiddleWare) {
 	<-endRunning
 }
 
-// Router adds a patterned controller handler to BeeApp.
+// Router adds a patterned controller handler to AsanaApp.
 // it's an alias method of App.Router.
 // usage:
 //  simple router
@@ -256,8 +256,8 @@ func (app *App) Run(mws ...MiddleWare) {
 //  asana.Router("/api/update",&RestController{},"put:UpdateFood")
 //  asana.Router("/api/delete",&RestController{},"delete:DeleteFood")
 func Router(rootPath string, c ControllerInterface, mappingMethods ...string) *App {
-	BeeApp.Handlers.Add(rootPath, c, mappingMethods...)
-	return BeeApp
+	AsanaApp.Handlers.Add(rootPath, c, mappingMethods...)
+	return AsanaApp
 }
 
 // UnregisterFixedRoute unregisters the route with the specified fixedRoute. It is particularly useful
@@ -273,53 +273,53 @@ func UnregisterFixedRoute(fixedRoute string, method string) *App {
 	subPaths := splitPath(fixedRoute)
 	if method == "" || method == "*" {
 		for m := range HTTPMETHOD {
-			if _, ok := BeeApp.Handlers.routers[m]; !ok {
+			if _, ok := AsanaApp.Handlers.routers[m]; !ok {
 				continue
 			}
-			if BeeApp.Handlers.routers[m].prefix == strings.Trim(fixedRoute, "/ ") {
-				findAndRemoveSingleTree(BeeApp.Handlers.routers[m])
+			if AsanaApp.Handlers.routers[m].prefix == strings.Trim(fixedRoute, "/ ") {
+				findAndRemoveSingleTree(AsanaApp.Handlers.routers[m])
 				continue
 			}
-			findAndRemoveTree(subPaths, BeeApp.Handlers.routers[m], m)
+			findAndRemoveTree(subPaths, AsanaApp.Handlers.routers[m], m)
 		}
-		return BeeApp
+		return AsanaApp
 	}
 	// Single HTTP method
 	um := strings.ToUpper(method)
-	if _, ok := BeeApp.Handlers.routers[um]; ok {
-		if BeeApp.Handlers.routers[um].prefix == strings.Trim(fixedRoute, "/ ") {
-			findAndRemoveSingleTree(BeeApp.Handlers.routers[um])
-			return BeeApp
+	if _, ok := AsanaApp.Handlers.routers[um]; ok {
+		if AsanaApp.Handlers.routers[um].prefix == strings.Trim(fixedRoute, "/ ") {
+			findAndRemoveSingleTree(AsanaApp.Handlers.routers[um])
+			return AsanaApp
 		}
-		findAndRemoveTree(subPaths, BeeApp.Handlers.routers[um], um)
+		findAndRemoveTree(subPaths, AsanaApp.Handlers.routers[um], um)
 	}
-	return BeeApp
+	return AsanaApp
 }
 
 func findAndRemoveTree(paths []string, entryPointTree *Tree, method string) {
-	for i := range entryPointTree.fixrouters {
-		if entryPointTree.fixrouters[i].prefix == paths[0] {
+	for i := range entryPointTree.fixRouters {
+		if entryPointTree.fixRouters[i].prefix == paths[0] {
 			if len(paths) == 1 {
-				if len(entryPointTree.fixrouters[i].fixrouters) > 0 {
+				if len(entryPointTree.fixRouters[i].fixRouters) > 0 {
 					// If the route had children subtrees, remove just the functional leaf,
 					// to allow children to function as before
-					if len(entryPointTree.fixrouters[i].leaves) > 0 {
-						entryPointTree.fixrouters[i].leaves[0] = nil
-						entryPointTree.fixrouters[i].leaves = entryPointTree.fixrouters[i].leaves[1:]
+					if len(entryPointTree.fixRouters[i].leaves) > 0 {
+						entryPointTree.fixRouters[i].leaves[0] = nil
+						entryPointTree.fixRouters[i].leaves = entryPointTree.fixRouters[i].leaves[1:]
 					}
 				} else {
-					// Remove the *Tree from the fixrouters slice
-					entryPointTree.fixrouters[i] = nil
+					// Remove the *Tree from the fixRouters slice
+					entryPointTree.fixRouters[i] = nil
 
-					if i == len(entryPointTree.fixrouters)-1 {
-						entryPointTree.fixrouters = entryPointTree.fixrouters[:i]
+					if i == len(entryPointTree.fixRouters)-1 {
+						entryPointTree.fixRouters = entryPointTree.fixRouters[:i]
 					} else {
-						entryPointTree.fixrouters = append(entryPointTree.fixrouters[:i], entryPointTree.fixrouters[i+1:len(entryPointTree.fixrouters)]...)
+						entryPointTree.fixRouters = append(entryPointTree.fixRouters[:i], entryPointTree.fixRouters[i+1:len(entryPointTree.fixRouters)]...)
 					}
 				}
 				return
 			}
-			findAndRemoveTree(paths[1:], entryPointTree.fixrouters[i], method)
+			findAndRemoveTree(paths[1:], entryPointTree.fixRouters[i], method)
 		}
 	}
 }
@@ -328,7 +328,7 @@ func findAndRemoveSingleTree(entryPointTree *Tree) {
 	if entryPointTree == nil {
 		return
 	}
-	if len(entryPointTree.fixrouters) > 0 {
+	if len(entryPointTree.fixRouters) > 0 {
 		// If the route had children subtrees, remove just the functional leaf,
 		// to allow children to function as before
 		if len(entryPointTree.leaves) > 0 {
@@ -366,35 +366,35 @@ func findAndRemoveSingleTree(entryPointTree *Tree) {
 // url support all the function Router's pattern
 // methodlist [get post head put delete options *]
 func Include(cList ...ControllerInterface) *App {
-	BeeApp.Handlers.Include(cList...)
-	return BeeApp
+	AsanaApp.Handlers.Include(cList...)
+	return AsanaApp
 }
 
-// RESTRouter adds a restful controller handler to BeeApp.
+// RESTRouter adds a restful controller handler to AsanaApp.
 // its' controller implements asana.ControllerInterface and
 // defines a param "pattern/:objectId" to visit each resource.
 func RESTRouter(rootPath string, c ControllerInterface) *App {
 	Router(rootPath, c)
 	Router(path.Join(rootPath, ":objectId"), c)
-	return BeeApp
+	return AsanaApp
 }
 
-// AutoRouter adds defined controller handler to BeeApp.
+// AutoRouter adds defined controller handler to AsanaApp.
 // it's same to App.AutoRouter.
 // if asana.AddAuto(&MainContorlller{}) and MainController has methods List and Page,
 // visit the url /main/list to exec List function or /main/page to exec Page function.
 func AutoRouter(c ControllerInterface) *App {
-	BeeApp.Handlers.AddAuto(c)
-	return BeeApp
+	AsanaApp.Handlers.AddAuto(c)
+	return AsanaApp
 }
 
-// AutoPrefix adds controller handler to BeeApp with prefix.
+// AutoPrefix adds controller handler to AsanaApp with prefix.
 // it's same to App.AutoRouterWithPrefix.
 // if asana.AutoPrefix("/admin",&MainContorlller{}) and MainController has methods List and Page,
 // visit the url /admin/main/list to exec List function or /admin/main/page to exec Page function.
 func AutoPrefix(prefix string, c ControllerInterface) *App {
-	BeeApp.Handlers.AddAutoPrefix(prefix, c)
-	return BeeApp
+	AsanaApp.Handlers.AddAutoPrefix(prefix, c)
+	return AsanaApp
 }
 
 // Get used to register router for Get method
@@ -403,8 +403,8 @@ func AutoPrefix(prefix string, c ControllerInterface) *App {
 //          ctx.Output.Body("hello world")
 //    })
 func Get(rootPath string, f FilterFunc) *App {
-	BeeApp.Handlers.Get(rootPath, f)
-	return BeeApp
+	AsanaApp.Handlers.Get(rootPath, f)
+	return AsanaApp
 }
 
 // Post used to register router for Post method
@@ -413,8 +413,8 @@ func Get(rootPath string, f FilterFunc) *App {
 //          ctx.Output.Body("hello world")
 //    })
 func Post(rootPath string, f FilterFunc) *App {
-	BeeApp.Handlers.Post(rootPath, f)
-	return BeeApp
+	AsanaApp.Handlers.Post(rootPath, f)
+	return AsanaApp
 }
 
 // Delete used to register router for Delete method
@@ -423,8 +423,8 @@ func Post(rootPath string, f FilterFunc) *App {
 //          ctx.Output.Body("hello world")
 //    })
 func Delete(rootPath string, f FilterFunc) *App {
-	BeeApp.Handlers.Delete(rootPath, f)
-	return BeeApp
+	AsanaApp.Handlers.Delete(rootPath, f)
+	return AsanaApp
 }
 
 // Put used to register router for Put method
@@ -433,8 +433,8 @@ func Delete(rootPath string, f FilterFunc) *App {
 //          ctx.Output.Body("hello world")
 //    })
 func Put(rootPath string, f FilterFunc) *App {
-	BeeApp.Handlers.Put(rootPath, f)
-	return BeeApp
+	AsanaApp.Handlers.Put(rootPath, f)
+	return AsanaApp
 }
 
 // Head used to register router for Head method
@@ -443,8 +443,8 @@ func Put(rootPath string, f FilterFunc) *App {
 //          ctx.Output.Body("hello world")
 //    })
 func Head(rootPath string, f FilterFunc) *App {
-	BeeApp.Handlers.Head(rootPath, f)
-	return BeeApp
+	AsanaApp.Handlers.Head(rootPath, f)
+	return AsanaApp
 }
 
 // Options used to register router for Options method
@@ -453,8 +453,8 @@ func Head(rootPath string, f FilterFunc) *App {
 //          ctx.Output.Body("hello world")
 //    })
 func Options(rootPath string, f FilterFunc) *App {
-	BeeApp.Handlers.Options(rootPath, f)
-	return BeeApp
+	AsanaApp.Handlers.Options(rootPath, f)
+	return AsanaApp
 }
 
 // Patch used to register router for Patch method
@@ -463,8 +463,8 @@ func Options(rootPath string, f FilterFunc) *App {
 //          ctx.Output.Body("hello world")
 //    })
 func Patch(rootPath string, f FilterFunc) *App {
-	BeeApp.Handlers.Patch(rootPath, f)
-	return BeeApp
+	AsanaApp.Handlers.Patch(rootPath, f)
+	return AsanaApp
 }
 
 // Any used to register router for all methods
@@ -473,8 +473,8 @@ func Patch(rootPath string, f FilterFunc) *App {
 //          ctx.Output.Body("hello world")
 //    })
 func Any(rootPath string, f FilterFunc) *App {
-	BeeApp.Handlers.Any(rootPath, f)
-	return BeeApp
+	AsanaApp.Handlers.Any(rootPath, f)
+	return AsanaApp
 }
 
 // Handler used to register a Handler router
@@ -483,8 +483,8 @@ func Any(rootPath string, f FilterFunc) *App {
 //          fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path))
 //    }))
 func Handler(rootPath string, h http.Handler, options ...interface{}) *App {
-	BeeApp.Handlers.Handler(rootPath, h, options...)
-	return BeeApp
+	AsanaApp.Handlers.Handler(rootPath, h, options...)
+	return AsanaApp
 }
 
 // InsertFilter adds a FilterFunc with pattern condition and action constant.
@@ -492,6 +492,6 @@ func Handler(rootPath string, h http.Handler, options ...interface{}) *App {
 // asana.BeforeStatic, asana.BeforeRouter, asana.BeforeExec, asana.AfterExec and asana.FinishRouter.
 // The bool params is for setting the returnOnOutput value (false allows multiple filters to execute)
 func InsertFilter(pattern string, pos int, filter FilterFunc, params ...bool) *App {
-	_ = BeeApp.Handlers.InsertFilter(pattern, pos, filter, params...)
-	return BeeApp
+	_ = AsanaApp.Handlers.InsertFilter(pattern, pos, filter, params...)
+	return AsanaApp
 }

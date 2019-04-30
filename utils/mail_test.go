@@ -36,6 +36,6 @@ func TestMail(t *testing.T) {
 	mail.Subject = "hi, just from asana!"
 	mail.Text = "Text Body is, of course, supported!"
 	mail.HTML = "<h1>Fancy Html is supported, too!</h1>"
-	mail.AttachFile("/Users/asana/github/asana/asana.go")
-	mail.Send()
+	_, _ = mail.AttachFile("/Users/asana/github/asana/asana.go")
+	_ = mail.Send()
 }

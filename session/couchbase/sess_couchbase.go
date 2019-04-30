@@ -197,7 +197,7 @@ func (cp *Provider) SessionRegenerate(oldsid, sid string) (session.Store, error)
 
 	var doc []byte
 	if err := cp.b.Get(oldsid, &doc); err != nil || doc == nil {
-		cp.b.Set(sid, int(cp.maxLifeTime), "")
+		_ = cp.b.Set(sid, int(cp.maxLifeTime), "")
 	} else {
 		err := cp.b.Delete(oldsid)
 		if err != nil {

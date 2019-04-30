@@ -58,17 +58,17 @@ func NewContext() *Context {
 	}
 }
 
-// Context Http request context struct including BeegoInput, BeegoOutput, http.Request and http.ResponseWriter.
-// BeegoInput and BeegoOutput provides some api to operate request and response more easily.
+// Context Http request context struct including AsanaInput, AsanaOutput, http.Request and http.ResponseWriter.
+// AsanaInput and AsanaOutput provides some api to operate request and response more easily.
 type Context struct {
-	Input          *BeegoInput
-	Output         *BeegoOutput
+	Input          *AsanaInput
+	Output         *AsanaOutput
 	Request        *http.Request
 	ResponseWriter *Response
 	_xsrfToken     string
 }
 
-// Reset init Context, BeegoInput and BeegoOutput
+// Reset init Context, AsanaInput and AsanaOutput
 func (ctx *Context) Reset(rw http.ResponseWriter, r *http.Request) {
 	ctx.Request = r
 	if ctx.ResponseWriter == nil {
@@ -99,13 +99,13 @@ func (ctx *Context) WriteString(content string) {
 }
 
 // GetCookie Get cookie from request by a given key.
-// It's alias of BeegoInput.Cookie.
+// It's alias of AsanaInput.Cookie.
 func (ctx *Context) GetCookie(key string) string {
 	return ctx.Input.Cookie(key)
 }
 
 // SetCookie Set cookie for response.
-// It's alias of BeegoOutput.Cookie.
+// It's alias of AsanaOutput.Cookie.
 func (ctx *Context) SetCookie(name string, value string, others ...interface{}) {
 	ctx.Output.Cookie(name, value, others...)
 }

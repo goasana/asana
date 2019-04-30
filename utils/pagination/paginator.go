@@ -62,7 +62,7 @@ func (p *Paginator) Page() int {
 		return p.page
 	}
 	if p.Request.Form == nil {
-		p.Request.ParseForm()
+		_ = p.Request.ParseForm()
 	}
 	p.page, _ = strconv.Atoi(p.Request.Form.Get("p"))
 	if p.page > p.PageNums() {

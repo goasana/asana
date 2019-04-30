@@ -236,14 +236,14 @@ func (n *Namespace) Namespace(ns ...*Namespace) *Namespace {
 func AddNamespace(nl ...*Namespace) {
 	for _, n := range nl {
 		for k, v := range n.handlers.routers {
-			if _, ok := BeeApp.Handlers.routers[k]; ok {
+			if _, ok := AsanaApp.Handlers.routers[k]; ok {
 				addPrefix(v, n.prefix)
-				BeeApp.Handlers.routers[k].AddTree(n.prefix, v)
+				AsanaApp.Handlers.routers[k].AddTree(n.prefix, v)
 			} else {
 				t := NewTree()
 				t.AddTree(n.prefix, v)
 				addPrefix(t, n.prefix)
-				BeeApp.Handlers.routers[k] = t
+				AsanaApp.Handlers.routers[k] = t
 			}
 		}
 		if n.handlers.enableFilter {
@@ -252,7 +252,7 @@ func AddNamespace(nl ...*Namespace) {
 					t := NewTree()
 					t.AddTree(n.prefix, mr.tree)
 					mr.tree = t
-					_ = BeeApp.Handlers.insertFilterRouter(pos, mr)
+					_ = AsanaApp.Handlers.insertFilterRouter(pos, mr)
 				}
 			}
 		}
@@ -260,11 +260,11 @@ func AddNamespace(nl ...*Namespace) {
 }
 
 func addPrefix(t *Tree, prefix string) {
-	for _, v := range t.fixrouters {
+	for _, v := range t.fixRouters {
 		addPrefix(v, prefix)
 	}
-	if t.wildcard != nil {
-		addPrefix(t.wildcard, prefix)
+	if t.wildCard != nil {
+		addPrefix(t.wildCard, prefix)
 	}
 	for _, l := range t.leaves {
 		if c, ok := l.runObject.(*ControllerInfo); ok {

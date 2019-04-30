@@ -74,7 +74,7 @@ var tpl = `
         </div>
     </div>
     <div id="footer">
-        <p>asana {{ .BeegoVersion }} (asana framework)</p>
+        <p>asana {{ .AsanaVersion }} (asana framework)</p>
         <p>golang version: {{.GoVersion}}</p>
     </div>
 </body>
@@ -90,7 +90,7 @@ func showErr(err interface{}, ctx *context.Context, stack string) {
 		"RequestURL":    ctx.Input.URI(),
 		"RemoteAddr":    ctx.Input.IP(),
 		"Stack":         stack,
-		"BeegoVersion":  VERSION,
+		"AsanaVersion":  VERSION,
 		"GoVersion":     runtime.Version(),
 	}
 	_ = t.Execute(ctx.ResponseWriter, data)
@@ -188,7 +188,7 @@ var errtpl = `
 					{{.Content}}
 					<a href="/" title="Home" class="button">Go Home</a><br />
 
-					<br>Powered by asana {{.BeegoVersion}}
+					<br>Powered by asana {{.AsanaVersion}}
 				</div>
 			</div>
 		</div>
@@ -363,7 +363,7 @@ func responseError(rw http.ResponseWriter, _ *http.Request, errCode int, errCont
 	t, _ := template.New("asanaerrortemp").Parse(errtpl)
 	data := M{
 		"Title":        http.StatusText(errCode),
-		"BeegoVersion": VERSION,
+		"AsanaVersion": VERSION,
 		"Content":      template.HTML(errContent),
 	}
 	_ = t.Execute(rw, data)
@@ -379,7 +379,7 @@ func ErrorHandler(code string, h http.HandlerFunc) *App {
 		handler:   h,
 		method:    code,
 	}
-	return BeeApp
+	return AsanaApp
 }
 
 // ErrorController registers ControllerInterface to each http err code string.
@@ -400,7 +400,7 @@ func ErrorController(c ControllerInterface) *App {
 			}
 		}
 	}
-	return BeeApp
+	return AsanaApp
 }
 
 // Exception Write HttpStatus with errCode and Exec error handler if exist.

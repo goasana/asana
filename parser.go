@@ -102,7 +102,7 @@ func parserPkg(pkgRealpath, pkgpath string) error {
 					if specDecl.Recv != nil {
 						exp, ok := specDecl.Recv.List[0].Type.(*ast.StarExpr) // Check that the type is correct first beforing throwing to parser
 						if ok {
-							parserComments(specDecl, fmt.Sprint(exp.X), pkgpath)
+							_ = parserComments(specDecl, fmt.Sprint(exp.X), pkgpath)
 						}
 					}
 				}
@@ -110,7 +110,7 @@ func parserPkg(pkgRealpath, pkgpath string) error {
 		}
 	}
 	genRouterCode(pkgRealpath)
-	savetoFile(pkgRealpath)
+	saveToFile(pkgRealpath)
 	return nil
 }
 
@@ -218,8 +218,8 @@ func buildMethodParams(funcParams []*ast.Field, pc *parsedComment) []*param.Meth
 	return result
 }
 
-func buildMethodParam(fparam *ast.Field, name string, pc *parsedComment) *param.MethodParam {
-	options := []param.MethodParamOption{}
+func buildMethodParam(_ *ast.Field, name string, pc *parsedComment) *param.MethodParam {
+	var options []param.MethodParamOption
 	if cparam, ok := pc.params[name]; ok {
 		//Build param from comment info
 		name = cparam.name
@@ -255,8 +255,8 @@ var routeRegex = regexp.MustCompile(`@router\s+(\S+)(?:\s+\[(\S+)\])?`)
 func parseComment(lines []*ast.Comment) (pcs []*parsedComment, err error) {
 	pcs = []*parsedComment{}
 	params := map[string]parsedParam{}
-	filters := []parsedFilter{}
-	imports := []parsedImport{}
+	var filters []parsedFilter
+	var imports []parsedImport
 
 	for _, c := range lines {
 		t := strings.TrimSpace(strings.TrimLeft(c.Text, "//"))
@@ -365,7 +365,7 @@ filterLoop:
 				}
 				pcs = append(pcs, pc)
 			} else {
-				return nil, errors.New("Router information is missing")
+				return nil, errors.New("pouter information is missing")
 			}
 		}
 	}
@@ -409,11 +409,11 @@ func getparams(str string) []string {
 }
 
 func genRouterCode(pkgRealpath string) {
-	os.Mkdir(getRouterDir(pkgRealpath), 0755)
+	_ = os.Mkdir(getRouterDir(pkgRealpath), 0755)
 	logs.Info("generate router from comments")
 	var (
-		globalinfo   string
-		globalimport string
+		globalInfo   string
+		globalImport string
 		sortKey      []string
 	)
 	for k := range genInfoList {
@@ -424,13 +424,13 @@ func genRouterCode(pkgRealpath string) {
 		cList := genInfoList[k]
 		sort.Sort(ControllerCommentsSlice(cList))
 		for _, c := range cList {
-			allmethod := "nil"
+			allMethod := "nil"
 			if len(c.AllowHTTPMethods) > 0 {
-				allmethod = "[]string{"
+				allMethod = "[]string{"
 				for _, m := range c.AllowHTTPMethods {
-					allmethod += `"` + m + `",`
+					allMethod += `"` + m + `",`
 				}
-				allmethod = strings.TrimRight(allmethod, ",") + "}"
+				allMethod = strings.TrimRight(allMethod, ",") + "}"
 			}
 
 			params := "nil"
@@ -467,7 +467,7 @@ func genRouterCode(pkgRealpath string) {
 						s = fmt.Sprintf(`
 	"%s"`, i.ImportPath)
 					}
-					if !strings.Contains(globalimport, s) {
+					if !strings.Contains(globalImport, s) {
 						imports += s
 					}
 				}
@@ -494,14 +494,14 @@ func genRouterCode(pkgRealpath string) {
             }`, filters)
 			}
 
-			globalimport += imports
+			globalImport += imports
 
-			globalinfo = globalinfo + `
+			globalInfo = globalInfo + `
     asana.GlobalControllerRouter["` + k + `"] = append(asana.GlobalControllerRouter["` + k + `"],
         asana.ControllerComments{
             Method: "` + strings.TrimSpace(c.Method) + `",
             ` + "Router: `" + c.Router + "`" + `,
-            AllowHTTPMethods: ` + allmethod + `,
+            AllowHTTPMethods: ` + allMethod + `,
             MethodParams: ` + methodParams + `,
             Filters: ` + filters + `,
             Params: ` + params + `})
@@ -509,7 +509,7 @@ func genRouterCode(pkgRealpath string) {
 		}
 	}
 
-	if globalinfo != "" {
+	if globalInfo != "" {
 		f, err := os.Create(filepath.Join(getRouterDir(pkgRealpath), commentFilename))
 		if err != nil {
 			panic(err)
@@ -517,9 +517,9 @@ func genRouterCode(pkgRealpath string) {
 		defer f.Close()
 
 		routersDir := AppConfig.DefaultString("routers", "routersdir")
-		content := strings.Replace(globalRouterTemplate, "{{.globalinfo}}", globalinfo, -1)
+		content := strings.Replace(globalRouterTemplate, "{{.globalInfo}}", globalInfo, -1)
 		content = strings.Replace(content, "{{.routersDir}}", routersDir, -1)
-		content = strings.Replace(content, "{{.globalimport}}", globalimport, -1)
+		content = strings.Replace(content, "{{.globalImport}}", globalImport, -1)
 		_, _ = f.WriteString(content)
 	}
 }
@@ -534,12 +534,12 @@ func compareFile(pkgRealpath string) bool {
 			return true
 		}
 		_ = json.Decode(content, &pkgLastupdate)
-		lastupdate, err := getPathTime(pkgRealpath)
+		lastUpdate, err := getPathTime(pkgRealpath)
 		if err != nil {
 			return true
 		}
 		if v, ok := pkgLastupdate[pkgRealpath]; ok {
-			if lastupdate <= v {
+			if lastUpdate <= v {
 				return false
 			}
 		}
@@ -547,7 +547,7 @@ func compareFile(pkgRealpath string) bool {
 	return true
 }
 
-func savetoFile(pkgRealpath string) {
+func saveToFile(pkgRealpath string) {
 	lastUpdate, err := getPathTime(pkgRealpath)
 	if err != nil {
 		return
@@ -560,17 +560,17 @@ func savetoFile(pkgRealpath string) {
 	_ = ioutil.WriteFile(lastupdateFilename, d, os.ModePerm)
 }
 
-func getPathTime(pkgRealpath string) (lastupdate int64, err error) {
+func getPathTime(pkgRealpath string) (lastUpdate int64, err error) {
 	fl, err := ioutil.ReadDir(pkgRealpath)
 	if err != nil {
-		return lastupdate, err
+		return lastUpdate, err
 	}
 	for _, f := range fl {
-		if lastupdate < f.ModTime().UnixNano() {
-			lastupdate = f.ModTime().UnixNano()
+		if lastUpdate < f.ModTime().UnixNano() {
+			lastUpdate = f.ModTime().UnixNano()
 		}
 	}
-	return lastupdate, nil
+	return lastUpdate, nil
 }
 
 func getRouterDir(pkgRealpath string) string {

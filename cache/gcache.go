@@ -4,8 +4,8 @@ import (
 	"errors"
 	"time"
 
-	"github.com/goasana/framework/encoder/json"
 	"github.com/bluele/gcache"
+	"github.com/goasana/framework/encoder/json"
 )
 
 // Cache gCache adapter
@@ -13,8 +13,8 @@ type gCache struct {
 	cache gcache.Cache
 }
 
-//NewSsdbCache create new gCache adapter.
-func NewgCache() Cache {
+//NewGCache create new gCache adapter.
+func NewGCache() Cache {
 	return &gCache{}
 }
 
@@ -171,5 +171,5 @@ func (rc *gCache) StartAndGC(config string) error {
 }
 
 func init() {
-	Register(GCacheProvider, NewgCache)
+	Register(GCacheProvider, NewGCache)
 }
