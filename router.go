@@ -267,7 +267,7 @@ func (p *ControllerRegister) Include(cList ...ControllerInterface) {
 			if pkgpath != "" {
 				if _, ok := skip[pkgpath]; !ok {
 					skip[pkgpath] = true
-					parserPkg(pkgpath, t.PkgPath())
+					_ = parserPkg(pkgpath, t.PkgPath())
 				}
 			}
 		}
@@ -279,7 +279,7 @@ func (p *ControllerRegister) Include(cList ...ControllerInterface) {
 		if comm, ok := GlobalControllerRouter[key]; ok {
 			for _, a := range comm {
 				for _, f := range a.Filters {
-					p.InsertFilter(f.Pattern, f.Pos, f.Filter, f.ReturnOnOutput, f.ResetParams)
+					_ = p.InsertFilter(f.Pattern, f.Pos, f.Filter, f.ReturnOnOutput, f.ResetParams)
 				}
 
 				p.addWithMethodParams(a.Router, c, a.MethodParams, strings.Join(a.AllowHTTPMethods, ",")+":"+a.Method)
@@ -709,7 +709,7 @@ func (p *ControllerRegister) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 		if BConfig.CopyRequestBody && !context.Input.IsUpload() {
 			context.Input.CopyBody(BConfig.MaxMemory)
 		}
-		context.Input.ParseFormOrMulitForm(BConfig.MaxMemory)
+		_ = context.Input.ParseFormOrMulitForm(BConfig.MaxMemory)
 	}
 
 	// session init

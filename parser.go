@@ -516,11 +516,11 @@ func genRouterCode(pkgRealpath string) {
 		}
 		defer f.Close()
 
-		routersDir := AppConfig.DefaultString("routersdir", "routers")
+		routersDir := AppConfig.DefaultString("routers", "routersdir")
 		content := strings.Replace(globalRouterTemplate, "{{.globalinfo}}", globalinfo, -1)
 		content = strings.Replace(content, "{{.routersDir}}", routersDir, -1)
 		content = strings.Replace(content, "{{.globalimport}}", globalimport, -1)
-		f.WriteString(content)
+		_, _ = f.WriteString(content)
 	}
 }
 
@@ -576,7 +576,7 @@ func getPathTime(pkgRealpath string) (lastupdate int64, err error) {
 func getRouterDir(pkgRealpath string) string {
 	dir := filepath.Dir(pkgRealpath)
 	for {
-		routersDir := AppConfig.DefaultString("routersdir", "routers")
+		routersDir := AppConfig.DefaultString("routers", "routersdir")
 		d := filepath.Join(dir, routersDir)
 		if utils.FileExists(d) {
 			return d

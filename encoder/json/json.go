@@ -13,7 +13,6 @@ func init()  {
 
 type jsonEncoder struct{}
 
-
 func Encode(v interface{}, hasIndent bool) ([]byte, error) {
 	if hasIndent {
 		return json.MarshalIndent(v, "", " ")

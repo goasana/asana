@@ -29,9 +29,10 @@ func main(){
 Congratulations! You've just built your first **Asana** app.
 
 ## Features
-
+* YAML file default config
+* Kubernetes Map, File, Consul config providers.
 * RESTful support
-* RESTful protocol buffers with [gogo/protobuf](https://github.com/gogo/protobuf)
+* Good for Microservices, RESTful protocol buffers with [gogo/protobuf](https://github.com/gogo/protobuf)
 * MVC architecture
 * Modularity
 * Auto API documents
