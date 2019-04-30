@@ -156,7 +156,11 @@ func init() {
 		}
 	}
 
-	s := file.NewSource(file.WithPath(appConfigPath), source.WithEncoder(encoder.GetEncoder(filepath.Ext(appConfigPath))))
+	s := file.NewSource(file.WithPath(appConfigPath),
+		source.WithEncoder(
+			encoder.GetEncoder(strings.Replace(filepath.Ext(appConfigPath), ".", "", 1)),
+		),
+	)
 	if err = parseConfig(s); err != nil {
 		panic(err)
 	}

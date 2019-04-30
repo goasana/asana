@@ -119,7 +119,10 @@ func TestAsanaInit(ap string) {
 
 // InitAsanaBeforeTest is for test package init
 func InitAsanaBeforeTest(appConfigPath string) {
-	if err := LoadAppConfig(file.NewSource(file.WithPath(appConfigPath), source.WithEncoder(encoder.GetEncoder(filepath.Ext(appConfigPath))))); err != nil {
+	if err := LoadAppConfig(file.NewSource(file.WithPath(appConfigPath),
+		source.WithEncoder(
+			encoder.GetEncoder(strings.Replace(filepath.Ext(appConfigPath), ".", "", 1)))),
+	); err != nil {
 		panic(err)
 	}
 	BConfig.RunMode = "test"
