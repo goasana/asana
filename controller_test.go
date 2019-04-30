@@ -140,7 +140,7 @@ func TestAdditionalViewPaths(t *testing.T) {
 		} else {
 			defer f.Close()
 			_, _ = f.WriteString(content)
-			f.Close()
+			_ = f.Close()
 		}
 
 	}
@@ -172,7 +172,7 @@ func TestAdditionalViewPaths(t *testing.T) {
 				t.Fatal("TestAdditionalViewPaths expected error")
 			}
 		}()
-		ctrl.RenderString()
+		_, _ = ctrl.RenderString()
 	}()
 
 	ctrl.TplName = "file2.tpl"

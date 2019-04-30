@@ -12,7 +12,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 
-	"github.com/goasana/framework/encoder/json"
+	"github.com/goasana/config/encoder/json"
 )
 
 // Error message in SLS HTTP response.

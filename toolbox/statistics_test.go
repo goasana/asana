@@ -18,7 +18,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/goasana/framework/encoder/json"
+	"github.com/goasana/config/encoder/json"
 )
 
 func TestStatics(t *testing.T) {

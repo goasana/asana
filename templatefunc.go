@@ -160,17 +160,17 @@ func NotNil(a interface{}) (isNil bool) {
 func GetConfig(returnType, key string, defaultVal interface{}) (value interface{}, err error) {
 	switch returnType {
 	case "String":
-		value = AppConfig.String(key)
+		value = AppConfig.Get(key).String()
 	case "Bool":
-		value, err = AppConfig.Bool(key)
+		value = AppConfig.Get(key).Bool()
 	case "Int":
-		value, err = AppConfig.Int(key)
+		value = AppConfig.Get(key).Int()
 	case "Int64":
-		value, err = AppConfig.Int64(key)
+		value = AppConfig.Get(key).Int64()
 	case "Float":
-		value, err = AppConfig.Float(key)
+		value = AppConfig.Get(key).Float64()
 	case "DIY":
-		value, err = AppConfig.DIY(key)
+		value = AppConfig.Get(key).StringMap()
 	default:
 		err = errors.New("config keys must be of type String, Bool, Int, Int64, Float, or DIY")
 	}

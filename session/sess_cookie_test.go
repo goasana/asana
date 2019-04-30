@@ -20,7 +20,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/goasana/framework/encoder/json"
+	"github.com/goasana/config/encoder/json"
 )
 
 func TestCookie(t *testing.T) {

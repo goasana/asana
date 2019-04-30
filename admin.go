@@ -23,7 +23,7 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/goasana/framework/encoder/json"
+	"github.com/goasana/config/encoder/json"
 	"github.com/goasana/framework/grace"
 	"github.com/goasana/framework/logs"
 	"github.com/goasana/framework/toolbox"
@@ -106,7 +106,6 @@ func listConf(rw http.ResponseWriter, r *http.Request) {
 		m := make(M)
 		list("BConfig", BConfig, m)
 		m["AppConfigPath"] = appConfigPath
-		m["AppConfigProvider"] = appConfigProvider
 		tmpl := template.Must(template.New("dashboard").Parse(dashboardTpl))
 		tmpl = template.Must(tmpl.Parse(configTpl))
 		tmpl = template.Must(tmpl.Parse(defaultScriptsTpl))

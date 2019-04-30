@@ -30,7 +30,7 @@ import (
 	"unicode"
 
 	"github.com/goasana/framework/context/param"
-	"github.com/goasana/framework/encoder/json"
+	"github.com/goasana/config/encoder/json"
 	"github.com/goasana/framework/logs"
 	"github.com/goasana/framework/utils"
 )
@@ -516,7 +516,7 @@ func genRouterCode(pkgRealpath string) {
 		}
 		defer f.Close()
 
-		routersDir := AppConfig.DefaultString("routers", "routersdir")
+		routersDir := AppConfig.Get("routersdir").String("routers")
 		content := strings.Replace(globalRouterTemplate, "{{.globalInfo}}", globalInfo, -1)
 		content = strings.Replace(content, "{{.routersDir}}", routersDir, -1)
 		content = strings.Replace(content, "{{.globalImport}}", globalImport, -1)
@@ -576,7 +576,7 @@ func getPathTime(pkgRealpath string) (lastUpdate int64, err error) {
 func getRouterDir(pkgRealpath string) string {
 	dir := filepath.Dir(pkgRealpath)
 	for {
-		routersDir := AppConfig.DefaultString("routers", "routersdir")
+		routersDir := AppConfig.Get("routersdir").String("routers")
 		d := filepath.Join(dir, routersDir)
 		if utils.FileExists(d) {
 			return d

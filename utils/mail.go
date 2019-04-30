@@ -32,7 +32,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/goasana/framework/encoder/json"
+	"github.com/goasana/config/encoder/json"
 )
 
 const (

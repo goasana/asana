@@ -36,7 +36,7 @@ import (
 
 	"github.com/bradfitz/gomemcache/memcache"
 	"github.com/goasana/framework/cache"
-	"github.com/goasana/framework/encoder/json"
+	"github.com/goasana/config/encoder/json"
 )
 
 // Cache Memcache adapter.

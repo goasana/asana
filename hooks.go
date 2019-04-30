@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/goasana/framework/context"
-	"github.com/goasana/framework/encoder/json"
+	"github.com/goasana/config/encoder/json"
 	"github.com/goasana/framework/logs"
 	"github.com/goasana/framework/session"
 )
@@ -46,7 +46,7 @@ func registerDefaultErrorHandler() error {
 func registerSession() error {
 	if BConfig.WebConfig.Session.SessionOn {
 		var err error
-		sessionConfig := AppConfig.String("sessionConfig")
+		sessionConfig := AppConfig.Get("sessionConfig").String("")
 		conf := new(session.ManagerConfig)
 		if sessionConfig == "" {
 			conf.CookieName = BConfig.WebConfig.Session.SessionName
@@ -94,9 +94,9 @@ func registerAdmin() error {
 func registerGzip() error {
 	if BConfig.EnableGzip {
 		context.InitGzip(
-			AppConfig.DefaultInt(-1, "gzipMinLength"),
-			AppConfig.DefaultInt( -1, "gzipCompressLevel"),
-			AppConfig.DefaultStrings([]string{"GET"}, "includedMethods"),
+			AppConfig.Get("gzipMinLength").Int(-1),
+			AppConfig.Get("gzipCompressLevel").Int(-1),
+			AppConfig.Get("includedMethods").StringSlice([]string{"GET"}),
 		)
 	}
 	return nil

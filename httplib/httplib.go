@@ -50,9 +50,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/goasana/framework/encoder/json"
-	"github.com/goasana/framework/encoder/xml"
-	"github.com/goasana/framework/encoder/yaml"
+	"github.com/goasana/config/encoder/json"
+	"github.com/goasana/config/encoder/xml"
+	"github.com/goasana/config/encoder/yaml"
 )
 
 var defaultSetting = AsanaHTTPSettings{

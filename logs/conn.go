@@ -19,7 +19,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/goasana/framework/encoder/json"
+	"github.com/goasana/config/encoder/json"
 )
 
 // connWriter implements LoggerInterface.

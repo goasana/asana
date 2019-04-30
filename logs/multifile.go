@@ -17,7 +17,7 @@ package logs
 import (
 	"time"
 
-	"github.com/goasana/framework/encoder/json"
+	"github.com/goasana/config/encoder/json"
 )
 
 // A filesLogWriter manages several fileLogWriter

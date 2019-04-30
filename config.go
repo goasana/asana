@@ -22,13 +22,15 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/goasana/config"
+	"github.com/goasana/config/encoder"
+	_ "github.com/goasana/config/encoder/yaml"
+	"github.com/goasana/config/source"
+	"github.com/goasana/config/source/file"
 	"github.com/goasana/framework/context"
-	_ "github.com/goasana/framework/encoder/yaml"
 	"github.com/goasana/framework/logs"
 	"github.com/goasana/framework/session"
 	"github.com/goasana/framework/utils"
-	"github.com/micro/go-config"
-	"github.com/micro/go-config/source/file"
 )
 
 // Config is the main struct for BConfig
@@ -153,7 +155,9 @@ func init() {
 			return
 		}
 	}
-	if err = parseConfig(appConfigPath); err != nil {
+
+	s := file.NewSource(file.WithPath(appConfigPath), source.WithEncoder(encoder.GetEncoder(filepath.Ext(appConfigPath))))
+	if err = parseConfig(s); err != nil {
 		panic(err)
 	}
 }
@@ -268,8 +272,8 @@ func newBConfig() *Config {
 }
 
 // now only support ini, next will support json.
-func parseConfig(appConfigPath string) (err error) {
-	AppConfig, err = newAppConfig(appConfigPath)
+func parseConfig(source source.Source) (err error) {
+	AppConfig, err = newAppConfig(source)
 	if err != nil {
 		return err
 	}
@@ -362,14 +366,17 @@ func assignSingleConfig(p interface{}, ac config.Config) {
 			continue
 		}
 		name := pt.Field(i).Name
-		switch pf.Kind() {
+		kind := pf.Kind()
+		switch kind {
 		case reflect.String:
-			pf.SetString(ac.Get(name).String(pf.String()))
-		case reflect.Int:
-			pf.SetInt(int64(ac.Get(name).Int(int(pf.Int()))))
+			valS := ac.Get(name).String(pf.String())
+			pf.SetString(valS)
+		case reflect.Int, reflect.Int64:
+			pf.SetInt(ac.Get(name).Int64(pf.Int()))
 		case reflect.Bool:
-			valDef := pf.Bool()
-			pf.SetBool(ac.Get(name).Bool(valDef))
+			pf.SetBool(ac.Get(name).Bool(pf.Bool()))
+		case reflect.Float64:
+			pf.SetFloat(ac.Get(name).Float64(pf.Float()))
 		case reflect.Struct:
 		default:
 			//do nothing here
@@ -378,20 +385,18 @@ func assignSingleConfig(p interface{}, ac config.Config) {
 }
 
 // LoadAppConfig allow developer to apply a config
-func LoadAppConfig(configName string) error {
-	return parseConfig(configName)
+func LoadAppConfig(source source.Source) error {
+	return parseConfig(source)
 }
 
 type asanaAppConfig struct {
 	config.Config
 }
 
-func newAppConfig(appConfigPath string) (*asanaAppConfig, error) {
-	conf:= config.NewConfig()
+func newAppConfig(source source.Source) (*asanaAppConfig, error) {
+	conf := config.NewConfig()
 
-	err := conf.Load(file.NewSource(
-		file.WithPath(appConfigPath),
-	))
+	err := conf.Load(source)
 
 	if err != nil {
 		return nil, err

@@ -47,7 +47,7 @@ import (
 
 	"github.com/goasana/framework"
 	"github.com/goasana/framework/context"
-	"github.com/goasana/framework/encoder/json"
+	"github.com/goasana/config/encoder/json"
 	"github.com/goasana/framework/logs"
 )
 

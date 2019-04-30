@@ -18,10 +18,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/goasana/framework/config"
-	"github.com/goasana/framework/config/file"
-	"github.com/goasana/framework/encoder"
-	"github.com/goasana/framework/encoder/json"
+	"github.com/goasana/config/encoder/json"
+	"github.com/goasana/config"
+	"github.com/goasana/config/source/memory"
 )
 
 func TestDefaults(t *testing.T) {
@@ -37,13 +36,11 @@ func TestDefaults(t *testing.T) {
 func TestAssignConfig_01(t *testing.T) {
 	_BConfig := &Config{}
 	_BConfig.AppName = "asana_test"
-	jcf := file.NewConfigFile(config.Option{
-		Encoder: encoder.GetEncoder("json"),
-		SeparatorKeys: "::",
-	})
+	jcf := config.NewConfig()
 
-	ac, _ := jcf.ParseData([]byte(`{"AppName":"asana_json"}`))
-	assignSingleConfig(_BConfig, ac)
+	jcf.Load(memory.NewSource(memory.WithData([]byte(`{"AppName":"asana_json"}`))))
+
+	assignSingleConfig(_BConfig, jcf)
 	if _BConfig.AppName != "asana_json" {
 		t.Log(_BConfig)
 		t.FailNow()
@@ -73,21 +70,21 @@ func TestAssignConfig_02(t *testing.T) {
 			configMap[k] = v
 		}
 	}
+	configMap["AppName"] = "asana"
 	configMap["MaxMemory"] = 1024
 	configMap["Graceful"] = true
 	configMap["XSRFExpire"] = 32
 	configMap["SessionProviderConfig"] = "file"
 	configMap["FileLineNum"] = true
 
-	jcf := file.NewConfigFile(config.Option{
-		Encoder: encoder.GetEncoder("json"),
-		SeparatorKeys: "::",
-	})
 	bs, _ = json.Encode(configMap, false)
-	ac, _ := jcf.ParseData(bs)
+
+	jcf := config.NewConfig()
+
+	jcf.Load(memory.NewSource(memory.WithData(bs)))
 
 	for _, i := range []interface{}{_BConfig, &_BConfig.Listen, &_BConfig.WebConfig, &_BConfig.Log, &_BConfig.WebConfig.Session} {
-		assignSingleConfig(i, ac)
+		assignSingleConfig(i, jcf)
 	}
 
 	if _BConfig.MaxMemory != 1024 {
@@ -115,36 +112,4 @@ func TestAssignConfig_02(t *testing.T) {
 		t.FailNow()
 	}
 
-}
-
-func TestAssignConfig_03(t *testing.T) {
-	jcf := file.NewConfigFile(config.Option{
-		Encoder: encoder.GetEncoder("json"),
-		SeparatorKeys: "::",
-	})
-	ac, _ := jcf.ParseData([]byte(`{"AppName":"asana"}`))
-	_ = ac.Set("AppName", "test_app")
-	_ = ac.Set("RunMode", "online")
-	_ = ac.Set("StaticDir", "download:down download2:down2")
-	_ = ac.Set("StaticExtensionsToGzip", ".css,.js,.html,.jpg,.png")
-	_ = assignConfig(ac)
-
-	//t.Logf("%#v", BConfig)
-
-	if BConfig.AppName != "test_app" {
-		t.FailNow()
-	}
-
-	if BConfig.RunMode != "online" {
-		t.FailNow()
-	}
-	if BConfig.WebConfig.StaticDir["/download"] != "down" {
-		t.FailNow()
-	}
-	if BConfig.WebConfig.StaticDir["/download2"] != "down2" {
-		t.FailNow()
-	}
-	if len(BConfig.WebConfig.StaticExtensionsToGzip) != 5 {
-		t.FailNow()
-	}
 }

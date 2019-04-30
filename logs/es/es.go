@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/goasana/framework/encoder/json"
+	"github.com/goasana/config/encoder/json"
 	"github.com/goasana/framework/logs"
 	"github.com/OwnLocal/goes"
 )

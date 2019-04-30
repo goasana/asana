@@ -8,7 +8,7 @@ import (
 	"strconv"
 
 	lz4 "github.com/cloudflare/golz4"
-	"github.com/goasana/framework/encoder/json"
+	"github.com/goasana/config/encoder/json"
 	"github.com/gogo/protobuf/proto"
 )
 

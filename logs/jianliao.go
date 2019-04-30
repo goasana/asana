@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/goasana/framework/encoder/json"
+	"github.com/goasana/config/encoder/json"
 )
 
 // JLWriter implements asana LoggerInterface and is used to send jiaoliao webhook

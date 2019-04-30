@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/bluele/gcache"
-	"github.com/goasana/framework/encoder/json"
+	"github.com/goasana/config/encoder/json"
 )
 
 // Cache gCache adapter
