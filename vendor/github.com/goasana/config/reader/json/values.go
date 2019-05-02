@@ -3,6 +3,7 @@ package json
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -101,6 +102,41 @@ func (j *jsonValues) String() string {
 	return "json"
 }
 
+func (j *jsonValue) pase(value string) (realValue string) {
+	realValue = value
+
+	vLen := len(value)
+	// 3 = ${}
+	if vLen < 3 {
+		return
+	}
+	// Need start with "${" and end with "}", then return.
+	if value[0] != '$' || value[1] != '{' || value[vLen-1] != '}' {
+		return
+	}
+
+	key := ""
+	defaultV := ""
+	// value start with "${"
+	for i := 2; i < vLen; i++ {
+		if value[i] == '|' && (i+1 < vLen && value[i+1] == '|') {
+			key = value[2:i]
+			defaultV = value[i+2 : vLen-1] // other string is default value.
+			break
+		} else if value[i] == '}' {
+			key = value[2:i]
+			break
+		}
+	}
+
+	realValue = os.Getenv(key)
+	if realValue == "" {
+		realValue = defaultV
+	}
+
+	return
+}
+
 func (j *jsonValue) Bool(def ...bool) bool {
 	b, err := j.Json.Bool()
 	if err == nil {
@@ -118,7 +154,7 @@ func (j *jsonValue) Bool(def ...bool) bool {
 		return vDef
 	}
 
-	b, err = strconv.ParseBool(str)
+	b, err = strconv.ParseBool(j.pase(str))
 	if err != nil {
 		return vDef
 	}
@@ -141,7 +177,7 @@ func (j *jsonValue) Int(def ...int) int {
 		return vDef
 	}
 
-	i, err = strconv.Atoi(str)
+	i, err = strconv.Atoi(j.pase(str))
 	if err != nil {
 		return vDef
 	}
@@ -165,7 +201,7 @@ func (j *jsonValue) Int64(def ...int64) int64 {
 		return vDef
 	}
 
-	i, err = strconv.ParseInt(str, 10, 0)
+	i, err = strconv.ParseInt(j.pase(str), 10, 0)
 	if err != nil {
 		return vDef
 	}
@@ -197,7 +233,7 @@ func (j *jsonValue) String(def ...string) string {
 		vDef = def[0]
 	}
 
-	return j.Json.MustString(vDef)
+	return j.pase(j.Json.MustString(vDef))
 }
 
 func (j *jsonValue) Float64(def ...float64) float64 {
@@ -217,7 +253,7 @@ func (j *jsonValue) Float64(def ...float64) float64 {
 		return vDef
 	}
 
-	f, err = strconv.ParseFloat(str, 64)
+	f, err = strconv.ParseFloat(j.pase(str), 64)
 	if err != nil {
 		return vDef
 	}
@@ -246,7 +282,7 @@ func (j *jsonValue) Duration(def ...time.Duration) time.Duration {
 		return vDef
 	}
 
-	value, err := time.ParseDuration(v)
+	value, err := time.ParseDuration(j.pase(v))
 	if err != nil {
 		return vDef
 	}
@@ -254,7 +290,7 @@ func (j *jsonValue) Duration(def ...time.Duration) time.Duration {
 	return value
 }
 
-func (j *jsonValue) StringSlice(def ...[]string) []string {
+func (j *jsonValue) StringSlice(def ...[]string) (f []string) {
 	v, err := j.Json.String()
 	if err == nil {
 		sl := strings.Split(v, ",")
@@ -271,7 +307,11 @@ func (j *jsonValue) StringSlice(def ...[]string) []string {
 		return vDef
 	}
 
-	return j.Json.MustStringArray(vDef)
+	for _, v := range j.Json.MustStringArray(vDef) {
+		f = append(f, j.pase(v))
+	}
+
+	return
 }
 
 func (j *jsonValue) StringMap(def ...map[string]string) map[string]string {
@@ -288,7 +328,7 @@ func (j *jsonValue) StringMap(def ...map[string]string) map[string]string {
 	res := map[string]string{}
 
 	for k, v := range m {
-		res[k] = fmt.Sprintf("%v", v)
+		res[k] = j.pase(fmt.Sprintf("%v", v))
 	}
 
 	return res

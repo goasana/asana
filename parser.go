@@ -29,8 +29,8 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/goasana/framework/context/param"
 	"github.com/goasana/config/encoder/json"
+	"github.com/goasana/framework/context/param"
 	"github.com/goasana/framework/logs"
 	"github.com/goasana/framework/utils"
 )
@@ -39,11 +39,11 @@ var globalRouterTemplate = `package {{.routersDir}}
 
 import (
 	"github.com/goasana/framework"
-	"github.com/goasana/framework/context/param"{{.globalimport}}
+	"github.com/goasana/framework/context/param"{{.globalImport}}
 )
 
 func init() {
-{{.globalinfo}}
+{{.globalInfo}}
 }
 `
 

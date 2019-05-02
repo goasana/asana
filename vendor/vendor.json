@@ -6,8 +6,8 @@
 			"checksumSHA1": "Pc2ORQp+VY3Un/dkh4QwLC7R6lE=",
 			"origin": "github.com/goasana/config/vendor/github.com/BurntSushi/toml",
 			"path": "github.com/BurntSushi/toml",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "oyXJxS8qqy5TCkqvndCD1c7Lkg4=",
@@ -25,8 +25,8 @@
 			"checksumSHA1": "0EhLvZ6Og9HYqJtCc2Dzs1EgM30=",
 			"origin": "github.com/goasana/config/vendor/github.com/bitly/go-simplejson",
 			"path": "github.com/bitly/go-simplejson",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "8O0xts7dLItO4mlwwbtyVpHKNds=",
@@ -174,15 +174,15 @@
 			"checksumSHA1": "YImPVNZRCKOaaReWnFEH+AaP8NM=",
 			"origin": "github.com/goasana/config/vendor/github.com/fsnotify/fsnotify",
 			"path": "github.com/fsnotify/fsnotify",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "WDcVWDtHun6YjZ5ImyORwp2qGxY=",
 			"origin": "github.com/goasana/config/vendor/github.com/ghodss/yaml",
 			"path": "github.com/ghodss/yaml",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "QEs5B10mZGtKgvsY9fSRAw3sS6U=",
@@ -235,98 +235,98 @@
 		{
 			"checksumSHA1": "m9wcN5I2qI4emyYDZGTOpY3kjR0=",
 			"path": "github.com/goasana/config",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "iRm4JiVBOcTzs7tpm67RaXlBTB8=",
 			"path": "github.com/goasana/config/encoder",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "ZMIYTN6p+ONU1EjtBzlF/pu85aQ=",
 			"path": "github.com/goasana/config/encoder/hcl",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "7MN+R+49RE9u90pR/gAU8Q4HfxQ=",
 			"path": "github.com/goasana/config/encoder/hjson",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "IvQyqfGz58V2qFtIuFqB/iVWloI=",
 			"path": "github.com/goasana/config/encoder/json",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "mbBINtIxRhiRCtGJWQFGw71GZYA=",
 			"path": "github.com/goasana/config/encoder/proto",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "fWmkW6IKJXOHvg5jbF7AEvNrWJ4=",
 			"path": "github.com/goasana/config/encoder/toml",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "y8v2sTh0SLvIbniYNFErEIKBBkE=",
 			"path": "github.com/goasana/config/encoder/xml",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "pIY1ceR0TGpO/mOJYjQht0iBxYM=",
 			"path": "github.com/goasana/config/encoder/yaml",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "Lv8jFc9vmD4ea2Y4n/GPh+wwSJE=",
 			"path": "github.com/goasana/config/loader",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "sisYSzKhWLDnzx2916yFUw9WS6o=",
 			"path": "github.com/goasana/config/loader/memory",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "yopgbEb1SH+WX6tqfnyMMMOhjWY=",
 			"path": "github.com/goasana/config/reader",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
-			"checksumSHA1": "1+WZcWsT5n6fRsoJFeSVmMN+Lm4=",
+			"checksumSHA1": "fAgHKnFTP4jupQ6UXW0XlNpGB5I=",
 			"path": "github.com/goasana/config/reader/json",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "dlcNHE8eSrBksgBusV6i0L8QQEc=",
 			"path": "github.com/goasana/config/source",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "9tKhz1LkXEoyKyslONwz6OB1530=",
 			"path": "github.com/goasana/config/source/file",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "DKtThTl17wNqU2V5ySoZMa5+JEo=",
 			"path": "github.com/goasana/config/source/memory",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "jyCYGbN0KvpV6PasLXLOmNsaA3s=",
@@ -357,85 +357,85 @@
 			"checksumSHA1": "s5tdcjh84+tiKS3oSq77mzjB970=",
 			"origin": "github.com/goasana/config/vendor/github.com/google/uuid",
 			"path": "github.com/google/uuid",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "bWGI7DqWg6IdhfamV96OD+Esa+8=",
 			"origin": "github.com/goasana/config/vendor/github.com/hashicorp/hcl",
 			"path": "github.com/hashicorp/hcl",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "XQmjDva9JCGGkIecOgwtBEMCJhU=",
 			"origin": "github.com/goasana/config/vendor/github.com/hashicorp/hcl/hcl/ast",
 			"path": "github.com/hashicorp/hcl/hcl/ast",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "1GmX7G0Pgf5XprOh+T3zXMXX0dc=",
 			"origin": "github.com/goasana/config/vendor/github.com/hashicorp/hcl/hcl/parser",
 			"path": "github.com/hashicorp/hcl/hcl/parser",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "+qJTCxhkwC7r+VZlPlZz8S74KmU=",
 			"origin": "github.com/goasana/config/vendor/github.com/hashicorp/hcl/hcl/scanner",
 			"path": "github.com/hashicorp/hcl/hcl/scanner",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "oS3SCN9Wd6D8/LG0Yx1fu84a7gI=",
 			"origin": "github.com/goasana/config/vendor/github.com/hashicorp/hcl/hcl/strconv",
 			"path": "github.com/hashicorp/hcl/hcl/strconv",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "c6yprzj06ASwCo18TtbbNNBHljA=",
 			"origin": "github.com/goasana/config/vendor/github.com/hashicorp/hcl/hcl/token",
 			"path": "github.com/hashicorp/hcl/hcl/token",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "PwlfXt7mFS8UYzWxOK5DOq0yxS0=",
 			"origin": "github.com/goasana/config/vendor/github.com/hashicorp/hcl/json/parser",
 			"path": "github.com/hashicorp/hcl/json/parser",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "afrZ8VmAwfTdDAYVgNSXbxa4GsA=",
 			"origin": "github.com/goasana/config/vendor/github.com/hashicorp/hcl/json/scanner",
 			"path": "github.com/hashicorp/hcl/json/scanner",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "fNlXQCQEnb+B3k5UDL/r15xtSJY=",
 			"origin": "github.com/goasana/config/vendor/github.com/hashicorp/hcl/json/token",
 			"path": "github.com/hashicorp/hcl/json/token",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "ju30EaPQpjo2jwuEv9r+aPIco4g=",
 			"origin": "github.com/goasana/config/vendor/github.com/hjson/hjson-go",
 			"path": "github.com/hjson/hjson-go",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "x7IEwuVYTztOJItr3jtePGyFDWA=",
 			"origin": "github.com/goasana/config/vendor/github.com/imdario/mergo",
 			"path": "github.com/imdario/mergo",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "pFE860yWOkB+Vi/WqAyJQWyZCcs=",
@@ -465,8 +465,8 @@
 			"checksumSHA1": "UruiaCPpVcDKfBTQhAM6UomufIw=",
 			"origin": "github.com/goasana/config/vendor/github.com/pborman/uuid",
 			"path": "github.com/pborman/uuid",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "gcKsviKkYO2z3VlgnRFZsnDW+ZA=",
@@ -764,8 +764,8 @@
 			"checksumSHA1": "uJiAW8UJQSNNHLzLzjNhOPNTvsg=",
 			"origin": "github.com/goasana/config/vendor/golang.org/x/sys/unix",
 			"path": "golang.org/x/sys/unix",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		},
 		{
 			"checksumSHA1": "CbpjEkkOeh0fdM/V8xKDdI0AA88=",
@@ -795,8 +795,8 @@
 			"checksumSHA1": "QqDq2x8XOU7IoOR98Cx1eiV5QY8=",
 			"origin": "github.com/goasana/config/vendor/gopkg.in/yaml.v2",
 			"path": "gopkg.in/yaml.v2",
-			"revision": "27dfb40d157da7f1246cf5231ea0d1a5111c5963",
-			"revisionTime": "2019-04-30T16:35:47Z"
+			"revision": "580eddb7268db88bbc70c7a6f844e242886b40e6",
+			"revisionTime": "2019-04-30T18:05:28Z"
 		}
 	],
 	"rootPath": "github.com/goasana/framework"
