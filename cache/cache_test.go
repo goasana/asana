@@ -176,13 +176,18 @@ func TestGCache(t *testing.T) {
 
 func TestSyncronizerCache(t *testing.T) {
 	bm, err := NewCache(MemoryProvider, `{"interval":20}`)
-	gc, err := NewCache(GCacheProvider, `{"size":20,"type":"arc"}`)
+	gc, err2 := NewCache(GCacheProvider, `{"size":20,"type":"arc"}`)
 
 	sync := NewSynchronizer(bm, gc)
 
 	if err != nil {
 		t.Error("init err")
 	}
+
+	if err2 != nil {
+		t.Error("init err")
+	}
+
 	timeoutDuration := 10 * time.Second
 	if err = sync.Put("asana", 1, timeoutDuration); err != nil {
 		t.Error("set Error", err)
