@@ -90,7 +90,9 @@ func NewFailoverClient(failoverOpt *FailoverOptions) *Client {
 			opt:      opt,
 			connPool: failover.Pool(),
 
-			onClose: failover.Close,
+			onClose: func() error {
+				return failover.Close()
+			},
 		},
 	}
 	c.baseClient.init()
@@ -176,21 +178,6 @@ func (c *SentinelClient) Failover(name string) *StatusCmd {
 // already discovered and associated with the master.
 func (c *SentinelClient) Reset(pattern string) *IntCmd {
 	cmd := NewIntCmd("sentinel", "reset", pattern)
-	c.Process(cmd)
-	return cmd
-}
-
-// FlushConfig forces Sentinel to rewrite its configuration on disk, including
-// the current Sentinel state.
-func (c *SentinelClient) FlushConfig() *StatusCmd {
-	cmd := NewStatusCmd("sentinel", "flushconfig")
-	c.Process(cmd)
-	return cmd
-}
-
-// Master shows the state and info of the specified master.
-func (c *SentinelClient) Master(name string) *StringStringMapCmd {
-	cmd := NewStringStringMapCmd("sentinel", "master", name)
 	c.Process(cmd)
 	return cmd
 }
@@ -389,7 +376,8 @@ func (c *sentinelFailover) listen(pubsub *PubSub) {
 			break
 		}
 
-		if msg.Channel == "+switch-master" {
+		switch msg.Channel {
+		case "+switch-master":
 			parts := strings.Split(msg.Payload, " ")
 			if parts[0] != c.masterName {
 				internal.Logf("sentinel: ignore addr for master=%q", parts[0])

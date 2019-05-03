@@ -15,7 +15,8 @@
 package testing
 
 import (
-	"github.com/goasana/framework/config"
+	"github.com/goasana/config"
+	"github.com/goasana/config/source/file"
 	"github.com/goasana/framework/httplib"
 )
 
@@ -29,11 +30,12 @@ type TestHTTPRequest struct {
 
 func getPort() string {
 	if port == "" {
-		conf, err := config.NewConfig(config.FileProvider, "../conf/app.yaml")
+		conf := config.NewConfig()
+		err := config.Load(file.NewSource(file.WithPath("../conf/app.yaml")))
 		if err != nil {
 			return "8080"
 		}
-		port = conf.String("httpport")
+		port = conf.Get("httpport").String()
 		return port
 	}
 	return port

@@ -5,46 +5,39 @@ go 1.12
 require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/bitly/go-simplejson v0.0.0-20181114203107-9db4a59bd4d8
-	github.com/davecgh/go-spew v0.0.0-20180830191138-d8f796af33cc
-	github.com/fsnotify/fsnotify v0.0.0-20190312181446-1485a34d5d57
-	github.com/ghodss/yaml v0.0.0-20190212211648-25d852aebe32
-	github.com/gogo/protobuf v0.0.0-20190415061611-67e450fba694
-	github.com/golang/protobuf v0.0.0-20190409050943-e91709a02e0e
-	github.com/google/gofuzz v1.0.0
-	github.com/google/uuid v0.0.0-20190416172445-c2e93f3ae59f
-	github.com/googleapis/gax-go v0.0.0-20190425172619-9e334198cafc
-	github.com/googleapis/gnostic v0.0.0-20190313182044-909070f02b66
-	github.com/hashicorp/consul v0.0.0-20190426204334-2febedd17cc2
-	github.com/hashicorp/golang-lru v0.5.1
-	github.com/hashicorp/hcl v0.0.0-20180906183839-65a6292f0157
-	github.com/hashicorp/vault v0.0.0-20190430055437-6cd95804766d
+	github.com/fsnotify/fsnotify v1.4.7
+	github.com/ghodss/yaml v1.0.1-0.20190212211648-25d852aebe32
+	github.com/gogo/protobuf v1.2.1
+	github.com/golang/protobuf v1.3.1
+	github.com/google/gofuzz v1.0.0 // indirect
+	github.com/googleapis/gnostic v0.2.0 // indirect
+	github.com/gregjones/httpcache v0.0.0-20180305231024-9cad4c3443a7 // indirect
+	github.com/grpc-ecosystem/go-grpc-middleware v1.0.1-0.20190118093823-f849b5445de4 // indirect
+	github.com/hashicorp/consul/api v1.0.1
+	github.com/hashicorp/go-msgpack v0.5.4 // indirect
+	github.com/hashicorp/golang-lru v0.5.1 // indirect
+	github.com/hashicorp/hcl v1.0.0
+	github.com/hashicorp/vault v1.1.2
 	github.com/hjson/hjson-go v0.0.0-20190209023717-9147687966d9
-	github.com/imdario/mergo v0.0.0-20190415133143-5ef87b449ca7
-	github.com/json-iterator/go v1.1.6
-	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
-	github.com/modern-go/reflect2 v1.0.1
+	github.com/imdario/mergo v0.3.6
+	github.com/json-iterator/go v1.1.6 // indirect
 	github.com/pborman/uuid v1.2.0
-	github.com/spf13/pflag v0.0.0-20181223182923-24fa6976df40
-	go.etcd.io/etcd v0.0.0-20190428011420-efcc1088f038
-	go.opencensus.io v0.0.0-20190426231706-3f87460392ec
+	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
+	github.com/spf13/pflag v1.0.3 // indirect
+	github.com/ugorji/go v1.1.4 // indirect
+	go.etcd.io/bbolt v1.3.2 // indirect
+	go.etcd.io/etcd v3.3.12+incompatible
 	gocloud.dev v0.0.0-20190429233308-d190aa0c4e07
-	golang.org/x/crypto v0.0.0-20190426145343-a29dc8fdc734
-	golang.org/x/lint v0.0.0-20190409202823-959b441ac422
+	golang.org/x/crypto v0.0.0-20190426145343-a29dc8fdc734 // indirect
 	golang.org/x/net v0.0.0-20190424112056-4829fb13d2c6
-	golang.org/x/oauth2 v0.0.0-20190402181905-9f3314589c9a
-	golang.org/x/sys v0.0.0-20190429190828-d89cdac9e872
-	golang.org/x/text v0.3.2
-	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4
-	golang.org/x/tools v0.0.0-20190430004104-b9fed7929fc1
-	golang.org/x/xerrors v0.0.0-20190410155217-1f06c39b4373
-	google.golang.org/grpc v0.0.0-20190429225008-d5973a91700d
-	gopkg.in/inf.v0 v0.9.1
-	gopkg.in/yaml.v2 v2.2.2
-	honnef.co/go/tools v0.0.0-20190418001031-e561f6794a2a
-	k8s.io/api v0.0.0-20190425012535-181e1f9c52c1
+	golang.org/x/sys v0.0.0-20190429190828-d89cdac9e872 // indirect
+	golang.org/x/text v0.3.2 // indirect
+	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4 // indirect
+	google.golang.org/appengine v1.5.0 // indirect
+	google.golang.org/genproto v0.0.0-20190425155659-357c62f0e4bb // indirect
+	google.golang.org/grpc v1.20.1
+	gopkg.in/inf.v0 v0.9.1 // indirect
+	k8s.io/api v0.0.0-20190430012547-97d6bb8ea5f4
 	k8s.io/apimachinery v0.0.0-20190425132440-17f84483f500
-	k8s.io/client-go v0.0.0-20190425172711-65184652c889
-	k8s.io/klog v0.3.0
-	k8s.io/utils v0.0.0-20190308190857-21c4ce38f2a7
-	sigs.k8s.io/yaml v0.0.0-20190426121629-addf6dad74ca
+	k8s.io/client-go v8.0.0+incompatible
 )
