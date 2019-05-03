@@ -3,12 +3,17 @@ package redis_sentinel
 import (
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/goasana/framework/session"
 )
 
 func TestRedisSentinel(t *testing.T) {
+	if tr := os.Getenv("TRAVIS"); len(tr) > 0 {
+		return
+	}
+
 	sessionConfig := &session.ManagerConfig{
 		CookieName:      "gosessionid",
 		EnableSetCookie: true,
