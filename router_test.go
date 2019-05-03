@@ -32,45 +32,45 @@ type TestController struct {
 
 func (tc *TestController) Get() {
 	tc.Data["Username"] = "asana"
-	tc.Ctx.Output.Body([]byte("ok"))
+	tc.Ctx.Response.Body([]byte("ok"))
 }
 
 func (tc *TestController) Post() {
-	tc.Ctx.Output.Body([]byte(tc.Ctx.Input.Query(":name")))
+	tc.Ctx.Response.Body([]byte(tc.Ctx.Request.Query(":name")))
 }
 
 func (tc *TestController) Param() {
-	tc.Ctx.Output.Body([]byte(tc.Ctx.Input.Query(":name")))
+	tc.Ctx.Response.Body([]byte(tc.Ctx.Request.Query(":name")))
 }
 
 func (tc *TestController) List() {
-	tc.Ctx.Output.Body([]byte("i am list"))
+	tc.Ctx.Response.Body([]byte("i am list"))
 }
 
 func (tc *TestController) Params() {
-	tc.Ctx.Output.Body([]byte(tc.Ctx.Input.Param("0") + tc.Ctx.Input.Param("1") + tc.Ctx.Input.Param("2")))
+	tc.Ctx.Response.Body([]byte(tc.Ctx.Request.Param("0") + tc.Ctx.Request.Param("1") + tc.Ctx.Request.Param("2")))
 }
 
 func (tc *TestController) Myext() {
-	tc.Ctx.Output.Body([]byte(tc.Ctx.Input.Param(":ext")))
+	tc.Ctx.Response.Body([]byte(tc.Ctx.Request.Param(":ext")))
 }
 
 func (tc *TestController) GetURL() {
-	tc.Ctx.Output.Body([]byte(tc.URLFor(".Myext")))
+	tc.Ctx.Response.Body([]byte(tc.URLFor(".Myext")))
 }
 
 func (tc *TestController) GetParams() {
-	tc.Ctx.WriteString(tc.Ctx.Input.Query(":last") + "+" +
-		tc.Ctx.Input.Query(":first") + "+" + tc.Ctx.Input.Query("learn"))
+	tc.Ctx.WriteString(tc.Ctx.Request.Query(":last") + "+" +
+		tc.Ctx.Request.Query(":first") + "+" + tc.Ctx.Request.Query("learn"))
 }
 
 func (tc *TestController) GetManyRouter() {
-	tc.Ctx.WriteString(tc.Ctx.Input.Query(":id") + tc.Ctx.Input.Query(":page"))
+	tc.Ctx.WriteString(tc.Ctx.Request.Query(":id") + tc.Ctx.Request.Query(":page"))
 }
 
 func (tc *TestController) GetEmptyBody() {
 	var res []byte
-	tc.Ctx.Output.Body(res)
+	tc.Ctx.Response.Body(res)
 }
 
 type JSONController struct {
@@ -84,7 +84,7 @@ func (jc *JSONController) Prepare() {
 
 func (jc *JSONController) Get() {
 	jc.Data["Username"] = "asana"
-	jc.Ctx.Output.Body([]byte("ok"))
+	jc.Ctx.Response.Body([]byte("ok"))
 }
 
 func TestUrlFor(t *testing.T) {
@@ -313,7 +313,7 @@ func TestRouterGet(t *testing.T) {
 
 	handler := NewControllerRegister()
 	handler.Get("/user", func(ctx *context.Context) {
-		ctx.Output.Body([]byte("Get userlist"))
+		ctx.Response.Body([]byte("Get userlist"))
 	})
 	handler.ServeHTTP(w, r)
 	if w.Body.String() != "Get userlist" {
@@ -327,7 +327,7 @@ func TestRouterPost(t *testing.T) {
 
 	handler := NewControllerRegister()
 	handler.Post("/user/:id", func(ctx *context.Context) {
-		ctx.Output.Body([]byte(ctx.Input.Param(":id")))
+		ctx.Response.Body([]byte(ctx.Request.Param(":id")))
 	})
 	handler.ServeHTTP(w, r)
 	if w.Body.String() != "123" {
@@ -674,11 +674,11 @@ func asanaFinishRouter2(ctx *context.Context) {
 }
 
 func asanaResetParams(ctx *context.Context) {
-	ctx.ResponseWriter.Header().Set("splat", ctx.Input.Param(":splat"))
+	ctx.ResponseWriter.Header().Set("splat", ctx.Request.Param(":splat"))
 }
 
 func asanaHandleResetParams(ctx *context.Context) {
-	ctx.ResponseWriter.Header().Set("splat", ctx.Input.Param(":splat"))
+	ctx.ResponseWriter.Header().Set("splat", ctx.Request.Param(":splat"))
 }
 
 // YAML
@@ -693,7 +693,7 @@ func (jc *YAMLController) Prepare() {
 
 func (jc *YAMLController) Get() {
 	jc.Data["Username"] = "asana"
-	jc.Ctx.Output.Body([]byte("ok"))
+	jc.Ctx.Response.Body([]byte("ok"))
 }
 
 func TestYAMLPrepare(t *testing.T) {

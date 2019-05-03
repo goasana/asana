@@ -66,7 +66,7 @@ func (response *AsanaResponse) Body(content []byte) error {
 	var encoding string
 	var buf = &bytes.Buffer{}
 	if response.EnableGzip {
-		encoding = ParseEncoding(response.Context.Request)
+		encoding = ParseEncoding(response.Context.HTTPRequest)
 	}
 	if b, n, _ := WriteBody(encoding, buf, content); b {
 		response.Header("Content-Encoding", n)
@@ -173,14 +173,14 @@ func sanitizeValue(v string) string {
 
 func jsonRenderer(value interface{}) Renderer {
 	return rendererFunc(func(ctx *Context) {
-		_ = ctx.Output.JSON(value, false, false)
+		_ = ctx.Response.JSON(value, false, false)
 	})
 }
 
 func errorRenderer(err error) Renderer {
 	return rendererFunc(func(ctx *Context) {
-		ctx.Output.SetStatus(500)
-		_ = ctx.Output.Body([]byte(err.Error()))
+		ctx.Response.SetStatus(500)
+		_ = ctx.Response.Body([]byte(err.Error()))
 	})
 }
 
@@ -233,7 +233,7 @@ func (response *AsanaResponse) JSONP(data interface{}, hasIndent bool) error {
 		http.Error(response.Context.ResponseWriter, err.Error(), http.StatusInternalServerError)
 		return err
 	}
-	callback := response.Context.Input.Query("callback")
+	callback := response.Context.Request.Query("callback")
 	if callback == "" {
 		return errors.New(`"callback" parameter required`)
 	}
@@ -258,7 +258,7 @@ func (response *AsanaResponse) XML(data interface{}, hasIndent bool) error {
 
 // ServeFormatted serve YAML, XML OR JSON, depending on the value of the Accept header
 func (response *AsanaResponse) ServeFormatted(data interface{}, hasIndent bool, hasEncode ...bool) {
-	accept := response.Context.Input.Header("Accept")
+	accept := response.Context.Request.Header("Accept")
 	switch accept {
 	case ApplicationYAML:
 		_ = response.YAML(data)
@@ -278,7 +278,7 @@ func (response *AsanaResponse) ServeFormatted(data interface{}, hasIndent bool, 
 func (response *AsanaResponse) Download(file string, filename ...string) {
 	// check get file error, file not found or other error.
 	if _, err := os.Stat(file); err != nil {
-		http.ServeFile(response.Context.ResponseWriter, response.Context.Request, file)
+		http.ServeFile(response.Context.ResponseWriter, response.Context.HTTPRequest, file)
 		return
 	}
 
@@ -308,7 +308,7 @@ func (response *AsanaResponse) Download(file string, filename ...string) {
 	response.Header("Expires", "0")
 	response.Header("Cache-Control", "must-revalidate")
 	response.Header("Pragma", "public")
-	http.ServeFile(response.Context.ResponseWriter, response.Context.Request, file)
+	http.ServeFile(response.Context.ResponseWriter, response.Context.HTTPRequest, file)
 }
 
 // ContentType sets the content type from ext string.
@@ -404,5 +404,5 @@ func stringsToJSON(str string) string {
 
 // Session sets session item value with given key.
 func (response *AsanaResponse) Session(name interface{}, value interface{}) {
-	_ = response.Context.Input.CruSession.Set(name, value)
+	_ = response.Context.Request.CruSession.Set(name, value)
 }

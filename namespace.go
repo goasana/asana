@@ -48,7 +48,7 @@ func NewNamespace(prefix string, params ...LinkNamespace) *Namespace {
 // if cond return true can run this namespace, else can't
 // usage:
 // ns.Cond(func (ctx *context.Context) bool{
-//       if ctx.Input.Domain() == "api.asana.me" {
+//       if ctx.Request.Domain() == "api.asana.me" {
 //         return true
 //       }
 //       return false
@@ -78,8 +78,8 @@ func (n *Namespace) Cond(cond namespaceCond) *Namespace {
 // FilterFunc
 // usage:
 // Filter("before", func (ctx *context.Context){
-//       _, ok := ctx.Input.Session("uid").(int)
-//       if !ok && ctx.Request.RequestURI != "/login" {
+//       _, ok := ctx.Request.Session("uid").(int)
+//       if !ok && ctx.HTTPRequest.RequestURI != "/login" {
 //          ctx.Redirect(302, "/login")
 //        }
 //   })
@@ -193,15 +193,15 @@ func (n *Namespace) Include(cList ...ControllerInterface) *Namespace {
 //Namespace(
 //    asana.NewNamespace("/shop").
 //        Get("/:id", func(ctx *context.Context) {
-//            ctx.Output.Body([]byte("shopinfo"))
+//            ctx.Response.Body([]byte("shopinfo"))
 //    }),
 //    asana.NewNamespace("/order").
 //        Get("/:id", func(ctx *context.Context) {
-//            ctx.Output.Body([]byte("orderinfo"))
+//            ctx.Response.Body([]byte("orderinfo"))
 //    }),
 //    asana.NewNamespace("/crm").
 //        Get("/:id", func(ctx *context.Context) {
-//            ctx.Output.Body([]byte("crminfo"))
+//            ctx.Response.Body([]byte("crminfo"))
 //    }),
 //)
 func (n *Namespace) Namespace(ns ...*Namespace) *Namespace {

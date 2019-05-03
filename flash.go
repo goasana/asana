@@ -91,7 +91,7 @@ func (fd *FlashData) Store(c *Controller) {
 // ReadFromRequest parsed flash data from encoded values in cookie.
 func ReadFromRequest(c *Controller) *FlashData {
 	flash := NewFlash()
-	if cookie, err := c.Ctx.Request.Cookie(BConfig.WebConfig.FlashName); err == nil {
+	if cookie, err := c.Ctx.HTTPRequest.Cookie(BConfig.WebConfig.FlashName); err == nil {
 		v, _ := url.QueryUnescape(cookie.Value)
 		vals := strings.Split(v, "\x00")
 		for _, v := range vals {

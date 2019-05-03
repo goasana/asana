@@ -25,7 +25,7 @@
 //   "github.com/goasana/framework/grace"
 // )
 //
-//  func handler(w http.ResponseWriter, r *http.Request) {
+//  func handler(w http.ResponseWriter, r *http.HTTPRequest) {
 //	  w.Write([]byte("WORLD!"))
 //  }
 //

@@ -43,7 +43,7 @@ func TestBasic(t *testing.T) {
 	_ = handler.InsertFilter("*", asana.BeforeRouter, NewAuthorizer(casbin.NewEnforcer("authz_model.conf", "authz_policy.csv")))
 
 	handler.Any("*", func(ctx *context.Context) {
-		ctx.Output.SetStatus(200)
+		ctx.Response.SetStatus(200)
 	})
 
 	testRequest(t, handler, "alice", "/dataset1/resource1", "GET", 200)
@@ -59,7 +59,7 @@ func TestPathWildcard(t *testing.T) {
 	_ = handler.InsertFilter("*", asana.BeforeRouter, NewAuthorizer(casbin.NewEnforcer("authz_model.conf", "authz_policy.csv")))
 
 	handler.Any("*", func(ctx *context.Context) {
-		ctx.Output.SetStatus(200)
+		ctx.Response.SetStatus(200)
 	})
 
 	testRequest(t, handler, "bob", "/dataset2/resource1", "GET", 200)
@@ -85,7 +85,7 @@ func TestRBAC(t *testing.T) {
 	_ = handler.InsertFilter("*", asana.BeforeRouter, NewAuthorizer(e))
 
 	handler.Any("*", func(ctx *context.Context) {
-		ctx.Output.SetStatus(200)
+		ctx.Response.SetStatus(200)
 	})
 
 	// cathy can access all /dataset1/* resources via all methods because it has the dataset1_admin role.

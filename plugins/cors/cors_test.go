@@ -60,7 +60,7 @@ func Test_AllowAll(t *testing.T) {
 		AllowAllOrigins: true,
 	}))
 	handler.Any("/foo", func(ctx *context.Context) {
-		ctx.Output.SetStatus(500)
+		ctx.Response.SetStatus(500)
 	})
 	r, _ := http.NewRequest("PUT", "/foo", nil)
 	handler.ServeHTTP(recorder, r)
@@ -77,7 +77,7 @@ func Test_AllowRegexMatch(t *testing.T) {
 		AllowOrigins: []string{"https://aaa.com", "https://*.foo.com"},
 	}))
 	handler.Any("/foo", func(ctx *context.Context) {
-		ctx.Output.SetStatus(500)
+		ctx.Response.SetStatus(500)
 	})
 	origin := "https://bar.foo.com"
 	r, _ := http.NewRequest("PUT", "/foo", nil)
@@ -97,7 +97,7 @@ func Test_AllowRegexNoMatch(t *testing.T) {
 		AllowOrigins: []string{"https://*.foo.com"},
 	}))
 	handler.Any("/foo", func(ctx *context.Context) {
-		ctx.Output.SetStatus(500)
+		ctx.Response.SetStatus(500)
 	})
 	origin := "https://ww.foo.com.evil.com"
 	r, _ := http.NewRequest("PUT", "/foo", nil)
@@ -122,7 +122,7 @@ func Test_OtherHeaders(t *testing.T) {
 		MaxAge:           5 * time.Minute,
 	}))
 	handler.Any("/foo", func(ctx *context.Context) {
-		ctx.Output.SetStatus(500)
+		ctx.Response.SetStatus(500)
 	})
 	r, _ := http.NewRequest("PUT", "/foo", nil)
 	handler.ServeHTTP(recorder, r)
@@ -161,7 +161,7 @@ func Test_DefaultAllowHeaders(t *testing.T) {
 		AllowAllOrigins: true,
 	}))
 	handler.Any("/foo", func(ctx *context.Context) {
-		ctx.Output.SetStatus(500)
+		ctx.Response.SetStatus(500)
 	})
 
 	r, _ := http.NewRequest("PUT", "/foo", nil)
@@ -183,7 +183,7 @@ func Test_Preflight(t *testing.T) {
 	}))
 
 	handler.Any("/foo", func(ctx *context.Context) {
-		ctx.Output.SetStatus(200)
+		ctx.Response.SetStatus(200)
 	})
 
 	r, _ := http.NewRequest("OPTIONS", "/foo", nil)
@@ -222,7 +222,7 @@ func Benchmark_WithoutCORS(b *testing.B) {
 	handler := asana.NewControllerRegister()
 	asana.BConfig.RunMode = asana.PROD
 	handler.Any("/foo", func(ctx *context.Context) {
-		ctx.Output.SetStatus(500)
+		ctx.Response.SetStatus(500)
 	})
 	b.ResetTimer()
 	r, _ := http.NewRequest("PUT", "/foo", nil)
@@ -243,7 +243,7 @@ func Benchmark_WithCORS(b *testing.B) {
 		MaxAge:           5 * time.Minute,
 	}))
 	handler.Any("/foo", func(ctx *context.Context) {
-		ctx.Output.SetStatus(500)
+		ctx.Response.SetStatus(500)
 	})
 	b.ResetTimer()
 	r, _ := http.NewRequest("PUT", "/foo", nil)

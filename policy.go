@@ -25,11 +25,11 @@ type PolicyFunc func(*context.Context)
 
 // FindPolicy Find Router info for URL
 func (p *ControllerRegister) FindPolicy(cont *context.Context) []PolicyFunc {
-	var urlPath = cont.Input.URL()
+	var urlPath = cont.Request.URL()
 	if !BConfig.RouterCaseSensitive {
 		urlPath = strings.ToLower(urlPath)
 	}
-	httpMethod := cont.Input.Method()
+	httpMethod := cont.Request.Method()
 	isWildcard := false
 	// Find policy for current method
 	t, ok := p.policies[httpMethod]

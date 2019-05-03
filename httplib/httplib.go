@@ -146,7 +146,7 @@ type AsanaHTTPSettings struct {
 	Retries          int // if set to -1 means will retry forever
 }
 
-// AsanaHTTPRequest provides more useful methods for requesting one url than http.Request.
+// AsanaHTTPRequest provides more useful methods for requesting one url than http.HTTPRequest.
 type AsanaHTTPRequest struct {
 	url     string
 	req     *http.Request
@@ -270,7 +270,7 @@ func (b *AsanaHTTPRequest) SetTransport(transport http.RoundTripper) *AsanaHTTPR
 // SetProxy set the http proxy
 // example:
 //
-//	func(req *http.Request) (*url.URL, error) {
+//	func(req *http.HTTPRequest) (*url.URL, error) {
 // 		u, _ := url.ParseRequestURI("http://127.0.0.1:8118")
 // 		return u, nil
 // 	}

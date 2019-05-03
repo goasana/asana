@@ -91,28 +91,28 @@ func APIBaiscAuth(appId, appKey string) asana.FilterFunc {
 // APISecretAuth use AppIdToAppSecret verify and
 func APISecretAuth(f AppIDToAppSecret, timeout int) asana.FilterFunc {
 	return func(ctx *context.Context) {
-		if ctx.Input.Query("appid") == "" {
+		if ctx.Request.Query("appid") == "" {
 			ctx.ResponseWriter.WriteHeader(403)
 			ctx.WriteString("miss query param: appid")
 			return
 		}
-		appSecret := f(ctx.Input.Query("appid"))
+		appSecret := f(ctx.Request.Query("appid"))
 		if appSecret == "" {
 			ctx.ResponseWriter.WriteHeader(403)
 			ctx.WriteString("not exist this appid")
 			return
 		}
-		if ctx.Input.Query("signature") == "" {
+		if ctx.Request.Query("signature") == "" {
 			ctx.ResponseWriter.WriteHeader(403)
 			ctx.WriteString("miss query param: signature")
 			return
 		}
-		if ctx.Input.Query("timestamp") == "" {
+		if ctx.Request.Query("timestamp") == "" {
 			ctx.ResponseWriter.WriteHeader(403)
 			ctx.WriteString("miss query param: timestamp")
 			return
 		}
-		u, err := time.Parse("2006-01-02 15:04:05", ctx.Input.Query("timestamp"))
+		u, err := time.Parse("2006-01-02 15:04:05", ctx.Request.Query("timestamp"))
 		if err != nil {
 			ctx.ResponseWriter.WriteHeader(403)
 			ctx.WriteString("timestamp format is error, should 2006-01-02 15:04:05")
@@ -124,8 +124,8 @@ func APISecretAuth(f AppIDToAppSecret, timeout int) asana.FilterFunc {
 			ctx.WriteString("timeout! the request time is long ago, please try again")
 			return
 		}
-		if ctx.Input.Query("signature") !=
-			Signature(appSecret, ctx.Input.Method(), ctx.Request.Form, ctx.Input.URL()) {
+		if ctx.Request.Query("signature") !=
+			Signature(appSecret, ctx.Request.Method(), ctx.HTTPRequest.Form, ctx.Request.URL()) {
 			ctx.ResponseWriter.WriteHeader(403)
 			ctx.WriteString("auth failed")
 		}

@@ -23,11 +23,11 @@ import (
 func TestXsrfReset_01(t *testing.T) {
 	r := &http.Request{}
 	c := NewContext()
-	c.Request = r
+	c.HTTPRequest = r
 	c.ResponseWriter = &Response{}
 	c.ResponseWriter.reset(httptest.NewRecorder())
-	c.Output.Reset(c)
-	c.Input.Reset(c)
+	c.Response.Reset(c)
+	c.Request.Reset(c)
 	c.XSRFToken("key", 16)
 	if c._xsrfToken == "" {
 		t.FailNow()

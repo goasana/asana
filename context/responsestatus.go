@@ -23,5 +23,5 @@ func (s StatusCode) Error() string {
 
 // Render sets the http status code
 func (s StatusCode) Render(ctx *Context) {
-	ctx.Output.SetStatus(int(s))
+	ctx.Response.SetStatus(int(s))
 }

@@ -59,10 +59,10 @@ var tpl = `
     <div id="content">
         <table>
             <tr>
-                <td class="t">Request Method: </td><td>{{.RequestMethod}}</td>
+                <td class="t">HTTPRequest Method: </td><td>{{.RequestMethod}}</td>
             </tr>
             <tr>
-                <td class="t">Request URL: </td><td>{{.RequestURL}}</td>
+                <td class="t">HTTPRequest URL: </td><td>{{.RequestURL}}</td>
             </tr>
             <tr>
                 <td class="t">RemoteAddr: </td><td>{{.RemoteAddr }}</td>
@@ -86,9 +86,9 @@ func showErr(err interface{}, ctx *context.Context, stack string) {
 	t, _ := template.New("asanaerrortemp").Parse(tpl)
 	data := map[string]string{
 		"AppError":      fmt.Sprintf("%s:%v", BConfig.AppName, err),
-		"RequestMethod": ctx.Input.Method(),
-		"RequestURL":    ctx.Input.URI(),
-		"RemoteAddr":    ctx.Input.IP(),
+		"RequestMethod": ctx.Request.Method(),
+		"RequestURL":    ctx.Request.URI(),
+		"RemoteAddr":    ctx.Request.IP(),
 		"Stack":         stack,
 		"AsanaVersion":  VERSION,
 		"GoVersion":     runtime.Version(),
@@ -293,7 +293,7 @@ func methodNotAllowed(rw http.ResponseWriter, r *http.Request) {
 		"<br>The method you have requested Not Allowed."+
 			"<br>Perhaps you are here because:"+
 			"<br><br><ul>"+
-			"<br>The method specified in the Request-Line is not allowed for the resource identified by the Request-URI"+
+			"<br>The method specified in the HTTPRequest-Line is not allowed for the resource identified by the HTTPRequest-URI"+
 			"<br>The response MUST include an Allow header containing a list of valid methods for the requested resource."+
 			"</ul>",
 	)
@@ -416,10 +416,10 @@ func exception(errCode string, ctx *context.Context) {
 		if err == nil {
 			return v
 		}
-		if ctx.Output.Status == 0 {
+		if ctx.Response.Status == 0 {
 			return 503
 		}
-		return ctx.Output.Status
+		return ctx.Response.Status
 	}
 
 	for _, ec := range []string{errCode, "503", "500"} {
@@ -439,11 +439,11 @@ func executeError(err *errorInfo, ctx *context.Context, code int) {
 
 	if err.errorType == errorTypeHandler {
 		ctx.ResponseWriter.WriteHeader(code)
-		err.handler(ctx.ResponseWriter, ctx.Request)
+		err.handler(ctx.ResponseWriter, ctx.HTTPRequest)
 		return
 	}
 	if err.errorType == errorTypeController {
-		ctx.Output.SetStatus(code)
+		ctx.Response.SetStatus(code)
 		//Invoke the request handler
 		vc := reflect.New(err.controllerType)
 		execController, ok := vc.Interface().(ControllerInterface)

@@ -71,7 +71,7 @@ var (
 	// these asana.Controller's methods shouldn't reflect to AutoRouter
 	exceptMethod = []string{"Init", "Prepare", "Finish", "Render", "RenderString",
 		"RenderBytes", "Redirect", "Abort", "StopRun", "UrlFor", "ServeJSON", "ServeJSONP",
-		"ServeYAML", "ServeXML", "Input", "ParseForm", "GetString", "GetStrings", "GetInt", "GetBool",
+		"ServeYAML", "ServeXML", "Request", "ParseForm", "GetString", "GetStrings", "GetInt", "GetBool",
 		"GetFloat", "GetFile", "SaveToFile", "StartSession", "SetSession", "GetSession",
 		"DelSession", "SessionRegenerateID", "DestroySession", "IsAjax", "GetSecureCookie",
 		"SetSecureCookie", "XsrfToken", "CheckXsrfCookie", "XsrfFormHtml",
@@ -92,7 +92,7 @@ type logFilter struct {
 }
 
 func (l *logFilter) Filter(ctx *asanaContext.Context) bool {
-	requestPath := path.Clean(ctx.Request.URL.Path)
+	requestPath := path.Clean(ctx.HTTPRequest.URL.Path)
 	if requestPath == "/favicon.ico" || requestPath == "/robots.txt" {
 		return true
 	}
@@ -291,7 +291,7 @@ func (p *ControllerRegister) Include(cList ...ControllerInterface) {
 // Get add get method
 // usage:
 //    Get("/", func(ctx *context.Context){
-//          ctx.Output.Body("hello world")
+//          ctx.Response.Body("hello world")
 //    })
 func (p *ControllerRegister) Get(pattern string, f FilterFunc) {
 	p.AddMethod("get", pattern, f)
@@ -300,7 +300,7 @@ func (p *ControllerRegister) Get(pattern string, f FilterFunc) {
 // Post add post method
 // usage:
 //    Post("/api", func(ctx *context.Context){
-//          ctx.Output.Body("hello world")
+//          ctx.Response.Body("hello world")
 //    })
 func (p *ControllerRegister) Post(pattern string, f FilterFunc) {
 	p.AddMethod("post", pattern, f)
@@ -309,7 +309,7 @@ func (p *ControllerRegister) Post(pattern string, f FilterFunc) {
 // Put add put method
 // usage:
 //    Put("/api/:id", func(ctx *context.Context){
-//          ctx.Output.Body("hello world")
+//          ctx.Response.Body("hello world")
 //    })
 func (p *ControllerRegister) Put(pattern string, f FilterFunc) {
 	p.AddMethod("put", pattern, f)
@@ -318,7 +318,7 @@ func (p *ControllerRegister) Put(pattern string, f FilterFunc) {
 // Delete add delete method
 // usage:
 //    Delete("/api/:id", func(ctx *context.Context){
-//          ctx.Output.Body("hello world")
+//          ctx.Response.Body("hello world")
 //    })
 func (p *ControllerRegister) Delete(pattern string, f FilterFunc) {
 	p.AddMethod("delete", pattern, f)
@@ -327,7 +327,7 @@ func (p *ControllerRegister) Delete(pattern string, f FilterFunc) {
 // Head add head method
 // usage:
 //    Head("/api/:id", func(ctx *context.Context){
-//          ctx.Output.Body("hello world")
+//          ctx.Response.Body("hello world")
 //    })
 func (p *ControllerRegister) Head(pattern string, f FilterFunc) {
 	p.AddMethod("head", pattern, f)
@@ -336,7 +336,7 @@ func (p *ControllerRegister) Head(pattern string, f FilterFunc) {
 // Patch add patch method
 // usage:
 //    Patch("/api/:id", func(ctx *context.Context){
-//          ctx.Output.Body("hello world")
+//          ctx.Response.Body("hello world")
 //    })
 func (p *ControllerRegister) Patch(pattern string, f FilterFunc) {
 	p.AddMethod("patch", pattern, f)
@@ -345,7 +345,7 @@ func (p *ControllerRegister) Patch(pattern string, f FilterFunc) {
 // Options add options method
 // usage:
 //    Options("/api/:id", func(ctx *context.Context){
-//          ctx.Output.Body("hello world")
+//          ctx.Response.Body("hello world")
 //    })
 func (p *ControllerRegister) Options(pattern string, f FilterFunc) {
 	p.AddMethod("options", pattern, f)
@@ -354,7 +354,7 @@ func (p *ControllerRegister) Options(pattern string, f FilterFunc) {
 // Any add all method
 // usage:
 //    Any("/api/:id", func(ctx *context.Context){
-//          ctx.Output.Body("hello world")
+//          ctx.Response.Body("hello world")
 //    })
 func (p *ControllerRegister) Any(pattern string, f FilterFunc) {
 	p.AddMethod("*", pattern, f)
@@ -363,7 +363,7 @@ func (p *ControllerRegister) Any(pattern string, f FilterFunc) {
 // AddMethod add http method router
 // usage:
 //    AddMethod("get","/api/:id", func(ctx *context.Context){
-//          ctx.Output.Body("hello world")
+//          ctx.Response.Body("hello world")
 //    })
 func (p *ControllerRegister) AddMethod(method, pattern string, f FilterFunc) {
 	method = strings.ToUpper(method)
@@ -638,14 +638,14 @@ func (p *ControllerRegister) execFilter(context *asanaContext.Context, urlPath s
 			return true
 		}
 		if filterR.resetParams {
-			preFilterParams = context.Input.Params()
+			preFilterParams = context.Request.Params()
 		}
 		if ok := filterR.ValidRouter(urlPath, context); ok {
 			filterR.filterFunc(context)
 			if filterR.resetParams {
-				context.Input.ResetParams()
+				context.Request.ResetParams()
 				for k, v := range preFilterParams {
-					context.Input.SetParam(k, v)
+					context.Request.SetParam(k, v)
 				}
 			}
 		}
@@ -675,10 +675,10 @@ func (p *ControllerRegister) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 		defer BConfig.RecoverFunc(context)
 	}
 
-	context.Output.EnableGzip = BConfig.EnableGzip
+	context.Response.EnableGzip = BConfig.EnableGzip
 
 	if BConfig.RunMode == DEV {
-		context.Output.Header("Server", BConfig.ServerName)
+		context.Response.Header("Server", BConfig.ServerName)
 	}
 
 	var urlPath = r.URL.Path
@@ -706,24 +706,24 @@ func (p *ControllerRegister) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 	}
 
 	if r.Method != http.MethodGet && r.Method != http.MethodHead {
-		if BConfig.CopyRequestBody && !context.Input.IsUpload() {
-			context.Input.CopyBody(BConfig.MaxMemory)
+		if BConfig.CopyRequestBody && !context.Request.IsUpload() {
+			context.Request.CopyBody(BConfig.MaxMemory)
 		}
-		_ = context.Input.ParseFormOrMulitForm(BConfig.MaxMemory)
+		_ = context.Request.ParseFormOrMulitForm(BConfig.MaxMemory)
 	}
 
 	// session init
 	if BConfig.WebConfig.Session.SessionOn {
 		var err error
-		context.Input.CruSession, err = GlobalSessions.SessionStart(rw, r)
+		context.Request.CruSession, err = GlobalSessions.SessionStart(rw, r)
 		if err != nil {
 			logs.Error(err)
 			exception("503", context)
 			goto Admin
 		}
 		defer func() {
-			if context.Input.CruSession != nil {
-				context.Input.CruSession.SessionRelease(rw)
+			if context.Request.CruSession != nil {
+				context.Request.CruSession.SessionRelease(rw)
 			}
 		}()
 	}
@@ -731,10 +731,10 @@ func (p *ControllerRegister) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 		goto Admin
 	}
 	// User can define RunController and RunMethod in filter
-	if context.Input.RunController != nil && context.Input.RunMethod != "" {
+	if context.Request.RunController != nil && context.Request.RunMethod != "" {
 		findRouter = true
-		runMethod = context.Input.RunMethod
-		runRouter = context.Input.RunController
+		runMethod = context.Request.RunMethod
+		runRouter = context.Request.RunController
 	} else {
 		routerInfo, findRouter = p.FindRouter(context)
 	}
@@ -744,9 +744,9 @@ func (p *ControllerRegister) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 		exception("404", context)
 		goto Admin
 	}
-	if splat := context.Input.Param(":splat"); splat != "" {
+	if splat := context.Request.Param(":splat"); splat != "" {
 		for k, v := range strings.Split(splat, "/") {
-			context.Input.SetParam(strconv.Itoa(k), v)
+			context.Request.SetParam(strconv.Itoa(k), v)
 		}
 	}
 
@@ -762,7 +762,7 @@ func (p *ControllerRegister) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 
 	if routerInfo != nil {
 		//store router pattern into context
-		context.Input.SetData("RouterPattern", routerInfo.pattern)
+		context.Request.SetData("RouterPattern", routerInfo.pattern)
 		if routerInfo.routerType == routerTypeRESTFul {
 			if _, ok := routerInfo.methods[r.Method]; ok {
 				isRunnable = true
@@ -778,10 +778,10 @@ func (p *ControllerRegister) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 			runRouter = routerInfo.controllerType
 			methodParams = routerInfo.methodParams
 			method := r.Method
-			if r.Method == http.MethodPost && context.Input.Query("_method") == http.MethodPut {
+			if r.Method == http.MethodPost && context.Request.Query("_method") == http.MethodPut {
 				method = http.MethodPut
 			}
-			if r.Method == http.MethodPost && context.Input.Query("_method") == http.MethodDelete {
+			if r.Method == http.MethodPost && context.Request.Query("_method") == http.MethodDelete {
 				method = http.MethodDelete
 			}
 			if m, ok := routerInfo.methods[method]; ok {
@@ -819,7 +819,7 @@ func (p *ControllerRegister) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 		if BConfig.WebConfig.EnableXSRF {
 			execController.XSRFToken()
 			if r.Method == http.MethodPost || r.Method == http.MethodDelete || r.Method == http.MethodPut ||
-				(r.Method == http.MethodPost && (context.Input.Query("_method") == http.MethodDelete || context.Input.Query("_method") == http.MethodPut)) {
+				(r.Method == http.MethodPost && (context.Request.Query("_method") == http.MethodDelete || context.Request.Query("_method") == http.MethodPut)) {
 				execController.CheckXSRFCookie()
 			}
 		}
@@ -860,7 +860,7 @@ func (p *ControllerRegister) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 			}
 
 			//render template
-			if !context.ResponseWriter.Started && context.Output.Status == 0 {
+			if !context.ResponseWriter.Started && context.Response.Status == 0 {
 				if BConfig.WebConfig.AutoRender {
 					if err := execController.Render(); err != nil {
 						logs.Error(err)
@@ -912,7 +912,7 @@ Admin:
 	if BConfig.RunMode == DEV && !BConfig.Log.AccessLogs {
 		match := map[bool]string{true: "match", false: "nomatch"}
 		devInfo := fmt.Sprintf("|%15s|%s %3d %s|%13s|%8s|%s %-7s %s %-3s",
-			context.Input.IP(),
+			context.Request.IP(),
 			logs.ColorByStatus(statusCode), statusCode, logs.ResetColor(),
 			timeDur.String(),
 			match[findRouter],
@@ -925,8 +925,8 @@ Admin:
 		logs.Debug(devInfo)
 	}
 	// Call WriteHeader if status code has been set changed
-	if context.Output.Status != 0 {
-		context.ResponseWriter.WriteHeader(context.Output.Status)
+	if context.Response.Status != 0 {
+		context.ResponseWriter.WriteHeader(context.Response.Status)
 	}
 }
 
@@ -939,18 +939,18 @@ func (p *ControllerRegister) handleParamResponse(context *asanaContext.Context, 
 			context.RenderMethodResult(resultValue)
 		}
 	}
-	if !context.ResponseWriter.Started && len(results) > 0 && context.Output.Status == 0 {
-		context.Output.SetStatus(200)
+	if !context.ResponseWriter.Started && len(results) > 0 && context.Response.Status == 0 {
+		context.Response.SetStatus(200)
 	}
 }
 
 // FindRouter Find Router info for URL
 func (p *ControllerRegister) FindRouter(context *asanaContext.Context) (routerInfo *ControllerInfo, isFind bool) {
-	var urlPath = context.Input.URL()
+	var urlPath = context.Request.URL()
 	if !BConfig.RouterCaseSensitive {
 		urlPath = strings.ToLower(urlPath)
 	}
-	httpMethod := context.Input.Method()
+	httpMethod := context.Request.Method()
 	if t, ok := p.routers[httpMethod]; ok {
 		runObject := t.Match(urlPath, context)
 		if r, ok := runObject.(*ControllerInfo); ok {
@@ -983,14 +983,14 @@ func LogAccess(ctx *asanaContext.Context, startTime *time.Time, statusCode int) 
 	var (
 		requestTime time.Time
 		elapsedTime time.Duration
-		r           = ctx.Request
+		r           = ctx.HTTPRequest
 	)
 	if startTime != nil {
 		requestTime = *startTime
 		elapsedTime = time.Since(*startTime)
 	}
 	record := &logs.AccessLogRecord{
-		RemoteAddr:     ctx.Input.IP(),
+		RemoteAddr:     ctx.Request.IP(),
 		RequestTime:    requestTime,
 		RequestMethod:  r.Method,
 		Request:        fmt.Sprintf("%s %s %s", r.Method, r.RequestURI, r.Proto),

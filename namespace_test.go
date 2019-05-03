@@ -29,7 +29,7 @@ func TestNamespaceGet(t *testing.T) {
 
 	ns := NewNamespace("/v1")
 	ns.Get("/user", func(ctx *context.Context) {
-		ctx.Output.Body([]byte("v1_user"))
+		ctx.Response.Body([]byte("v1_user"))
 	})
 	AddNamespace(ns)
 	AsanaApp.Handlers.ServeHTTP(w, r)
@@ -44,7 +44,7 @@ func TestNamespacePost(t *testing.T) {
 
 	ns := NewNamespace("/v1")
 	ns.Post("/user/:id", func(ctx *context.Context) {
-		ctx.Output.Body([]byte(ctx.Input.Param(":id")))
+		ctx.Response.Body([]byte(ctx.Request.Param(":id")))
 	})
 	AddNamespace(ns)
 	AsanaApp.Handlers.ServeHTTP(w, r)
@@ -61,7 +61,7 @@ func TestNamespaceNest(t *testing.T) {
 	ns.Namespace(
 		NewNamespace("/admin").
 			Get("/order", func(ctx *context.Context) {
-				ctx.Output.Body([]byte("order"))
+				ctx.Response.Body([]byte("order"))
 			}),
 	)
 	AddNamespace(ns)
@@ -79,7 +79,7 @@ func TestNamespaceNestParam(t *testing.T) {
 	ns.Namespace(
 		NewNamespace("/admin").
 			Get("/order/:id", func(ctx *context.Context) {
-				ctx.Output.Body([]byte(ctx.Input.Param(":id")))
+				ctx.Response.Body([]byte(ctx.Request.Param(":id")))
 			}),
 	)
 	AddNamespace(ns)
@@ -121,10 +121,10 @@ func TestNamespaceFilter(t *testing.T) {
 
 	ns := NewNamespace("/v1")
 	ns.Filter("before", func(ctx *context.Context) {
-		ctx.Output.Body([]byte("this is Filter"))
+		ctx.Response.Body([]byte("this is Filter"))
 	}).
 		Get("/user/:id", func(ctx *context.Context) {
-			ctx.Output.Body([]byte(ctx.Input.Param(":id")))
+			ctx.Response.Body([]byte(ctx.Request.Param(":id")))
 		})
 	AddNamespace(ns)
 	AsanaApp.Handlers.ServeHTTP(w, r)
@@ -139,7 +139,7 @@ func TestNamespaceCond(t *testing.T) {
 
 	ns := NewNamespace("/v2")
 	ns.Cond(func(ctx *context.Context) bool {
-		return ctx.Input.Domain() == "asana.me"
+		return ctx.Request.Domain() == "asana.me"
 	}).
 		AutoRouter(&TestController{})
 	AddNamespace(ns)
@@ -156,7 +156,7 @@ func TestNamespaceInside(t *testing.T) {
 		NSAutoRouter(&TestController{}),
 		NSNamespace("/shop",
 			NSGet("/order/:id", func(ctx *context.Context) {
-				ctx.Output.Body([]byte(ctx.Input.Param(":id")))
+				ctx.Response.Body([]byte(ctx.Request.Param(":id")))
 			}),
 		),
 	)

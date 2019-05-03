@@ -58,8 +58,8 @@ func Basic(username string, password string) asana.FilterFunc {
 func NewBasicAuthenticator(secrets SecretProvider, Realm string) asana.FilterFunc {
 	return func(ctx *context.Context) {
 		a := &BasicAuth{Secrets: secrets, Realm: Realm}
-		if username := a.CheckAuth(ctx.Request); username == "" {
-			a.RequireAuth(ctx.ResponseWriter, ctx.Request)
+		if username := a.CheckAuth(ctx.HTTPRequest); username == "" {
+			a.RequireAuth(ctx.ResponseWriter, ctx.HTTPRequest)
 		}
 	}
 }

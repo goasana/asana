@@ -23,7 +23,7 @@ import (
 )
 
 var FilterUser = func(ctx *context.Context) {
-	_ = ctx.Output.Body([]byte("i am " + ctx.Input.Param(":last") + ctx.Input.Param(":first")))
+	_ = ctx.Response.Body([]byte("i am " + ctx.Request.Param(":last") + ctx.Request.Param(":first")))
 }
 
 func TestFilter(t *testing.T) {
@@ -39,7 +39,7 @@ func TestFilter(t *testing.T) {
 }
 
 var FilterAdminUser = func(ctx *context.Context) {
-	_ = ctx.Output.Body([]byte("i am admin"))
+	_ = ctx.Response.Body([]byte("i am admin"))
 }
 
 // Filter pattern /admin/:all

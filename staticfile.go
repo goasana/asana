@@ -33,7 +33,7 @@ import (
 var errNotStaticRequest = errors.New("request not a static file request")
 
 func serverStaticRouter(ctx *context.Context) {
-	if ctx.Input.Method() != "GET" && ctx.Input.Method() != "HEAD" {
+	if ctx.Request.Method() != "GET" && ctx.Request.Method() != "HEAD" {
 		return
 	}
 
@@ -51,20 +51,20 @@ func serverStaticRouter(ctx *context.Context) {
 		if BConfig.RunMode == DEV {
 			logs.Warn("Can't find/open the file:", filePath, err)
 		}
-		http.NotFound(ctx.ResponseWriter, ctx.Request)
+		http.NotFound(ctx.ResponseWriter, ctx.HTTPRequest)
 		return
 	}
 	if fileInfo.IsDir() {
-		requestURL := ctx.Input.URL()
+		requestURL := ctx.Request.URL()
 		if requestURL[len(requestURL)-1] != '/' {
 			redirectURL := requestURL + "/"
-			if ctx.Request.URL.RawQuery != "" {
-				redirectURL = redirectURL + "?" + ctx.Request.URL.RawQuery
+			if ctx.HTTPRequest.URL.RawQuery != "" {
+				redirectURL = redirectURL + "?" + ctx.HTTPRequest.URL.RawQuery
 			}
 			ctx.Redirect(302, redirectURL)
 		} else {
 			//serveFile will list dir
-			http.ServeFile(ctx.ResponseWriter, ctx.Request, filePath)
+			http.ServeFile(ctx.ResponseWriter, ctx.HTTPRequest, filePath)
 		}
 		return
 	}
@@ -72,24 +72,24 @@ func serverStaticRouter(ctx *context.Context) {
 	var enableCompress = BConfig.EnableGzip && isStaticCompress(filePath)
 	var acceptEncoding string
 	if enableCompress {
-		acceptEncoding = context.ParseEncoding(ctx.Request)
+		acceptEncoding = context.ParseEncoding(ctx.HTTPRequest)
 	}
 	b, n, sch, reader, err := openFile(filePath, fileInfo, acceptEncoding)
 	if err != nil {
 		if BConfig.RunMode == DEV {
 			logs.Warn("Can't compress the file:", filePath, err)
 		}
-		http.NotFound(ctx.ResponseWriter, ctx.Request)
+		http.NotFound(ctx.ResponseWriter, ctx.HTTPRequest)
 		return
 	}
 
 	if b {
-		ctx.Output.Header("Content-Encoding", n)
+		ctx.Response.Header("Content-Encoding", n)
 	} else {
-		ctx.Output.Header("Content-Length", strconv.FormatInt(sch.size, 10))
+		ctx.Response.Header("Content-Length", strconv.FormatInt(sch.size, 10))
 	}
 
-	http.ServeContent(ctx.ResponseWriter, ctx.Request, filePath, sch.modTime, reader)
+	http.ServeContent(ctx.ResponseWriter, ctx.HTTPRequest, filePath, sch.modTime, reader)
 }
 
 type serveContentHolder struct {
@@ -158,7 +158,7 @@ func isStaticCompress(filePath string) bool {
 // searchFile search the file by url path
 // if none the static file prefix matches ,return notStaticRequestErr
 func searchFile(ctx *context.Context) (string, os.FileInfo, error) {
-	requestPath := filepath.ToSlash(filepath.Clean(ctx.Request.URL.Path))
+	requestPath := filepath.ToSlash(filepath.Clean(ctx.HTTPRequest.URL.Path))
 	// special processing : favicon.ico/robots.txt  can be in any static dir
 	if requestPath == "/favicon.ico" || requestPath == "/robots.txt" {
 		file := path.Join(".", requestPath)
@@ -200,7 +200,7 @@ func lookupFile(ctx *context.Context) (bool, string, os.FileInfo, error) {
 	if !fi.IsDir() {
 		return false, fp, fi, err
 	}
-	if requestURL := ctx.Input.URL(); requestURL[len(requestURL)-1] == '/' {
+	if requestURL := ctx.Request.URL(); requestURL[len(requestURL)-1] == '/' {
 		ifp := filepath.Join(fp, "index.html")
 		if ifi, _ := os.Stat(ifp); ifi != nil && ifi.Mode().IsRegular() {
 			return false, ifp, ifi, err

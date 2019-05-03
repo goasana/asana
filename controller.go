@@ -145,7 +145,7 @@ func (c *Controller) Init(ctx *context.Context, controllerName, actionName strin
 	c.AppController = app
 	c.EnableRender = true
 	c.EnableXSRF = true
-	c.Data = ctx.Input.Data()
+	c.Data = ctx.Request.Data()
 	c.methodMapping = make(map[string]func())
 }
 
@@ -205,10 +205,10 @@ func (c *Controller) Trace() {
 		}
 		return
 	}
-	hs := fmt.Sprintf("\r\nTRACE %s %s%s\r\n", c.Ctx.Request.RequestURI, c.Ctx.Request.Proto, ts(c.Ctx.Request.Header))
-	c.Ctx.Output.Header("Content-Type", "message/http")
-	c.Ctx.Output.Header("Content-Length", fmt.Sprint(len(hs)))
-	c.Ctx.Output.Header("Cache-Control", "no-cache, no-store, must-revalidate")
+	hs := fmt.Sprintf("\r\nTRACE %s %s%s\r\n", c.Ctx.HTTPRequest.RequestURI, c.Ctx.HTTPRequest.Proto, ts(c.Ctx.HTTPRequest.Header))
+	c.Ctx.Response.Header("Content-Type", "message/http")
+	c.Ctx.Response.Header("Content-Length", fmt.Sprint(len(hs)))
+	c.Ctx.Response.Header("Cache-Control", "no-cache, no-store, must-revalidate")
 	c.Ctx.WriteString(hs)
 }
 
@@ -240,10 +240,10 @@ func (c *Controller) Render() error {
 	}
 
 	if c.Ctx.ResponseWriter.Header().Get("Content-Type") == "" {
-		c.Ctx.Output.Header("Content-Type", "text/html; charset=utf-8")
+		c.Ctx.Response.Header("Content-Type", "text/html; charset=utf-8")
 	}
 
-	return c.Ctx.Output.Body(rb)
+	return c.Ctx.Response.Body(rb)
 }
 
 // RenderString returns the rendered template string. Do not send out response.
@@ -321,7 +321,7 @@ func (c *Controller) Redirect(url string, code int) {
 
 // SetData set the data depending on the accepted
 func (c *Controller) SetData(data interface{}) {
-	accept := c.Ctx.Input.Header("Accept")
+	accept := c.Ctx.Request.Header("Accept")
 	switch accept {
 	case context.ApplicationYAML:
 		c.Data["yaml"] = data
@@ -349,7 +349,7 @@ func (c *Controller) Abort(code string) {
 func (c *Controller) CustomAbort(status int, body string) {
 	// first panic from ErrorMaps, it is user defined error functions.
 	if _, ok := ErrorMaps[body]; ok {
-		c.Ctx.Output.Status = status
+		c.Ctx.Response.Status = status
 		panic(body)
 	}
 	// last panic user string
@@ -379,34 +379,34 @@ func (c *Controller) URLFor(endpoint string, values ...interface{}) string {
 func (c *Controller) ServeJSON(encoding ...bool) {
 	hasIndent := BConfig.RunMode != PROD
 	hasEncoding := len(encoding) > 0 && encoding[0]
-	_ = c.Ctx.Output.JSON(c.Data["json"], hasIndent, hasEncoding)
+	_ = c.Ctx.Response.JSON(c.Data["json"], hasIndent, hasEncoding)
 }
 
 // ServeJSONP sends a jsonp response.
 func (c *Controller) ServeJSONP() {
 	hasIndent := BConfig.RunMode != PROD
-	_ = c.Ctx.Output.JSONP(c.Data["jsonp"], hasIndent)
+	_ = c.Ctx.Response.JSONP(c.Data["jsonp"], hasIndent)
 }
 
 // ServeXML sends xml response.
 func (c *Controller) ServeXML() {
 	hasIndent := BConfig.RunMode != PROD
-	_ = c.Ctx.Output.XML(c.Data["xml"], hasIndent)
+	_ = c.Ctx.Response.XML(c.Data["xml"], hasIndent)
 }
 
 // ServeYAML sends yaml response.
 func (c *Controller) ServeYAML() {
-	_ = c.Ctx.Output.YAML(c.Data["yaml"])
+	_ = c.Ctx.Response.YAML(c.Data["yaml"])
 }
 
 // ServeProtoBuf sends protobuf response.
 func (c *Controller) ServeProtoBuf() {
-	_ = c.Ctx.Output.ProtoBuf(c.Data["protobuf"])
+	_ = c.Ctx.Response.ProtoBuf(c.Data["protobuf"])
 }
 
 // ServeFormatted serve YAML, XML OR JSON, depending on the value of the Accept header
 func (c *Controller) ServeFormatted(encoding ...bool) {
-	accept := c.Ctx.Input.Header("Accept")
+	accept := c.Ctx.Request.Header("Accept")
 	switch accept {
 	case context.ApplicationXML, context.TextXML:
 		c.ServeXML()
@@ -421,12 +421,12 @@ func (c *Controller) ServeFormatted(encoding ...bool) {
 	}
 }
 
-// Input returns the input data map from POST or PUT request body and query string.
+// Request returns the input data map from POST or PUT request body and query string.
 func (c *Controller) Input() url.Values {
-	if c.Ctx.Request.Form == nil {
-		_ = c.Ctx.Request.ParseForm()
+	if c.Ctx.HTTPRequest.Form == nil {
+		_ = c.Ctx.HTTPRequest.ParseForm()
 	}
-	return c.Ctx.Request.Form
+	return c.Ctx.HTTPRequest.Form
 }
 
 // ParseForm maps input data map to obj struct.
@@ -436,7 +436,7 @@ func (c *Controller) ParseForm(obj interface{}) error {
 
 // GetString returns the input value by key string or the default value while it's present and input is blank
 func (c *Controller) GetString(key string, def ...string) string {
-	if v := c.Ctx.Input.Query(key); v != "" {
+	if v := c.Ctx.Request.Query(key); v != "" {
 		return v
 	}
 	if len(def) > 0 {
@@ -464,7 +464,7 @@ func (c *Controller) GetStrings(key string, def ...[]string) []string {
 
 // GetInt returns input as an int or the default value while it's present and input is blank
 func (c *Controller) GetInt(key string, def ...int) (int, error) {
-	strv := c.Ctx.Input.Query(key)
+	strv := c.Ctx.Request.Query(key)
 	if len(strv) == 0 && len(def) > 0 {
 		return def[0], nil
 	}
@@ -473,7 +473,7 @@ func (c *Controller) GetInt(key string, def ...int) (int, error) {
 
 // GetInt8 return input as an int8 or the default value while it's present and input is blank
 func (c *Controller) GetInt8(key string, def ...int8) (int8, error) {
-	strv := c.Ctx.Input.Query(key)
+	strv := c.Ctx.Request.Query(key)
 	if len(strv) == 0 && len(def) > 0 {
 		return def[0], nil
 	}
@@ -483,7 +483,7 @@ func (c *Controller) GetInt8(key string, def ...int8) (int8, error) {
 
 // GetUint8 return input as an uint8 or the default value while it's present and input is blank
 func (c *Controller) GetUint8(key string, def ...uint8) (uint8, error) {
-	strv := c.Ctx.Input.Query(key)
+	strv := c.Ctx.Request.Query(key)
 	if len(strv) == 0 && len(def) > 0 {
 		return def[0], nil
 	}
@@ -493,7 +493,7 @@ func (c *Controller) GetUint8(key string, def ...uint8) (uint8, error) {
 
 // GetInt16 returns input as an int16 or the default value while it's present and input is blank
 func (c *Controller) GetInt16(key string, def ...int16) (int16, error) {
-	strv := c.Ctx.Input.Query(key)
+	strv := c.Ctx.Request.Query(key)
 	if len(strv) == 0 && len(def) > 0 {
 		return def[0], nil
 	}
@@ -503,7 +503,7 @@ func (c *Controller) GetInt16(key string, def ...int16) (int16, error) {
 
 // GetUint16 returns input as an uint16 or the default value while it's present and input is blank
 func (c *Controller) GetUint16(key string, def ...uint16) (uint16, error) {
-	strv := c.Ctx.Input.Query(key)
+	strv := c.Ctx.Request.Query(key)
 	if len(strv) == 0 && len(def) > 0 {
 		return def[0], nil
 	}
@@ -513,7 +513,7 @@ func (c *Controller) GetUint16(key string, def ...uint16) (uint16, error) {
 
 // GetInt32 returns input as an int32 or the default value while it's present and input is blank
 func (c *Controller) GetInt32(key string, def ...int32) (int32, error) {
-	strv := c.Ctx.Input.Query(key)
+	strv := c.Ctx.Request.Query(key)
 	if len(strv) == 0 && len(def) > 0 {
 		return def[0], nil
 	}
@@ -523,7 +523,7 @@ func (c *Controller) GetInt32(key string, def ...int32) (int32, error) {
 
 // GetUint32 returns input as an uint32 or the default value while it's present and input is blank
 func (c *Controller) GetUint32(key string, def ...uint32) (uint32, error) {
-	strv := c.Ctx.Input.Query(key)
+	strv := c.Ctx.Request.Query(key)
 	if len(strv) == 0 && len(def) > 0 {
 		return def[0], nil
 	}
@@ -533,7 +533,7 @@ func (c *Controller) GetUint32(key string, def ...uint32) (uint32, error) {
 
 // GetInt64 returns input value as int64 or the default value while it's present and input is blank.
 func (c *Controller) GetInt64(key string, def ...int64) (int64, error) {
-	strv := c.Ctx.Input.Query(key)
+	strv := c.Ctx.Request.Query(key)
 	if len(strv) == 0 && len(def) > 0 {
 		return def[0], nil
 	}
@@ -542,7 +542,7 @@ func (c *Controller) GetInt64(key string, def ...int64) (int64, error) {
 
 // GetUint64 returns input value as uint64 or the default value while it's present and input is blank.
 func (c *Controller) GetUint64(key string, def ...uint64) (uint64, error) {
-	strv := c.Ctx.Input.Query(key)
+	strv := c.Ctx.Request.Query(key)
 	if len(strv) == 0 && len(def) > 0 {
 		return def[0], nil
 	}
@@ -551,7 +551,7 @@ func (c *Controller) GetUint64(key string, def ...uint64) (uint64, error) {
 
 // GetBool returns input value as bool or the default value while it's present and input is blank.
 func (c *Controller) GetBool(key string, def ...bool) (bool, error) {
-	strv := c.Ctx.Input.Query(key)
+	strv := c.Ctx.Request.Query(key)
 	if len(strv) == 0 && len(def) > 0 {
 		return def[0], nil
 	}
@@ -560,7 +560,7 @@ func (c *Controller) GetBool(key string, def ...bool) (bool, error) {
 
 // GetFloat returns input value as float64 or the default value while it's present and input is blank.
 func (c *Controller) GetFloat(key string, def ...float64) (float64, error) {
-	strv := c.Ctx.Input.Query(key)
+	strv := c.Ctx.Request.Query(key)
 	if len(strv) == 0 && len(def) > 0 {
 		return def[0], nil
 	}
@@ -570,7 +570,7 @@ func (c *Controller) GetFloat(key string, def ...float64) (float64, error) {
 // GetFile returns the file data in file upload field named as key.
 // it returns the first one of multi-uploaded files.
 func (c *Controller) GetFile(key string) (multipart.File, *multipart.FileHeader, error) {
-	return c.Ctx.Request.FormFile(key)
+	return c.Ctx.HTTPRequest.FormFile(key)
 }
 
 // GetFiles return multi-upload files
@@ -601,7 +601,7 @@ func (c *Controller) GetFile(key string) (multipart.File, *multipart.FileHeader,
 //	}
 // }
 func (c *Controller) GetFiles(key string) ([]*multipart.FileHeader, error) {
-	if files, ok := c.Ctx.Request.MultipartForm.File[key]; ok {
+	if files, ok := c.Ctx.HTTPRequest.MultipartForm.File[key]; ok {
 		return files, nil
 	}
 	return nil, http.ErrMissingFile
@@ -610,7 +610,7 @@ func (c *Controller) GetFiles(key string) ([]*multipart.FileHeader, error) {
 // SaveToFile saves uploaded file to new path.
 // it only operates the first one of mutil-upload form file field.
 func (c *Controller) SaveToFile(fromFile, toFile string) error {
-	file, _, err := c.Ctx.Request.FormFile(fromFile)
+	file, _, err := c.Ctx.HTTPRequest.FormFile(fromFile)
 	if err != nil {
 		return err
 	}
@@ -627,7 +627,7 @@ func (c *Controller) SaveToFile(fromFile, toFile string) error {
 // StartSession starts session and load old session data info this controller.
 func (c *Controller) StartSession() session.Store {
 	if c.CruSession == nil {
-		c.CruSession = c.Ctx.Input.CruSession
+		c.CruSession = c.Ctx.Request.CruSession
 	}
 	return c.CruSession
 }
@@ -662,20 +662,20 @@ func (c *Controller) SessionRegenerateID() {
 	if c.CruSession != nil {
 		c.CruSession.SessionRelease(c.Ctx.ResponseWriter)
 	}
-	c.CruSession = GlobalSessions.SessionRegenerateID(c.Ctx.ResponseWriter, c.Ctx.Request)
-	c.Ctx.Input.CruSession = c.CruSession
+	c.CruSession = GlobalSessions.SessionRegenerateID(c.Ctx.ResponseWriter, c.Ctx.HTTPRequest)
+	c.Ctx.Request.CruSession = c.CruSession
 }
 
 // DestroySession cleans session data and session cookie.
 func (c *Controller) DestroySession() {
-	_ = c.Ctx.Input.CruSession.Flush()
-	c.Ctx.Input.CruSession = nil
-	GlobalSessions.SessionDestroy(c.Ctx.ResponseWriter, c.Ctx.Request)
+	_ = c.Ctx.Request.CruSession.Flush()
+	c.Ctx.Request.CruSession = nil
+	GlobalSessions.SessionDestroy(c.Ctx.ResponseWriter, c.Ctx.HTTPRequest)
 }
 
 // IsAjax returns this request is ajax or not.
 func (c *Controller) IsAjax() bool {
-	return c.Ctx.Input.IsAjax()
+	return c.Ctx.Request.IsAjax()
 }
 
 // GetSecureCookie returns decoded cookie value from encoded browser cookie values.

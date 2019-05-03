@@ -40,13 +40,13 @@ func convertParam(param *MethodParam, paramType reflect.Type, ctx *asanaContext.
 func getParamValue(param *MethodParam, ctx *asanaContext.Context) string {
 	switch param.in {
 	case body:
-		return string(ctx.Input.RequestBody)
+		return string(ctx.Request.RequestBody)
 	case header:
-		return ctx.Input.Header(param.name)
+		return ctx.Request.Header(param.name)
 	case path:
-		return ctx.Input.Query(":" + param.name)
+		return ctx.Request.Query(":" + param.name)
 	default:
-		return ctx.Input.Query(param.name)
+		return ctx.Request.Query(param.name)
 	}
 }
 

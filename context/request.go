@@ -66,17 +66,17 @@ func (request *AsanaRequest) Reset(ctx *Context) {
 
 // Protocol returns request protocol name, such as HTTP/1.1 .
 func (request *AsanaRequest) Protocol() string {
-	return request.Context.Request.Proto
+	return request.Context.HTTPRequest.Proto
 }
 
 // URI returns full request url with query string, fragment.
 func (request *AsanaRequest) URI() string {
-	return request.Context.Request.RequestURI
+	return request.Context.HTTPRequest.RequestURI
 }
 
 // URL returns request url path (without query string, fragment).
 func (request *AsanaRequest) URL() string {
-	return request.Context.Request.URL.Path
+	return request.Context.HTTPRequest.URL.Path
 }
 
 // Site returns base site url as scheme://domain type.
@@ -89,10 +89,10 @@ func (request *AsanaRequest) Scheme() string {
 	if scheme := request.Header("X-Forwarded-Proto"); scheme != "" {
 		return scheme
 	}
-	if request.Context.Request.URL.Scheme != "" {
-		return request.Context.Request.URL.Scheme
+	if request.Context.HTTPRequest.URL.Scheme != "" {
+		return request.Context.HTTPRequest.URL.Scheme
 	}
-	if request.Context.Request.TLS == nil {
+	if request.Context.HTTPRequest.TLS == nil {
 		return "http"
 	}
 	return "https"
@@ -107,18 +107,18 @@ func (request *AsanaRequest) Domain() string {
 // Host returns host name.
 // if no host info in request, return localhost.
 func (request *AsanaRequest) Host() string {
-	if request.Context.Request.Host != "" {
-		if hostPart, _, err := net.SplitHostPort(request.Context.Request.Host); err == nil {
+	if request.Context.HTTPRequest.Host != "" {
+		if hostPart, _, err := net.SplitHostPort(request.Context.HTTPRequest.Host); err == nil {
 			return hostPart
 		}
-		return request.Context.Request.Host
+		return request.Context.HTTPRequest.Host
 	}
 	return "localhost"
 }
 
 // Method returns http request method.
 func (request *AsanaRequest) Method() string {
-	return request.Context.Request.Method
+	return request.Context.HTTPRequest.Method
 }
 
 // Is returns boolean of this request is on given method, such as Is("POST").
@@ -234,10 +234,10 @@ func (request *AsanaRequest) IP() string {
 		}
 		return rip
 	}
-	if ip, _, err := net.SplitHostPort(request.Context.Request.RemoteAddr); err == nil {
+	if ip, _, err := net.SplitHostPort(request.Context.HTTPRequest.RemoteAddr); err == nil {
 		return ip
 	}
-	return request.Context.Request.RemoteAddr
+	return request.Context.HTTPRequest.RemoteAddr
 }
 
 // Proxy returns proxy client ips slice.
@@ -271,7 +271,7 @@ func (request *AsanaRequest) SubDomains() string {
 // Port returns request client port.
 // when error or empty, return 80.
 func (request *AsanaRequest) Port() int {
-	if _, portPart, err := net.SplitHostPort(request.Context.Request.Host); err == nil {
+	if _, portPart, err := net.SplitHostPort(request.Context.HTTPRequest.Host); err == nil {
 		port, _ := strconv.Atoi(portPart)
 		return port
 	}
@@ -335,22 +335,22 @@ func (request *AsanaRequest) Query(key string) string {
 	if val := request.Param(key); val != "" {
 		return val
 	}
-	if request.Context.Request.Form == nil {
-		_ = request.Context.Request.ParseForm()
+	if request.Context.HTTPRequest.Form == nil {
+		_ = request.Context.HTTPRequest.ParseForm()
 	}
-	return request.Context.Request.Form.Get(key)
+	return request.Context.HTTPRequest.Form.Get(key)
 }
 
 // Header returns request header item string by a given string.
 // if non-existed, return empty string.
 func (request *AsanaRequest) Header(key string) string {
-	return request.Context.Request.Header.Get(key)
+	return request.Context.HTTPRequest.Header.Get(key)
 }
 
 // Cookie returns request cookie item string by a given key.
 // if non-existed, return empty string.
 func (request *AsanaRequest) Cookie(key string) string {
-	ck, err := request.Context.Request.Cookie(key)
+	ck, err := request.Context.HTTPRequest.Cookie(key)
 	if err != nil {
 		return ""
 	}
@@ -365,12 +365,12 @@ func (request *AsanaRequest) Session(key interface{}) interface{} {
 
 // CopyBody returns the raw request body data as bytes.
 func (request *AsanaRequest) CopyBody(MaxMemory int64) []byte {
-	if request.Context.Request.Body == nil {
+	if request.Context.HTTPRequest.Body == nil {
 		return []byte{}
 	}
 
 	var requestBody []byte
-	safe := &io.LimitedReader{R: request.Context.Request.Body, N: MaxMemory}
+	safe := &io.LimitedReader{R: request.Context.HTTPRequest.Body, N: MaxMemory}
 	if request.Header("Content-Encoding") == "gzip" {
 		reader, err := gzip.NewReader(safe)
 		if err != nil {
@@ -381,9 +381,9 @@ func (request *AsanaRequest) CopyBody(MaxMemory int64) []byte {
 		requestBody, _ = ioutil.ReadAll(safe)
 	}
 
-	_ = request.Context.Request.Body.Close()
+	_ = request.Context.HTTPRequest.Body.Close()
 	bf := bytes.NewBuffer(requestBody)
-	request.Context.Request.Body = http.MaxBytesReader(request.Context.ResponseWriter, ioutil.NopCloser(bf), MaxMemory)
+	request.Context.HTTPRequest.Body = http.MaxBytesReader(request.Context.ResponseWriter, ioutil.NopCloser(bf), MaxMemory)
 	request.RequestBody = requestBody
 	return requestBody
 }
@@ -417,10 +417,10 @@ func (request *AsanaRequest) SetData(key, val interface{}) {
 func (request *AsanaRequest) ParseFormOrMulitForm(maxMemory int64) error {
 	// Parse the body depending on the content type.
 	if strings.Contains(request.Header("Content-Type"), "multipart/form-data") {
-		if err := request.Context.Request.ParseMultipartForm(maxMemory); err != nil {
+		if err := request.Context.HTTPRequest.ParseMultipartForm(maxMemory); err != nil {
 			return errors.New("Error parsing request body:" + err.Error())
 		}
-	} else if err := request.Context.Request.ParseForm(); err != nil {
+	} else if err := request.Context.HTTPRequest.ParseForm(); err != nil {
 		return errors.New("Error parsing request body:" + err.Error())
 	}
 	return nil
@@ -458,8 +458,8 @@ func (request *AsanaRequest) Bind(dest interface{}, key string) error {
 }
 
 func (request *AsanaRequest) bind(key string, typ reflect.Type) reflect.Value {
-	if request.Context.Request.Form == nil {
-		_ = request.Context.Request.ParseForm()
+	if request.Context.HTTPRequest.Form == nil {
+		_ = request.Context.HTTPRequest.ParseForm()
 	}
 	rv := reflect.Zero(typ)
 	switch typ.Kind() {
@@ -494,13 +494,13 @@ func (request *AsanaRequest) bind(key string, typ reflect.Type) reflect.Value {
 		}
 		rv = request.bindBool(val, typ)
 	case reflect.Slice:
-		rv = request.bindSlice(&request.Context.Request.Form, key, typ)
+		rv = request.bindSlice(&request.Context.HTTPRequest.Form, key, typ)
 	case reflect.Struct:
-		rv = request.bindStruct(&request.Context.Request.Form, key, typ)
+		rv = request.bindStruct(&request.Context.HTTPRequest.Form, key, typ)
 	case reflect.Ptr:
 		rv = request.bindPoint(key, typ)
 	case reflect.Map:
-		rv = request.bindMap(&request.Context.Request.Form, key, typ)
+		rv = request.bindMap(&request.Context.HTTPRequest.Form, key, typ)
 	}
 	return rv
 }

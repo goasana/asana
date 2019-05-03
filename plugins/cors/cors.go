@@ -55,8 +55,8 @@ const (
 	headerMaxAge           = "Access-Control-Max-Age"
 
 	headerOrigin         = "Origin"
-	headerRequestMethod  = "Access-Control-Request-Method"
-	headerRequestHeaders = "Access-Control-Request-Headers"
+	headerRequestMethod  = "Access-Control-HTTPRequest-Method"
+	headerRequestHeaders = "Access-Control-HTTPRequest-Headers"
 )
 
 var (
@@ -202,19 +202,19 @@ func Allow(opts *Options) asana.FilterFunc {
 
 	return func(ctx *context.Context) {
 		var (
-			origin           = ctx.Input.Header(headerOrigin)
-			requestedMethod  = ctx.Input.Header(headerRequestMethod)
-			requestedHeaders = ctx.Input.Header(headerRequestHeaders)
+			origin           = ctx.Request.Header(headerOrigin)
+			requestedMethod  = ctx.Request.Header(headerRequestMethod)
+			requestedHeaders = ctx.Request.Header(headerRequestHeaders)
 			// additional headers to be added
 			// to the response.
 			headers map[string]string
 		)
 
-		if ctx.Input.Method() == "OPTIONS" &&
+		if ctx.Request.Method() == "OPTIONS" &&
 			(requestedMethod != "" || requestedHeaders != "") {
 			headers = opts.PreflightHeader(origin, requestedMethod, requestedHeaders)
 			for key, value := range headers {
-				ctx.Output.Header(key, value)
+				ctx.Response.Header(key, value)
 			}
 			ctx.ResponseWriter.WriteHeader(http.StatusOK)
 			return
@@ -222,7 +222,7 @@ func Allow(opts *Options) asana.FilterFunc {
 		headers = opts.Header(origin)
 
 		for key, value := range headers {
-			ctx.Output.Header(key, value)
+			ctx.Response.Header(key, value)
 		}
 	}
 }

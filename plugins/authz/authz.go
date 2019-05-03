@@ -53,7 +53,7 @@ func NewAuthorizer(e *casbin.Enforcer) asana.FilterFunc {
 	return func(ctx *context.Context) {
 		a := &BasicAuthorizer{enforcer: e}
 
-		if !a.CheckPermission(ctx.Request) {
+		if !a.CheckPermission(ctx.HTTPRequest) {
 			a.RequirePermission(ctx.ResponseWriter)
 		}
 	}

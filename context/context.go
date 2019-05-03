@@ -17,7 +17,7 @@
 //
 //	import "github.com/goasana/framework/context"
 //
-//	ctx := context.Context{Request:req,ResponseWriter:rw}
+//	ctx := context.Context{HTTPRequest:req,ResponseWriter:rw}
 //
 //  more docs http://asana.me/docs/module/context.md
 package context
@@ -50,69 +50,69 @@ const (
 	TextHTML            = "text/html"
 )
 
-// NewContext return the Context with Input and Output
+// NewContext return the Context with Request and Response
 func NewContext() *Context {
 	return &Context{
-		Input:  NewRequest(),
-		Output: NewResponse(),
+		Request:  NewRequest(),
+		Response: NewResponse(),
 	}
 }
 
-// Context Http request context struct including AsanaRequest, AsanaResponse, http.Request and http.ResponseWriter.
+// Context Http request context struct including AsanaRequest, AsanaResponse, http.HTTPRequest and http.ResponseWriter.
 // AsanaRequest and AsanaResponse provides some api to operate request and response more easily.
 type Context struct {
-	Input          *AsanaRequest
-	Output         *AsanaResponse
-	Request        *http.Request
+	Request        *AsanaRequest
+	Response       *AsanaResponse
+	HTTPRequest    *http.Request
 	ResponseWriter *Response
 	_xsrfToken     string
 }
 
 // Reset init Context, AsanaRequest and AsanaResponse
 func (ctx *Context) Reset(rw http.ResponseWriter, r *http.Request) {
-	ctx.Request = r
+	ctx.HTTPRequest = r
 	if ctx.ResponseWriter == nil {
 		ctx.ResponseWriter = &Response{}
 	}
 	ctx.ResponseWriter.reset(rw)
-	ctx.Input.Reset(ctx)
-	ctx.Output.Reset(ctx)
+	ctx.Request.Reset(ctx)
+	ctx.Response.Reset(ctx)
 	ctx._xsrfToken = ""
 }
 
-// Redirect does redirection to localurl with http header status code.
-func (ctx *Context) Redirect(status int, localurl string) {
-	http.Redirect(ctx.ResponseWriter, ctx.Request, localurl, status)
+// Redirect does redirection to localUrl with http header status code.
+func (ctx *Context) Redirect(status int, localUrl string) {
+	http.Redirect(ctx.ResponseWriter, ctx.HTTPRequest, localUrl, status)
 }
 
 // Abort stops this request.
 // if asana.ErrorMaps exists, panic body.
 func (ctx *Context) Abort(status int, body string) {
-	ctx.Output.SetStatus(status)
+	ctx.Response.SetStatus(status)
 	panic(body)
 }
 
 // WriteString Write string to response body.
 // it sends response body.
 func (ctx *Context) WriteString(content string) {
-	ctx.ResponseWriter.Write([]byte(content))
+	_, _ = ctx.ResponseWriter.Write([]byte(content))
 }
 
 // GetCookie Get cookie from request by a given key.
 // It's alias of AsanaRequest.Cookie.
 func (ctx *Context) GetCookie(key string) string {
-	return ctx.Input.Cookie(key)
+	return ctx.Request.Cookie(key)
 }
 
 // SetCookie Set cookie for response.
 // It's alias of AsanaResponse.Cookie.
 func (ctx *Context) SetCookie(name string, value string, others ...interface{}) {
-	ctx.Output.Cookie(name, value, others...)
+	ctx.Response.Cookie(name, value, others...)
 }
 
 // GetSecureCookie Get secure cookie from request by a given key.
 func (ctx *Context) GetSecureCookie(Secret, key string) (string, bool) {
-	val := ctx.Input.Cookie(key)
+	val := ctx.Request.Cookie(key)
 	if val == "" {
 		return "", false
 	}
@@ -128,7 +128,7 @@ func (ctx *Context) GetSecureCookie(Secret, key string) (string, bool) {
 	sig := parts[2]
 
 	h := hmac.New(sha1.New, []byte(Secret))
-	fmt.Fprintf(h, "%s%s", vs, timestamp)
+	_, _ = fmt.Fprintf(h, "%s%s", vs, timestamp)
 
 	if fmt.Sprintf("%02x", h.Sum(nil)) != sig {
 		return "", false
@@ -142,10 +142,10 @@ func (ctx *Context) SetSecureCookie(Secret, name, value string, others ...interf
 	vs := base64.URLEncoding.EncodeToString([]byte(value))
 	timestamp := strconv.FormatInt(time.Now().UnixNano(), 10)
 	h := hmac.New(sha1.New, []byte(Secret))
-	fmt.Fprintf(h, "%s%s", vs, timestamp)
+	_, _ = fmt.Fprintf(h, "%s%s", vs, timestamp)
 	sig := fmt.Sprintf("%02x", h.Sum(nil))
 	cookie := strings.Join([]string{vs, timestamp, sig}, "|")
-	ctx.Output.Cookie(name, cookie, others...)
+	ctx.Response.Cookie(name, cookie, others...)
 }
 
 // XSRFToken creates a xsrf token string and returns.
@@ -165,12 +165,12 @@ func (ctx *Context) XSRFToken(key string, expire int64) string {
 // the token can provided in request header "X-Xsrftoken" and "X-CsrfToken"
 // or in form field value named as "_xsrf".
 func (ctx *Context) CheckXSRFCookie() bool {
-	token := ctx.Input.Query("_xsrf")
+	token := ctx.Request.Query("_xsrf")
 	if token == "" {
-		token = ctx.Request.Header.Get("X-Xsrftoken")
+		token = ctx.HTTPRequest.Header.Get("X-Xsrftoken")
 	}
 	if token == "" {
-		token = ctx.Request.Header.Get("X-Csrftoken")
+		token = ctx.HTTPRequest.Header.Get("X-Csrftoken")
 	}
 	if token == "" {
 		ctx.Abort(403, "'_xsrf' argument missing from POST")

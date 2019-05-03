@@ -168,7 +168,7 @@ func (manager *Manager) GetProvider() Provider {
 	return manager.provider
 }
 
-// getSid retrieves session identifier from HTTP Request.
+// getSid retrieves session identifier from HTTP HTTPRequest.
 // First try to retrieve id by reading from cookie, session cookie name is configurable,
 // if not exist, then retrieve id from querying parameters.
 //
@@ -199,7 +199,7 @@ func (manager *Manager) getSid(r *http.Request) (string, error) {
 		return sid, nil
 	}
 
-	// HTTP Request contains cookie for sessionid info.
+	// HTTP HTTPRequest contains cookie for sessionid info.
 	return url.QueryUnescape(cookie.Value)
 }
 

@@ -53,7 +53,7 @@ import (
 
 func BeforeMiddlewareZap() func(ctx *context.Context) {
 	return func(ctx *context.Context) {
-		ctx.Input.SetData("start_timer", time.Now())
+		ctx.Request.SetData("start_timer", time.Now())
 	}
 }
 
@@ -63,10 +63,10 @@ func AfterMiddlewareZap(logger *zap.Logger, timeFormat string, utc bool, appendB
 	}
 
 	return func(ctx *context.Context) {
-		startTimeInterface := ctx.Input.GetData("start_timer")
+		startTimeInterface := ctx.Request.GetData("start_timer")
 		if startTime, ok := startTimeInterface.(time.Time); ok {
-			path := ctx.Request.URL.Path
-			query := ctx.Request.URL.RawQuery
+			path := ctx.HTTPRequest.URL.Path
+			query := ctx.HTTPRequest.URL.RawQuery
 
 			endTime := time.Now()
 			latency := endTime.Sub(startTime)
@@ -75,9 +75,9 @@ func AfterMiddlewareZap(logger *zap.Logger, timeFormat string, utc bool, appendB
 				endTime = endTime.UTC()
 			}
 
-			headers, _ := json.Encode(ctx.Request.Header, false)
+			headers, _ := json.Encode(ctx.HTTPRequest.Header, false)
 
-			statusCode := ctx.Output.Status
+			statusCode := ctx.Response.Status
 
 			// TODO: The default code in asana is 0.
 			if statusCode == 0 {
@@ -86,21 +86,21 @@ func AfterMiddlewareZap(logger *zap.Logger, timeFormat string, utc bool, appendB
 
 			fields := []zap.Field{
 				zap.Int("status", statusCode),
-				zap.String("method", ctx.Input.Method()),
+				zap.String("method", ctx.Request.Method()),
 				zap.String("path", path),
-				zap.String("uri", ctx.Input.URI()),
+				zap.String("uri", ctx.Request.URI()),
 				zap.String("query", query),
 				zap.ByteString("headers", headers),
-				zap.String("site", ctx.Input.Site()),
-				zap.String("ip", ctx.Input.IP()),
-				zap.String("refer", ctx.Input.Refer()),
-				zap.String("user-agent", ctx.Input.UserAgent()),
+				zap.String("site", ctx.Request.Site()),
+				zap.String("ip", ctx.Request.IP()),
+				zap.String("refer", ctx.Request.Refer()),
+				zap.String("user-agent", ctx.Request.UserAgent()),
 				zap.String("time", endTime.Format(timeFormat)),
 				zap.Duration("latency", latency),
 			}
 
 			if appendBody {
-				fields = append(fields, zap.ByteString("body", ctx.Input.RequestBody))
+				fields = append(fields, zap.ByteString("body", ctx.Request.RequestBody))
 			}
 
 			logger.Info(path, fields...)
