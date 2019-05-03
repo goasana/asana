@@ -238,7 +238,7 @@ func (d *commandSQLAll) Parse(args []string) {
 
 	flagSet := flag.NewFlagSet("orm command: sqlall", flag.ExitOnError)
 	flagSet.StringVar(&name, "db", "default", "DataBase alias name")
-	flagSet.Parse(args)
+	_ = flagSet.Parse(args)
 
 	d.al = getDbAlias(name)
 }

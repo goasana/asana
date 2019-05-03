@@ -2061,7 +2061,7 @@ func TestTransaction(t *testing.T) {
 	throwFail(t, err)
 	throwFail(t, AssertIs(id > 0, true))
 
-	o.Commit()
+	_ = o.Commit()
 	throwFail(t, err)
 
 	num, err = o.QueryTable("tag").Filter("name", "commit").Delete()
@@ -2098,7 +2098,7 @@ func TestTransactionIsolationLevel(t *testing.T) {
 	throwFail(t, AssertIs(num, 0))
 
 	// o1 commit
-	o1.Commit()
+	_ = o1.Commit()
 
 	// o2 query tag table, still no result
 	num, err = o2.QueryTable("tag").Filter("name", "test-transaction").Count()
@@ -2106,7 +2106,7 @@ func TestTransactionIsolationLevel(t *testing.T) {
 	throwFail(t, AssertIs(num, 0))
 
 	// o2 commit and query tag table, get the result
-	o2.Commit()
+	_ = o2.Commit()
 	num, err = o2.QueryTable("tag").Filter("name", "test-transaction").Count()
 	throwFail(t, err)
 	throwFail(t, AssertIs(num, 1))
@@ -2119,7 +2119,7 @@ func TestTransactionIsolationLevel(t *testing.T) {
 func TestBeginTxWithContextCanceled(t *testing.T) {
 	o := NewOrm()
 	ctx, cancel := context.WithCancel(context.Background())
-	o.BeginTx(ctx, nil)
+	_ = o.BeginTx(ctx, nil)
 	id, err := o.Insert(&Tag{Name: "test-context"})
 	throwFail(t, err)
 	throwFail(t, AssertIs(id > 0, true))
@@ -2166,7 +2166,7 @@ func TestReadOrCreate(t *testing.T) {
 	throwFail(t, AssertIs(nu.IsStaff, u.IsStaff))
 	throwFail(t, AssertIs(nu.IsActive, u.IsActive))
 
-	dORM.Delete(u)
+	_, _ = dORM.Delete(u)
 }
 
 func TestInLine(t *testing.T) {
@@ -2311,7 +2311,7 @@ func TestUintPk(t *testing.T) {
 	throwFail(t, AssertIs(pk, u.ID))
 	throwFail(t, AssertIs(nu.Name, name))
 
-	dORM.Delete(u)
+	_, _ = dORM.Delete(u)
 }
 
 func TestPtrPk(t *testing.T) {
@@ -2406,7 +2406,7 @@ func TestInsertOrUpdate(t *testing.T) {
 	user := User{UserName: "unique_username133", Status: 1, Password: "o"}
 	user1 := User{UserName: "unique_username133", Status: 2, Password: "o"}
 	user2 := User{UserName: "unique_username133", Status: 3, Password: "oo"}
-	dORM.Insert(&user)
+	_, _ = dORM.Insert(&user)
 	test := User{UserName: "unique_username133"}
 	fmt.Println(dORM.Driver().Name())
 	if dORM.Driver().Name() == "sqlite3" {
@@ -2422,7 +2422,7 @@ func TestInsertOrUpdate(t *testing.T) {
 			throwFailNow(t, err)
 		}
 	} else {
-		dORM.Read(&test, "user_name")
+		_ = dORM.Read(&test, "user_name")
 		throwFailNow(t, AssertIs(user1.Status, test.Status))
 	}
 	//test2
@@ -2434,7 +2434,7 @@ func TestInsertOrUpdate(t *testing.T) {
 			throwFailNow(t, err)
 		}
 	} else {
-		dORM.Read(&test, "user_name")
+		_ = dORM.Read(&test, "user_name")
 		throwFailNow(t, AssertIs(user2.Status, test.Status))
 		throwFailNow(t, AssertIs(user2.Password, strings.TrimSpace(test.Password)))
 	}
@@ -2452,7 +2452,7 @@ func TestInsertOrUpdate(t *testing.T) {
 			throwFailNow(t, err)
 		}
 	} else {
-		dORM.Read(&test, "user_name")
+		_ = dORM.Read(&test, "user_name")
 		throwFailNow(t, AssertIs(user2.Status+1, test.Status))
 	}
 	//test4 -
@@ -2464,7 +2464,7 @@ func TestInsertOrUpdate(t *testing.T) {
 			throwFailNow(t, err)
 		}
 	} else {
-		dORM.Read(&test, "user_name")
+		_ = dORM.Read(&test, "user_name")
 		throwFailNow(t, AssertIs((user2.Status+1)-1, test.Status))
 	}
 	//test5 *
@@ -2476,7 +2476,7 @@ func TestInsertOrUpdate(t *testing.T) {
 			throwFailNow(t, err)
 		}
 	} else {
-		dORM.Read(&test, "user_name")
+		_ = dORM.Read(&test, "user_name")
 		throwFailNow(t, AssertIs(((user2.Status+1)-1)*3, test.Status))
 	}
 	//test6 /
@@ -2488,7 +2488,7 @@ func TestInsertOrUpdate(t *testing.T) {
 			throwFailNow(t, err)
 		}
 	} else {
-		dORM.Read(&test, "user_name")
+		_ = dORM.Read(&test, "user_name")
 		throwFailNow(t, AssertIs((((user2.Status+1)-1)*3)/3, test.Status))
 	}
 }

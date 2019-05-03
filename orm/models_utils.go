@@ -107,7 +107,7 @@ func getTableUnique(val reflect.Value) [][]string {
 }
 
 // get snaked column name
-func getColumnName(ft int, addrField reflect.Value, sf reflect.StructField, col string) string {
+func getColumnName(ft int, _ reflect.Value, sf reflect.StructField, col string) string {
 	column := col
 	if col == "" {
 		column = nameStrategyMap[nameStrategy](sf.Name)

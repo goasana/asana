@@ -16,7 +16,7 @@ type MethodParam struct {
 type paramType byte
 
 const (
-	param paramType = iota
+	_ paramType = iota
 	path
 	body
 	header
@@ -27,7 +27,7 @@ func New(name string, opts ...MethodParamOption) *MethodParam {
 	return newParam(name, nil, opts)
 }
 
-func newParam(name string, parser paramParser, opts []MethodParamOption) (param *MethodParam) {
+func newParam(name string, _ paramParser, opts []MethodParamOption) (param *MethodParam) {
 	param = &MethodParam{name: name}
 	for _, option := range opts {
 		option(param)

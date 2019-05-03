@@ -51,7 +51,7 @@ func (d *dbBaseTidb) IndexExists(db dbQuerier, table string, name string) bool {
 	row := db.QueryRow("SELECT count(*) FROM information_schema.statistics "+
 		"WHERE table_schema = DATABASE() AND table_name = ? AND index_name = ?", table, name)
 	var cnt int
-	row.Scan(&cnt)
+	_ = row.Scan(&cnt)
 	return cnt > 0
 }
 

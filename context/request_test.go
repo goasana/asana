@@ -91,7 +91,7 @@ func TestBind(t *testing.T) {
 	}
 	for _, c := range cases {
 		r, _ := http.NewRequest("GET", c.request, nil)
-		asanaInput := NewInput()
+		asanaInput := NewRequest()
 		asanaInput.Context = NewContext()
 		asanaInput.Context.Reset(httptest.NewRecorder(), r)
 
@@ -111,7 +111,7 @@ func TestBind(t *testing.T) {
 
 func TestSubDomain(t *testing.T) {
 	r, _ := http.NewRequest("GET", "http://www.example.com/?id=123&isok=true&ft=1.2&ol[0]=1&ol[1]=2&ul[]=str&ul[]=array&user.Name=asana", nil)
-	asanaInput := NewInput()
+	asanaInput := NewRequest()
 	asanaInput.Context = NewContext()
 	asanaInput.Context.Reset(httptest.NewRecorder(), r)
 
@@ -154,7 +154,7 @@ func TestSubDomain(t *testing.T) {
 }
 
 func TestParams(t *testing.T) {
-	inp := NewInput()
+	inp := NewRequest()
 
 	inp.SetParam("p1", "val1_ver1")
 	inp.SetParam("p2", "val2_ver1")

@@ -243,7 +243,7 @@ func (d *dbBase) collectFieldValue(mi *modelInfo, fi *fieldInfo, ind reflect.Val
 				value = tnow
 				if fi.isFielder {
 					f := field.Addr().Interface().(Fielder)
-					f.SetRaw(tnow.In(DefaultTimeLoc))
+					_ = f.SetRaw(tnow.In(DefaultTimeLoc))
 				} else if field.Kind() == reflect.Ptr {
 					v := tnow.In(DefaultTimeLoc)
 					field.Set(reflect.ValueOf(&v))
@@ -1229,13 +1229,13 @@ func (d *dbBase) setColsValues(mi *modelInfo, ind *reflect.Value, cols []string,
 
 		value, err := d.convertValueFromDB(fi, val, tz)
 		if err != nil {
-			panic(fmt.Errorf("Raw value: `%v` %s", val, err.Error()))
+			panic(fmt.Errorf("aw value: `%v` %s", val, err.Error()))
 		}
 
 		_, err = d.setFieldValue(fi, value, field)
 
 		if err != nil {
-			panic(fmt.Errorf("Raw value: `%v` %s", val, err.Error()))
+			panic(fmt.Errorf("raw value: `%v` %s", val, err.Error()))
 		}
 	}
 }

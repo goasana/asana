@@ -70,6 +70,7 @@ type Cache interface {
 type CacheProvider string
 
 const (
+	GoRedisProvider   CacheProvider = "goredis"
 	RedisProvider     CacheProvider = "redis"
 	MemCachedProvider CacheProvider = "memcache"
 	SSDBProvider      CacheProvider = "ssdb"

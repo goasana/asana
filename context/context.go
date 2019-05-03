@@ -53,22 +53,22 @@ const (
 // NewContext return the Context with Input and Output
 func NewContext() *Context {
 	return &Context{
-		Input:  NewInput(),
-		Output: NewOutput(),
+		Input:  NewRequest(),
+		Output: NewResponse(),
 	}
 }
 
-// Context Http request context struct including AsanaInput, AsanaOutput, http.Request and http.ResponseWriter.
-// AsanaInput and AsanaOutput provides some api to operate request and response more easily.
+// Context Http request context struct including AsanaRequest, AsanaResponse, http.Request and http.ResponseWriter.
+// AsanaRequest and AsanaResponse provides some api to operate request and response more easily.
 type Context struct {
-	Input          *AsanaInput
-	Output         *AsanaOutput
+	Input          *AsanaRequest
+	Output         *AsanaResponse
 	Request        *http.Request
 	ResponseWriter *Response
 	_xsrfToken     string
 }
 
-// Reset init Context, AsanaInput and AsanaOutput
+// Reset init Context, AsanaRequest and AsanaResponse
 func (ctx *Context) Reset(rw http.ResponseWriter, r *http.Request) {
 	ctx.Request = r
 	if ctx.ResponseWriter == nil {
@@ -99,13 +99,13 @@ func (ctx *Context) WriteString(content string) {
 }
 
 // GetCookie Get cookie from request by a given key.
-// It's alias of AsanaInput.Cookie.
+// It's alias of AsanaRequest.Cookie.
 func (ctx *Context) GetCookie(key string) string {
 	return ctx.Input.Cookie(key)
 }
 
 // SetCookie Set cookie for response.
-// It's alias of AsanaOutput.Cookie.
+// It's alias of AsanaResponse.Cookie.
 func (ctx *Context) SetCookie(name string, value string, others ...interface{}) {
 	ctx.Output.Cookie(name, value, others...)
 }
