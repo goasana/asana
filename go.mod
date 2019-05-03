@@ -7,7 +7,6 @@ require (
 	github.com/bluele/gcache v0.0.0-20190301044115-79ae3b2d8680
 	github.com/bradfitz/gomemcache v0.0.0-20190329173943-551aad21a668
 	github.com/casbin/casbin v1.8.2
-	github.com/cloudflare/golz4 v0.0.0-20150217214814-ef862a3cdc58
 	github.com/couchbase/go-couchbase v0.0.0-20190429182051-6aeabeae85e5
 	github.com/couchbase/gomemcached v0.0.0-20190420034518-d7858f29a056 // indirect
 	github.com/couchbase/goutils v0.0.0-20190315194238-f9d42b11473b // indirect
@@ -23,6 +22,7 @@ require (
 	github.com/lib/pq v1.1.0
 	github.com/mattn/go-sqlite3 v1.10.0
 	github.com/pelletier/go-toml v1.4.0 // indirect
+	github.com/pierrec/lz4 v2.0.5+incompatible
 	github.com/shiena/ansicolor v0.0.0-20151119151921-a422bbe96644
 	github.com/siddontang/go v0.0.0-20180604090527-bdc77568d726 // indirect
 	github.com/siddontang/ledisdb v0.0.0-20190202134119-8ceb77e66a92
