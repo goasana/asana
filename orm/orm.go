@@ -21,7 +21,7 @@
 //
 //	import (
 //		"fmt"
-//		"github.com/asana/asana/orm"
+//		"github.com/goasasna/framework/orm"
 //		_ "github.com/go-sql-driver/mysql" // import your used driver
 //	)
 //

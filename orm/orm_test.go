@@ -746,7 +746,6 @@ The program—and web server—godoc processes Go source files to extract docume
 			throwFailNow(t, AssertIs(nums, num))
 		}
 	}
-
 }
 
 func TestCustomField(t *testing.T) {
@@ -810,14 +809,11 @@ func TestOperators(t *testing.T) {
 
 	num, err = qs.Filter("user_name__contains", "e").Count()
 	throwFail(t, err)
-	throwFail(t, AssertIs(num, 2))
+	throwFail(t, AssertIs(num, 1))
 
-	var shouldNum int
-
+	shouldNum := 0
 	if IsSqlite || IsTidb {
-		shouldNum = 2
-	} else {
-		shouldNum = 0
+		shouldNum = 1
 	}
 
 	num, err = qs.Filter("user_name__contains", "E").Count()
@@ -826,11 +822,11 @@ func TestOperators(t *testing.T) {
 
 	num, err = qs.Filter("user_name__icontains", "E").Count()
 	throwFail(t, err)
-	throwFail(t, AssertIs(num, 2))
+	throwFail(t, AssertIs(num, 1))
 
 	num, err = qs.Filter("user_name__icontains", "E").Count()
 	throwFail(t, err)
-	throwFail(t, AssertIs(num, 2))
+	throwFail(t, AssertIs(num, 1))
 
 	num, err = qs.Filter("status__gt", 1).Count()
 	throwFail(t, err)
@@ -868,10 +864,10 @@ func TestOperators(t *testing.T) {
 
 	num, err = qs.Filter("user_name__endswith", "e").Count()
 	throwFail(t, err)
-	throwFail(t, AssertIs(num, 2))
+	throwFail(t, AssertIs(num, 1))
 
 	if IsSqlite || IsTidb {
-		shouldNum = 2
+		shouldNum = 1
 	} else {
 		shouldNum = 0
 	}
@@ -882,7 +878,7 @@ func TestOperators(t *testing.T) {
 
 	num, err = qs.Filter("user_name__iendswith", "E").Count()
 	throwFail(t, err)
-	throwFail(t, AssertIs(num, 2))
+	throwFail(t, AssertIs(num, 1))
 
 	num, err = qs.Filter("profile__isnull", true).Count()
 	throwFail(t, err)

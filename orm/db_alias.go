@@ -57,6 +57,7 @@ var (
 	drivers       = map[string]DriverType{
 		"mysql":    DRMySQL,
 		"postgres": DRPostgres,
+		"sqlite":   DRSqlite,
 		"sqlite3":  DRSqlite,
 		"tidb":     DRTiDB,
 		"oracle":   DROracle,

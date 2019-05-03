@@ -18,8 +18,9 @@ Test:
 Direct Use:
 
 	import (
+	    "log"
+	    
 		"github.com/goasana/framework/validation"
-		"log"
 	)
 
 	type User struct {
