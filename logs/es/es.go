@@ -7,9 +7,9 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/OwnLocal/goes"
 	"github.com/goasana/config/encoder/json"
 	"github.com/goasana/framework/logs"
-	"github.com/OwnLocal/goes"
 )
 
 // NewES return a LoggerInterface
@@ -21,7 +21,7 @@ func NewES() logs.Logger {
 }
 
 type esLogger struct {
-	*goes.Client
+	*goes.Connection
 	DSN   string `json:"dsn"`
 	Level int    `json:"level"`
 }
@@ -41,8 +41,8 @@ func (el *esLogger) Init(jsonConfig string) error {
 	} else if host, port, err := net.SplitHostPort(u.Host); err != nil {
 		return err
 	} else {
-		conn := goes.NewClient(host, port)
-		el.Client = conn
+		conn := goes.NewConnection(host, port)
+		el.Connection = conn
 	}
 	return nil
 }
@@ -78,4 +78,3 @@ func (el *esLogger) Flush() {
 func init() {
 	logs.Register(logs.AdapterEs, NewES)
 }
-
