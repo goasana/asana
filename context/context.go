@@ -48,6 +48,7 @@ const (
 	ApplicationProtoBuf = "application/x-protobuf"
 	TextXML             = "text/xml"
 	TextHTML            = "text/html"
+	TextPlain           = "text/plain"
 )
 
 // NewContext return the Context with Request and Response

@@ -35,6 +35,61 @@ import (
 	"github.com/goasana/config/encoder/yaml"
 )
 
+// Headers
+const (
+	HeaderAccept                  = "Accept"
+	HeaderAcceptEncoding          = "Accept-Encoding"
+	HeaderExpires                 = "Expires"
+	HeaderAllow                   = "Allow"
+	HeaderAuthorization           = "Authorization"
+	HeaderCacheControl            = "Cache-Control"
+	HeaderPragma                  = "Pragma"
+	HeaderContentDisposition      = "Content-Disposition"
+	HeaderContentDescription      = "Content-Description"
+	HeaderContentEncoding         = "Content-Encoding"
+	HeaderContentTransferEncoding = "Content-Transfer-Encoding"
+	HeaderContentLength           = "Content-Length"
+	HeaderContentType             = "Content-Type"
+	HeaderCookie                  = "Cookie"
+	HeaderSetCookie               = "Set-Cookie"
+	HeaderIfModifiedSince         = "If-Modified-Since"
+	HeaderLastModified            = "Last-Modified"
+	HeaderLocation                = "Location"
+	HeaderUpgrade                 = "Upgrade"
+	HeaderVary                    = "Vary"
+	HeaderWWWAuthenticate         = "WWW-Authenticate"
+	HeaderXForwardedFor           = "X-Forwarded-For"
+	HeaderXForwardedProto         = "X-Forwarded-Proto"
+	HeaderXForwardedProtocol      = "X-Forwarded-Protocol"
+	HeaderXForwardedSsl           = "X-Forwarded-Ssl"
+	HeaderXUrlScheme              = "X-Url-Scheme"
+	HeaderXHTTPMethodOverride     = "X-HTTP-Method-Override"
+	HeaderXRealIP                 = "X-Real-IP"
+	HeaderXRequestID              = "X-Request-ID"
+	HeaderXRequestedWith          = "X-Requested-With"
+	HeaderServer                  = "Server"
+	HeaderOrigin                  = "Origin"
+
+	// Access control
+	HeaderAccessControlRequestMethod    = "Access-Control-Request-Method"
+	HeaderAccessControlRequestHeaders   = "Access-Control-Request-Headers"
+	HeaderAccessControlAllowOrigin      = "Access-Control-Allow-Origin"
+	HeaderAccessControlAllowMethods     = "Access-Control-Allow-Methods"
+	HeaderAccessControlAllowHeaders     = "Access-Control-Allow-Headers"
+	HeaderAccessControlAllowCredentials = "Access-Control-Allow-Credentials"
+	HeaderAccessControlExposeHeaders    = "Access-Control-Expose-Headers"
+	HeaderAccessControlMaxAge           = "Access-Control-Max-Age"
+
+	// Security
+	HeaderStrictTransportSecurity         = "Strict-Transport-Security"
+	HeaderXContentTypeOptions             = "X-Content-Type-Options"
+	HeaderXXSSProtection                  = "X-XSS-Protection"
+	HeaderXFrameOptions                   = "X-Frame-Options"
+	HeaderContentSecurityPolicy           = "Content-Security-Policy"
+	HeaderContentSecurityPolicyReportOnly = "Content-Security-Policy-Report-Only"
+	HeaderXCSRFToken                      = "X-CSRF-Token"
+)
+
 // AsanaResponse does work for sending response header.
 type AsanaResponse struct {
 	Context    *Context
@@ -55,8 +110,9 @@ func (response *AsanaResponse) Reset(ctx *Context) {
 }
 
 // Header sets response header item string via given key.
-func (response *AsanaResponse) Header(key, val string) {
+func (response *AsanaResponse) Header(key, val string) *AsanaResponse {
 	response.Context.ResponseWriter.Header().Set(key, val)
+	return response
 }
 
 // Body sets response body content.
@@ -69,10 +125,10 @@ func (response *AsanaResponse) Body(content []byte) error {
 		encoding = ParseEncoding(response.Context.HTTPRequest)
 	}
 	if b, n, _ := WriteBody(encoding, buf, content); b {
-		response.Header("Content-Encoding", n)
-		response.Header("Content-Length", strconv.Itoa(buf.Len()))
+		response.Header(HeaderContentEncoding, n)
+		response.Header(HeaderContentLength, strconv.Itoa(buf.Len()))
 	} else {
-		response.Header("Content-Length", strconv.Itoa(len(content)))
+		response.Header(HeaderContentLength, strconv.Itoa(len(content)))
 	}
 	// Write status code if it has been set manually
 	// Set it to 0 afterwards to prevent "multiple response.WriteHeader calls"
@@ -88,7 +144,7 @@ func (response *AsanaResponse) Body(content []byte) error {
 
 // Cookie sets cookie value via given key.
 // others are ordered as cookie's max age time, path,domain, secure and httponly.
-func (response *AsanaResponse) Cookie(name string, value string, others ...interface{}) {
+func (response *AsanaResponse) Cookie(name string, value string, others ...interface{}) *AsanaResponse {
 	var b bytes.Buffer
 	_, _ = fmt.Fprintf(&b, "%s=%s", sanitizeName(name), sanitizeValue(value))
 
@@ -157,6 +213,8 @@ func (response *AsanaResponse) Cookie(name string, value string, others ...inter
 	}
 
 	response.Context.ResponseWriter.Header().Add("Set-Cookie", b.String())
+
+	return response
 }
 
 var cookieNameSanitizer = strings.NewReplacer("\n", "-", "\r", "-")
@@ -188,10 +246,51 @@ func getContentTypeHead(contentType string) string {
 	return fmt.Sprintf("%s; charset=utf-8", contentType)
 }
 
-// JSON writes json to response body.
+// String writes plain text to response body.
+func (response *AsanaResponse) Text(data string) error {
+	return response.TextBlob([]byte(data))
+}
+
+func (response *AsanaResponse) TextBlob(data []byte) error {
+	return response.Blob(TextPlain, []byte(data))
+}
+
+func (response *AsanaResponse) HTML(html string) error {
+	return response.HTMLBlob([]byte(html))
+}
+
+func (response *AsanaResponse) HTMLBlob(data []byte) error {
+	return response.Blob(TextHTML, data)
+}
+
+func (response *AsanaResponse) Blob(contentType string, b []byte) error {
+	return response.Header(HeaderContentType, getContentTypeHead(contentType)).Body(b)
+}
+
+func (response *AsanaResponse) Stream(code int, contentType string, r io.Reader) (err error) {
+	response.Header(HeaderContentType, getContentTypeHead(contentType))
+	_, err = io.Copy(response.Context.ResponseWriter, r)
+	return
+}
+
+func (response *AsanaResponse) NoContent(code int) error {
+	response.Context.ResponseWriter.WriteHeader(code)
+	return nil
+}
+
+func (response *AsanaResponse) Redirect(url string) error {
+	if !response.IsRedirect() {
+		return errors.New("invalid redirect status code")
+	}
+
+	response.Context.ResponseWriter.Header().Set(HeaderLocation, url)
+	response.Context.ResponseWriter.WriteHeader(response.Status)
+	return nil
+}
+
+// JSON writes json to response bodyresponse.
 // if encoding is true, it converts utf-8 to \u0000 type.
 func (response *AsanaResponse) JSON(data interface{}, hasIndent bool, encoding bool) error {
-	response.Header("Content-Type", getContentTypeHead(ApplicationJSON))
 	content, err := json.Encode(data, hasIndent)
 	if err != nil {
 		http.Error(response.Context.ResponseWriter, err.Error(), http.StatusInternalServerError)
@@ -200,34 +299,31 @@ func (response *AsanaResponse) JSON(data interface{}, hasIndent bool, encoding b
 	if encoding {
 		content = []byte(stringsToJSON(string(content)))
 	}
-	return response.Body(content)
+	return response.Header(HeaderContentType, getContentTypeHead(ApplicationJSON)).Body(content)
 }
 
 // ProtoBuf writes protobuf to response body.
 func (response *AsanaResponse) ProtoBuf(data interface{}) error {
-	response.Header("Content-Type", getContentTypeHead(ApplicationProtoBuf))
 	content, err := proto.Encode(data)
 	if err != nil {
 		http.Error(response.Context.ResponseWriter, err.Error(), http.StatusInternalServerError)
 		return err
 	}
-	return response.Body(content)
+	return response.Header(HeaderContentType, getContentTypeHead(ApplicationProtoBuf)).Body(content)
 }
 
 // YAML writes yaml to response body.
 func (response *AsanaResponse) YAML(data interface{}) error {
-	response.Header("Content-Type", getContentTypeHead(ApplicationYAML))
 	content, err := yaml.Encode(data)
 	if err != nil {
 		http.Error(response.Context.ResponseWriter, err.Error(), http.StatusInternalServerError)
 		return err
 	}
-	return response.Body(content)
+	return response.Header(HeaderContentType, getContentTypeHead(ApplicationYAML)).Body(content)
 }
 
 // JSONP writes jsonp to response body.
 func (response *AsanaResponse) JSONP(data interface{}, hasIndent bool) error {
-	response.Header("Content-Type", getContentTypeHead(ApplicationJSONP))
 	content, err := json.Encode(data, hasIndent)
 	if err != nil {
 		http.Error(response.Context.ResponseWriter, err.Error(), http.StatusInternalServerError)
@@ -242,34 +338,56 @@ func (response *AsanaResponse) JSONP(data interface{}, hasIndent bool) error {
 	callbackContent.WriteString("(")
 	callbackContent.Write(content)
 	callbackContent.WriteString(");\r\n")
-	return response.Body(callbackContent.Bytes())
+	return response.Header(HeaderContentType, getContentTypeHead(ApplicationJSONP)).Body(callbackContent.Bytes())
 }
 
 // XML writes xml string to response body.
 func (response *AsanaResponse) XML(data interface{}, hasIndent bool) error {
-	response.Header("Content-Type", getContentTypeHead(ApplicationXML))
 	content, err := xml.Encode(data, hasIndent)
 	if err != nil {
 		http.Error(response.Context.ResponseWriter, err.Error(), http.StatusInternalServerError)
 		return err
 	}
-	return response.Body(content)
+	return response.Header(HeaderContentType, getContentTypeHead(ApplicationXML)).Body(content)
 }
 
 // ServeFormatted serve YAML, XML OR JSON, depending on the value of the Accept header
-func (response *AsanaResponse) ServeFormatted(data interface{}, hasIndent bool, hasEncode ...bool) {
-	accept := response.Context.Request.Header("Accept")
+func (response *AsanaResponse) ServeFormatted(data interface{}, hasIndent bool, hasEncode ...bool) error {
+	accept := response.Context.Request.Header(HeaderAccept)
 	switch accept {
 	case ApplicationYAML:
-		_ = response.YAML(data)
+		return response.YAML(data)
 	case ApplicationXML, TextXML:
-		_ = response.XML(data, hasIndent)
+		return response.XML(data, hasIndent)
 	case ApplicationProtoBuf:
-		_ = response.ProtoBuf(data)
+		return response.ProtoBuf(data)
 	case ApplicationJSONP:
-		_ = response.JSONP(data, hasIndent)
+		return response.JSONP(data, hasIndent)
+	case ApplicationJSON:
+		return response.JSON(data, hasIndent, len(hasEncode) > 0 && hasEncode[0])
+	case TextHTML:
+		switch data.(type) {
+		case string:
+			val := data.(string)
+			return response.HTML(val)
+		case []byte:
+			val := data.([]byte)
+			return response.HTMLBlob(val)
+		default:
+			panic("format not supportedd")
+		}
 	default:
-		_ = response.JSON(data, hasIndent, len(hasEncode) > 0 && hasEncode[0])
+		switch data.(type) {
+		case string:
+			val := data.(string)
+			return response.Text(val)
+		case []byte:
+			val := data.([]byte)
+			return response.TextBlob(val)
+		default:
+			panic("format not supportedd")
+		}
+
 	}
 }
 
@@ -301,19 +419,19 @@ func (response *AsanaResponse) Download(file string, filename ...string) {
 		*/
 		fn = "filename=" + fName + "; filename*=utf-8''" + fn
 	}
-	response.Header("Content-Disposition", "attachment; "+fn)
-	response.Header("Content-Description", "File Transfer")
-	response.Header("Content-Type", "application/octet-stream")
-	response.Header("Content-Transfer-Encoding", "binary")
-	response.Header("Expires", "0")
-	response.Header("Cache-Control", "must-revalidate")
-	response.Header("Pragma", "public")
+	response.Header(HeaderContentDisposition, "attachment; "+fn)
+	response.Header(HeaderContentDescription, "File Transfer")
+	response.Header(HeaderContentType, "application/octet-stream")
+	response.Header(HeaderContentTransferEncoding, "binary")
+	response.Header(HeaderExpires, "0")
+	response.Header(HeaderCacheControl, "must-revalidate")
+	response.Header(HeaderPragma, "public")
 	http.ServeFile(response.Context.ResponseWriter, response.Context.HTTPRequest, file)
 }
 
 // ContentType sets the content type from ext string.
 // MIME type is given in mime package.
-func (response *AsanaResponse) ContentType(ext string) {
+func (response *AsanaResponse) ContentType(ext string) *AsanaResponse {
 	if !strings.HasPrefix(ext, ".") {
 		ext = "." + ext
 	}
@@ -321,12 +439,14 @@ func (response *AsanaResponse) ContentType(ext string) {
 	if ctype != "" {
 		response.Header("Content-Type", ctype)
 	}
+	return response
 }
 
 // SetStatus sets response status code.
 // It writes response header directly.
-func (response *AsanaResponse) SetStatus(status int) {
+func (response *AsanaResponse) SetStatus(status int) *AsanaResponse {
 	response.Status = status
+	return response
 }
 
 // IsCachable returns boolean of this request is cached.
@@ -403,6 +523,7 @@ func stringsToJSON(str string) string {
 }
 
 // Session sets session item value with given key.
-func (response *AsanaResponse) Session(name interface{}, value interface{}) {
+func (response *AsanaResponse) Session(name interface{}, value interface{}) *AsanaResponse {
 	_ = response.Context.Request.CruSession.Set(name, value)
+	return response
 }
