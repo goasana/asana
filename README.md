@@ -1,4 +1,4 @@
-# Asana [![Build Status](https://travis-ci.org/goasana/framework.svg?branch=master)](https://travis-ci.org/goasana/framework) [![GoDoc](http://godoc.org/github.com/goasana/framework?status.svg)](http://godoc.org/github.com/goasana/framework) [![Go Report Card](https://goreportcard.com/badge/github.com/goasana/framework)](https://goreportcard.com/report/github.com/goasana/framework)
+# Asana [![Build Status](https://travis-ci.org/goasana/asana.svg?branch=master)](https://travis-ci.org/goasana/asana) [![GoDoc](http://godoc.org/github.com/goasana/asana?status.svg)](http://godoc.org/github.com/goasana/asana) [![Go Report Card](https://goreportcard.com/badge/github.com/goasana/asana)](https://goreportcard.com/report/github.com/goasana/asana)
 
 
 Asana is clone of [beego](http://beego.me).
@@ -7,13 +7,13 @@ Asana is clone of [beego](http://beego.me).
 
 #### Download and install
 
-    go get github.com/goasana/framework
+    go get github.com/goasana/asana
 
 #### Create file `hello.go`
 ```go
 package main
 
-import "github.com/goasana/framework"
+import "github.com/goasana/asana"
 
 func main(){
     asana.Run()

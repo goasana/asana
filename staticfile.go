@@ -26,8 +26,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/goasana/framework/context"
-	"github.com/goasana/framework/logs"
+	"github.com/goasana/asana/context"
+	"github.com/goasana/asana/logs"
 )
 
 var errNotStaticRequest = errors.New("request not a static file request")

@@ -17,7 +17,7 @@ package testing
 import (
 	"github.com/goasana/config"
 	"github.com/goasana/config/source/file"
-	"github.com/goasana/framework/httplib"
+	"github.com/goasana/asana/httplib"
 )
 
 var port = ""

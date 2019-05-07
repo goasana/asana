@@ -15,7 +15,7 @@
 // Package context provide the context utils
 // Usage:
 //
-//	import "github.com/goasana/framework/context"
+//	import "github.com/goasana/asana/context"
 //
 //	ctx := Context{HTTPRequest:req,ResponseWriter:rw}
 //
@@ -48,8 +48,8 @@ import (
 	"github.com/goasana/config/encoder/proto"
 	"github.com/goasana/config/encoder/xml"
 	"github.com/goasana/config/encoder/yaml"
-	"github.com/goasana/framework/session"
-	"github.com/goasana/framework/utils"
+	"github.com/goasana/asana/session"
+	"github.com/goasana/asana/utils"
 )
 
 //commonly used mime-types

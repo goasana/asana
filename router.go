@@ -26,11 +26,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/goasana/framework/context"
-	"github.com/goasana/framework/context/param"
-	"github.com/goasana/framework/logs"
-	"github.com/goasana/framework/toolbox"
-	"github.com/goasana/framework/utils"
+	"github.com/goasana/asana/context"
+	"github.com/goasana/asana/context/param"
+	"github.com/goasana/asana/logs"
+	"github.com/goasana/asana/toolbox"
+	"github.com/goasana/asana/utils"
 )
 
 // default filter execution points

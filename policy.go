@@ -17,7 +17,7 @@ package asana
 import (
 	"strings"
 
-	"github.com/goasana/framework/context"
+	"github.com/goasana/asana/context"
 )
 
 // PolicyFunc defines a policy function which is invoked before the controller handler is executed.

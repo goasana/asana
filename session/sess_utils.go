@@ -29,7 +29,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/goasana/framework/utils"
+	"github.com/goasana/asana/utils"
 )
 
 func init() {

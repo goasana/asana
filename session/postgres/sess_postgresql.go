@@ -38,8 +38,8 @@
 //
 // Usage:
 // import(
-//   _ "github.com/goasana/framework/session/postgresql"
-//   "github.com/goasana/framework/session"
+//   _ "github.com/goasana/asana/session/postgresql"
+//   "github.com/goasana/asana/session"
 // )
 //
 //	func init() {
@@ -56,7 +56,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/goasana/framework/session"
+	"github.com/goasana/asana/session"
 	// import postgresql Driver
 	_ "github.com/lib/pq"
 )

@@ -19,7 +19,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/goasana/framework/cache"
+	"github.com/goasana/asana/cache"
 	"github.com/gomodule/redigo/redis"
 )
 

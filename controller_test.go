@@ -19,7 +19,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/goasana/framework/context"
+	"github.com/goasana/asana/context"
 	"os"
 	"path/filepath"
 )

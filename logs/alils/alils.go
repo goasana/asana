@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/goasana/config/encoder/json"
-	"github.com/goasana/framework/logs"
+	"github.com/goasana/asana/logs"
 	"github.com/gogo/protobuf/proto"
 )
 

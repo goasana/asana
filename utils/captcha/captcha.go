@@ -19,9 +19,9 @@
 // package controllers
 //
 // import (
-// 	"github.com/goasana/framework"
-// 	"github.com/goasana/framework/cache"
-// 	"github.com/goasana/framework/utils/captcha"
+// 	"github.com/goasana/asana"
+// 	"github.com/goasana/asana/cache"
+// 	"github.com/goasana/asana/utils/captcha"
 // )
 //
 // var cpt *captcha.Captcha
@@ -66,11 +66,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/goasana/framework"
-	"github.com/goasana/framework/cache"
-	"github.com/goasana/framework/context"
-	"github.com/goasana/framework/logs"
-	"github.com/goasana/framework/utils"
+	"github.com/goasana/asana"
+	"github.com/goasana/asana/cache"
+	"github.com/goasana/asana/context"
+	"github.com/goasana/asana/logs"
+	"github.com/goasana/asana/utils"
 )
 
 var (

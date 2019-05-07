@@ -27,8 +27,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/goasana/framework/logs"
-	"github.com/goasana/framework/utils"
+	"github.com/goasana/asana/logs"
+	"github.com/goasana/asana/utils"
 )
 
 var (

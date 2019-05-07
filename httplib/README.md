@@ -6,7 +6,7 @@ httplib is an libs help you to curl remote url.
 ## GET
 you can use Get to crawl data.
 
-	import "github.com/goasana/framework/httplib"
+	import "github.com/goasana/asana/httplib"
 	
 	str, err := httplib.Get("http://asana.me/").String()
 	if err != nil {
@@ -94,4 +94,4 @@ httplib support mutil file upload, use `req.PostFile()`
 
 See godoc for further documentation and examples.
 
-* [godoc.org/github.com/goasana/framework/httplib](https://godoc.org/github.com/goasana/framework/httplib)
+* [godoc.org/github.com/goasana/asana/httplib](https://godoc.org/github.com/goasana/asana/httplib)

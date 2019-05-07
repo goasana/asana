@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"reflect"
 
-	asanaContext "github.com/goasana/framework/context"
-	"github.com/goasana/framework/logs"
+	asanaContext "github.com/goasana/asana/context"
+	"github.com/goasana/asana/logs"
 )
 
 // ConvertParams converts http method params to values that will be passed to the method controller as arguments

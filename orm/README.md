@@ -1,6 +1,6 @@
 # asana orm
 
-[![Build Status](https://drone.io/github.com/goasana/framework/status.png)](https://drone.io/github.com/goasana/framework/latest)
+[![Build Status](https://drone.io/github.com/goasana/asana/status.png)](https://drone.io/github.com/goasana/asana/latest)
 
 A powerful orm framework for go.
 
@@ -27,7 +27,7 @@ more features please read the docs
 
 **Install:**
 
-	go get github.com/goasana/framework/orm
+	go get github.com/goasana/asana/orm
 
 ## Changelog
 
@@ -45,7 +45,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/goasana/framework/orm"
+	"github.com/goasana/asana/orm"
 	_ "github.com/go-sql-driver/mysql" // import your used driver
 )
 

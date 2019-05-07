@@ -27,7 +27,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/goasana/framework/session"
+	"github.com/goasana/asana/session"
 )
 
 var maxParam = 50

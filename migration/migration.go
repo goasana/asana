@@ -33,8 +33,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/goasana/framework/logs"
-	"github.com/goasana/framework/orm"
+	"github.com/goasana/asana/logs"
+	"github.com/goasana/asana/orm"
 )
 
 // const the data format for the asana generate migration datatype

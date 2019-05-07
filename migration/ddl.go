@@ -17,7 +17,7 @@ package migration
 import (
 	"fmt"
 
-	"github.com/goasana/framework/logs"
+	"github.com/goasana/asana/logs"
 )
 
 // Index struct defines the structure of Index Columns

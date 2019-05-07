@@ -20,8 +20,8 @@
 //
 // Usage:
 // import(
-//   _ "github.com/goasana/framework/session/redis_cluster"
-//   "github.com/goasana/framework/session"
+//   _ "github.com/goasana/asana/session/redis_cluster"
+//   "github.com/goasana/asana/session"
 // )
 //
 //	func init() {
@@ -40,7 +40,7 @@ import (
 	"time"
 
 	"github.com/go-redis/redis"
-	"github.com/goasana/framework/session"
+	"github.com/goasana/asana/session"
 )
 
 var redispder = &Provider{}

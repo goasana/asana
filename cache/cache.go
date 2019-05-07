@@ -16,7 +16,7 @@
 // Usage:
 //
 // import(
-//   "github.com/goasana/framework/cache"
+//   "github.com/goasana/asana/cache"
 // )
 //
 // bm, err := cache.NewCache(cache.MemoryProvider, `{"interval":60}`)

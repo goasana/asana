@@ -7,11 +7,11 @@ validation is a form validation for a data validation and error collecting using
 
 Install:
 
-	go get github.com/goasana/framework/validation
+	go get github.com/goasana/asana/validation
 
 Test:
 
-	go test github.com/goasana/framework/validation
+	go test github.com/goasana/asana/validation
 
 ## Example
 
@@ -20,7 +20,7 @@ Direct Use:
 	import (
 	    "log"
 	    
-		"github.com/goasana/framework/validation"
+		"github.com/goasana/asana/validation"
 	)
 
 	type User struct {
@@ -50,7 +50,7 @@ Direct Use:
 Struct Tag Use:
 
 	import (
-		"github.com/goasana/framework/validation"
+		"github.com/goasana/asana/validation"
 	)
 
 	// validation function follow with "valid" tag
@@ -82,7 +82,7 @@ Struct Tag Use:
 Use custom function:
 
 	import (
-		"github.com/goasana/framework/validation"
+		"github.com/goasana/asana/validation"
 	)
 
 	type user struct {

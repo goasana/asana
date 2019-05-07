@@ -23,8 +23,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/goasana/framework/context"
-	"github.com/goasana/framework/utils"
+	"github.com/goasana/asana/context"
+	"github.com/goasana/asana/utils"
 )
 
 const (

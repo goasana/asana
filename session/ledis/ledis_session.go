@@ -7,7 +7,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/goasana/framework/session"
+	"github.com/goasana/asana/session"
 	"github.com/siddontang/ledisdb/config"
 	"github.com/siddontang/ledisdb/ledis"
 )

@@ -20,8 +20,8 @@
 //
 // Usage:
 // import(
-//   _ "github.com/goasana/framework/cache/redis"
-//   "github.com/goasana/framework/cache"
+//   _ "github.com/goasana/asana/cache/redis"
+//   "github.com/goasana/asana/cache"
 // )
 //
 //  bm, err := cache.NewCache("redis", `{"conn":"127.0.0.1:11211"}`)
@@ -37,7 +37,7 @@ import (
 
 	"github.com/go-redis/redis"
 	"github.com/goasana/config/encoder/json"
-	"github.com/goasana/framework/cache"
+	"github.com/goasana/asana/cache"
 )
 
 var (

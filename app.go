@@ -27,9 +27,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/goasana/framework/grace"
-	"github.com/goasana/framework/logs"
-	"github.com/goasana/framework/utils"
+	"github.com/goasana/asana/grace"
+	"github.com/goasana/asana/logs"
+	"github.com/goasana/asana/utils"
 
 	"golang.org/x/crypto/acme/autocert"
 )

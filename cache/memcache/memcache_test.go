@@ -21,7 +21,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/goasana/framework/cache"
+	"github.com/goasana/asana/cache"
 )
 
 func TestMemcacheCache(t *testing.T) {

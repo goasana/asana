@@ -20,9 +20,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/goasana/framework/context"
-	"github.com/goasana/framework/logs"
-	"github.com/goasana/framework/testdata/proto"
+	"github.com/goasana/asana/context"
+	"github.com/goasana/asana/logs"
+	"github.com/goasana/asana/testdata/proto"
 	"github.com/golang/protobuf/proto"
 )
 

@@ -15,7 +15,7 @@
 // Package logs provide a general log interface
 // Usage:
 //
-// import "github.com/goasana/framework/logs"
+// import "github.com/goasana/asana/logs"
 //
 //	log := NewLogger(10000)
 //	log.SetLogger("console", "")

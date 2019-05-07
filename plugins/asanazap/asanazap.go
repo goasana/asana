@@ -20,8 +20,8 @@
 //
 //	"go.uber.org/zap"
 //
-//	asana "github.com/goasana/framework"
-//	"github.com/goasana/framework/plugins/asanazap"
+//	asana "github.com/goasana/asana"
+//	"github.com/goasana/asana/plugins/asanazap"
 //)
 //
 //type MainController struct {
@@ -46,9 +46,9 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/goasana/config/encoder/json"
-	"github.com/goasana/framework"
-	"github.com/goasana/framework/context"
-	"github.com/goasana/framework/logs"
+	"github.com/goasana/asana"
+	"github.com/goasana/asana/context"
+	"github.com/goasana/asana/logs"
 )
 
 // BeforeMiddlewareZap For insert in asana.BeforeRouter Filter

@@ -20,9 +20,9 @@ import (
 	"testing"
 	
 	"github.com/casbin/casbin"
-	"github.com/goasana/framework"
-	"github.com/goasana/framework/context"
-	"github.com/goasana/framework/plugins/auth"
+	"github.com/goasana/asana"
+	"github.com/goasana/asana/context"
+	"github.com/goasana/asana/plugins/auth"
 )
 
 func testRequest(t *testing.T, handler *asana.ControllerRegister, user string, path string, method string, code int) {

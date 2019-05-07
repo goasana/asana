@@ -9,7 +9,7 @@ import (
 
 	"github.com/OwnLocal/goes"
 	"github.com/goasana/config/encoder/json"
-	"github.com/goasana/framework/logs"
+	"github.com/goasana/asana/logs"
 )
 
 // NewES return a LoggerInterface

@@ -16,7 +16,7 @@
 //
 // Usage:
 // import(
-//   "github.com/goasana/framework/session"
+//   "github.com/goasana/asana/session"
 // )
 //
 //	func init() {

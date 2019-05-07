@@ -21,8 +21,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/goasana/framework"
-	"github.com/goasana/framework/context"
+	"github.com/goasana/asana"
+	"github.com/goasana/asana/context"
 )
 
 // HTTPHeaderGuardRecorder is httptest.ResponseRecorder with own http.Header

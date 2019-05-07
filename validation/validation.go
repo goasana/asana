@@ -15,7 +15,7 @@
 // Package validation for validations
 //
 //	import (
-//		"github.com/goasana/framework/validation"
+//		"github.com/goasana/asana/validation"
 //		"log"
 //	)
 //

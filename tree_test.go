@@ -18,7 +18,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/goasana/framework/context"
+	"github.com/goasana/asana/context"
 )
 
 type testInfo struct {

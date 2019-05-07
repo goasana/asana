@@ -1,4 +1,4 @@
-module github.com/goasana/framework
+module github.com/goasana/asana
 
 go 1.12
 

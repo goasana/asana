@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/goasana/framework/session"
+	"github.com/goasana/asana/session"
 )
 
 func TestRedisSentinel(t *testing.T) {

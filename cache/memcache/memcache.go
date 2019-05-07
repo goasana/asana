@@ -20,8 +20,8 @@
 //
 // Usage:
 // import(
-//   _ "github.com/goasana/framework/cache/memcache"
-//   "github.com/goasana/framework/cache"
+//   _ "github.com/goasana/asana/cache/memcache"
+//   "github.com/goasana/asana/cache"
 // )
 //
 //  bm, err := cache.NewCache("memcache", `{"conn":"127.0.0.1:11211"}`)
@@ -35,7 +35,7 @@ import (
 	"time"
 
 	"github.com/bradfitz/gomemcache/memcache"
-	"github.com/goasana/framework/cache"
+	"github.com/goasana/asana/cache"
 	"github.com/goasana/config/encoder/json"
 )
 

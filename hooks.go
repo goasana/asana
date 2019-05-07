@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 
 	"github.com/goasana/config/encoder/json"
-	"github.com/goasana/framework/context"
-	"github.com/goasana/framework/logs"
-	"github.com/goasana/framework/session"
+	"github.com/goasana/asana/context"
+	"github.com/goasana/asana/logs"
+	"github.com/goasana/asana/session"
 )
 
 // register MIME type with content type

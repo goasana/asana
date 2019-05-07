@@ -27,10 +27,10 @@ import (
 	_ "github.com/goasana/config/encoder/yaml" // Default parser
 	"github.com/goasana/config/source"
 	"github.com/goasana/config/source/file"
-	"github.com/goasana/framework/context"
-	"github.com/goasana/framework/logs"
-	"github.com/goasana/framework/session"
-	"github.com/goasana/framework/utils"
+	"github.com/goasana/asana/context"
+	"github.com/goasana/asana/logs"
+	"github.com/goasana/asana/session"
+	"github.com/goasana/asana/utils"
 )
 
 // Config is the main struct for BConfig

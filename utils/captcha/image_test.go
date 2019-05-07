@@ -17,7 +17,7 @@ package captcha
 import (
 	"testing"
 
-	"github.com/goasana/framework/utils"
+	"github.com/goasana/asana/utils"
 )
 
 type byteCounter struct {

@@ -23,8 +23,8 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/goasana/framework/context"
-	"github.com/goasana/framework/context/param"
+	"github.com/goasana/asana/context"
+	"github.com/goasana/asana/context/param"
 )
 
 var (

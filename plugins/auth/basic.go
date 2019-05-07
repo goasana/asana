@@ -15,8 +15,8 @@
 // Package auth provides handlers to enable basic auth support.
 // Simple Usage:
 //	import(
-//		"github.com/goasana/framework"
-//		"github.com/goasana/framework/plugins/auth"
+//		"github.com/goasana/asana"
+//		"github.com/goasana/asana/plugins/auth"
 //	)
 //
 //	func main(){
@@ -40,8 +40,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/goasana/framework"
-	"github.com/goasana/framework/context"
+	"github.com/goasana/asana"
+	"github.com/goasana/asana/context"
 )
 
 var defaultRealm = "Authorization Required"

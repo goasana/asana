@@ -15,8 +15,8 @@
 // Package authz provides handlers to enable ACL, RBAC, ABAC authorization support.
 // Simple Usage:
 //	import(
-//		"github.com/goasana/framework"
-//		"github.com/goasana/framework/plugins/authz"
+//		"github.com/goasana/asana"
+//		"github.com/goasana/asana/plugins/authz"
 //		"github.com/casbin/casbin"
 //	)
 //
@@ -43,8 +43,8 @@ import (
 	"net/http"
 
 	"github.com/casbin/casbin"
-	"github.com/goasana/framework"
-	"github.com/goasana/framework/context"
+	"github.com/goasana/asana"
+	"github.com/goasana/asana/context"
 )
 
 // NewAuthorizer returns the authorizer.

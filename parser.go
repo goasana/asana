@@ -30,16 +30,16 @@ import (
 	"unicode"
 
 	"github.com/goasana/config/encoder/json"
-	"github.com/goasana/framework/context/param"
-	"github.com/goasana/framework/logs"
-	"github.com/goasana/framework/utils"
+	"github.com/goasana/asana/context/param"
+	"github.com/goasana/asana/logs"
+	"github.com/goasana/asana/utils"
 )
 
 var globalRouterTemplate = `package {{.routersDir}}
 
 import (
-	"github.com/goasana/framework"
-	"github.com/goasana/framework/context/param"{{.globalImport}}
+	"github.com/goasana/asana"
+	"github.com/goasana/asana/context/param"{{.globalImport}}
 )
 
 func init() {

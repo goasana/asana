@@ -8,7 +8,7 @@ In your asana.Controller:
 
  package controllers
 
- import "github.com/goasana/framework/utils/pagination"
+ import "github.com/goasana/asana/utils/pagination"
 
  type PostsController struct {
    asana.Controller

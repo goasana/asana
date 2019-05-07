@@ -22,7 +22,7 @@ import (
 	"testing"
 
 	"github.com/elazarl/go-bindata-assetfs"
-	"github.com/goasana/framework/testdata"
+	"github.com/goasana/asana/testdata"
 )
 
 var header = `{{define "header"}}

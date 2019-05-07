@@ -15,7 +15,7 @@
 // Package httplib is used as http.Client
 // Usage:
 //
-// import "github.com/goasana/framework/httplib"
+// import "github.com/goasana/asana/httplib"
 //
 //	b := httplib.Post("http://asana.me/")
 //	b.Param("username","asana")

@@ -15,7 +15,7 @@
 package pagination
 
 import (
-	"github.com/goasana/framework/context"
+	"github.com/goasana/asana/context"
 )
 
 // SetPaginator Instantiates a Paginator and assigns it to context.Request.Data("paginator").

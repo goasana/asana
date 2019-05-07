@@ -18,7 +18,7 @@ import (
 	"net/http"
 	"strings"
 
-	asanaContext "github.com/goasana/framework/context"
+	asanaContext "github.com/goasana/asana/context"
 )
 
 type namespaceCond func(*asanaContext.Context) bool
@@ -97,91 +97,91 @@ func (n *Namespace) Filter(action string, filter ...FilterFunc) *Namespace {
 }
 
 // Router same as asana.Rourer
-// refer: https://godoc.org/github.com/goasana/framework#Router
+// refer: https://godoc.org/github.com/goasana/asana#Router
 func (n *Namespace) Router(rootPath string, c ControllerInterface, mappingMethods ...string) *Namespace {
 	n.handlers.Add(rootPath, c, mappingMethods...)
 	return n
 }
 
 // AutoRouter same as asana.AutoRouter
-// refer: https://godoc.org/github.com/goasana/framework#AutoRouter
+// refer: https://godoc.org/github.com/goasana/asana#AutoRouter
 func (n *Namespace) AutoRouter(c ControllerInterface) *Namespace {
 	n.handlers.AddAuto(c)
 	return n
 }
 
 // AutoPrefix same as asana.AutoPrefix
-// refer: https://godoc.org/github.com/goasana/framework#AutoPrefix
+// refer: https://godoc.org/github.com/goasana/asana#AutoPrefix
 func (n *Namespace) AutoPrefix(prefix string, c ControllerInterface) *Namespace {
 	n.handlers.AddAutoPrefix(prefix, c)
 	return n
 }
 
 // Get same as asana.Get
-// refer: https://godoc.org/github.com/goasana/framework#Get
+// refer: https://godoc.org/github.com/goasana/asana#Get
 func (n *Namespace) Get(rootPath string, f FilterFunc) *Namespace {
 	n.handlers.Get(rootPath, f)
 	return n
 }
 
 // Post same as asana.Post
-// refer: https://godoc.org/github.com/goasana/framework#Post
+// refer: https://godoc.org/github.com/goasana/asana#Post
 func (n *Namespace) Post(rootPath string, f FilterFunc) *Namespace {
 	n.handlers.Post(rootPath, f)
 	return n
 }
 
 // Delete same as asana.Delete
-// refer: https://godoc.org/github.com/goasana/framework#Delete
+// refer: https://godoc.org/github.com/goasana/asana#Delete
 func (n *Namespace) Delete(rootPath string, f FilterFunc) *Namespace {
 	n.handlers.Delete(rootPath, f)
 	return n
 }
 
 // Put same as asana.Put
-// refer: https://godoc.org/github.com/goasana/framework#Put
+// refer: https://godoc.org/github.com/goasana/asana#Put
 func (n *Namespace) Put(rootPath string, f FilterFunc) *Namespace {
 	n.handlers.Put(rootPath, f)
 	return n
 }
 
 // Head same as asana.Head
-// refer: https://godoc.org/github.com/goasana/framework#Head
+// refer: https://godoc.org/github.com/goasana/asana#Head
 func (n *Namespace) Head(rootPath string, f FilterFunc) *Namespace {
 	n.handlers.Head(rootPath, f)
 	return n
 }
 
 // Options same as asana.Options
-// refer: https://godoc.org/github.com/goasana/framework#Options
+// refer: https://godoc.org/github.com/goasana/asana#Options
 func (n *Namespace) Options(rootPath string, f FilterFunc) *Namespace {
 	n.handlers.Options(rootPath, f)
 	return n
 }
 
 // Patch same as asana.Patch
-// refer: https://godoc.org/github.com/goasana/framework#Patch
+// refer: https://godoc.org/github.com/goasana/asana#Patch
 func (n *Namespace) Patch(rootPath string, f FilterFunc) *Namespace {
 	n.handlers.Patch(rootPath, f)
 	return n
 }
 
 // Any same as asana.Any
-// refer: https://godoc.org/github.com/goasana/framework#Any
+// refer: https://godoc.org/github.com/goasana/asana#Any
 func (n *Namespace) Any(rootPath string, f FilterFunc) *Namespace {
 	n.handlers.Any(rootPath, f)
 	return n
 }
 
 // Handler same as asana.Handler
-// refer: https://godoc.org/github.com/goasana/framework#Handler
+// refer: https://godoc.org/github.com/goasana/asana#Handler
 func (n *Namespace) Handler(rootPath string, h http.Handler) *Namespace {
 	n.handlers.Handler(rootPath, h)
 	return n
 }
 
 // Include add include class
-// refer: https://godoc.org/github.com/goasana/framework#Include
+// refer: https://godoc.org/github.com/goasana/asana#Include
 func (n *Namespace) Include(cList ...ControllerInterface) *Namespace {
 	n.handlers.Include(cList...)
 	return n

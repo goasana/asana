@@ -16,8 +16,8 @@
 //
 // Simple Usage:
 //	import(
-//		"github.com/goasana/framework"
-//		"github.com/goasana/framework/plugins/apiauth"
+//		"github.com/goasana/asana"
+//		"github.com/goasana/asana/plugins/apiauth"
 //	)
 //
 //	func main(){
@@ -65,8 +65,8 @@ import (
 	"sort"
 	"time"
 
-	"github.com/goasana/framework"
-	"github.com/goasana/framework/context"
+	"github.com/goasana/asana"
+	"github.com/goasana/asana/context"
 )
 
 // AppIDToAppSecret is used to get appsecret throw appid

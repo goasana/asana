@@ -28,8 +28,8 @@
 //
 // Usage:
 // import(
-//   _ "github.com/goasana/framework/session/mysql"
-//   "github.com/goasana/framework/session"
+//   _ "github.com/goasana/asana/session/mysql"
+//   "github.com/goasana/asana/session"
 // )
 //
 //	func init() {
@@ -46,7 +46,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/goasana/framework/session"
+	"github.com/goasana/asana/session"
 	// import mysql driver
 	_ "github.com/go-sql-driver/mysql"
 )

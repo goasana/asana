@@ -15,8 +15,8 @@
 // Package cors provides handlers to enable CORS support.
 // Usage
 //	import (
-// 		"github.com/goasana/framework"
-//		"github.com/goasana/framework/plugins/cors"
+// 		"github.com/goasana/asana"
+//		"github.com/goasana/asana/plugins/cors"
 // )
 //
 //	func main() {
@@ -42,8 +42,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/goasana/framework"
-	"github.com/goasana/framework/context"
+	"github.com/goasana/asana"
+	"github.com/goasana/asana/context"
 )
 
 const (
