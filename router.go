@@ -26,7 +26,7 @@ import (
 	"sync"
 	"time"
 
-	asanaContext "github.com/goasana/framework/context"
+	"github.com/goasana/framework/context"
 	"github.com/goasana/framework/context/param"
 	"github.com/goasana/framework/logs"
 	"github.com/goasana/framework/toolbox"
@@ -84,14 +84,14 @@ var (
 
 // FilterHandler is an interface for
 type FilterHandler interface {
-	Filter(*asanaContext.Context) bool
+	Filter(*context.Context) bool
 }
 
 // default log filter static file will not show
 type logFilter struct {
 }
 
-func (l *logFilter) Filter(ctx *asanaContext.Context) bool {
+func (l *logFilter) Filter(ctx *context.Context) bool {
 	requestPath := path.Clean(ctx.HTTPRequest.URL.Path)
 	if requestPath == "/favicon.ico" || requestPath == "/robots.txt" {
 		return true
@@ -138,7 +138,7 @@ func NewControllerRegister() *ControllerRegister {
 		policies: make(map[string]*Tree),
 		pool: sync.Pool{
 			New: func() interface{} {
-				return asanaContext.NewContext()
+				return context.NewContext()
 			},
 		},
 	}
@@ -631,7 +631,7 @@ func (p *ControllerRegister) getURL(t *Tree, url, controllerName, methodName str
 	return false, ""
 }
 
-func (p *ControllerRegister) execFilter(context *asanaContext.Context, urlPath string, pos int) (started bool) {
+func (p *ControllerRegister) execFilter(context *context.Context, urlPath string, pos int) (started bool) {
 	var preFilterParams map[string]string
 	for _, filterR := range p.filters[pos] {
 		if filterR.returnOnOutput && context.ResponseWriter.Started {
@@ -667,7 +667,7 @@ func (p *ControllerRegister) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 		routerInfo   *ControllerInfo
 		isRunnable   bool
 	)
-	context := p.pool.Get().(*asanaContext.Context)
+	context := p.pool.Get().(*context.Context)
 	context.Reset(rw, r)
 
 	defer p.pool.Put(context)
@@ -930,7 +930,7 @@ Admin:
 	}
 }
 
-func (p *ControllerRegister) handleParamResponse(context *asanaContext.Context, execController ControllerInterface, results []reflect.Value) {
+func (p *ControllerRegister) handleParamResponse(context *context.Context, execController ControllerInterface, results []reflect.Value) {
 	//looping in reverse order for the case when both error and value are returned and error sets the response status code
 	for i := len(results) - 1; i >= 0; i-- {
 		result := results[i]
@@ -945,7 +945,7 @@ func (p *ControllerRegister) handleParamResponse(context *asanaContext.Context, 
 }
 
 // FindRouter Find Router info for URL
-func (p *ControllerRegister) FindRouter(context *asanaContext.Context) (routerInfo *ControllerInfo, isFind bool) {
+func (p *ControllerRegister) FindRouter(context *context.Context) (routerInfo *ControllerInfo, isFind bool) {
 	var urlPath = context.Request.URL()
 	if !BConfig.RouterCaseSensitive {
 		urlPath = strings.ToLower(urlPath)
@@ -971,7 +971,7 @@ func toURL(params map[string]string) string {
 	return strings.TrimRight(u, "&")
 }
 
-func LogAccess(ctx *asanaContext.Context, startTime *time.Time, statusCode int) {
+func LogAccess(ctx *context.Context, startTime *time.Time, statusCode int) {
 	//Skip logging if AccessLogs config is false
 	if !BConfig.Log.AccessLogs {
 		return

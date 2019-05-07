@@ -206,15 +206,15 @@ func (c *Controller) Trace() {
 		return
 	}
 	hs := fmt.Sprintf("\r\nTRACE %s %s%s\r\n", c.Ctx.HTTPRequest.RequestURI, c.Ctx.HTTPRequest.Proto, ts(c.Ctx.HTTPRequest.Header))
-	c.Ctx.Response.Header("Content-Type", "message/http")
-	c.Ctx.Response.Header("Content-Length", fmt.Sprint(len(hs)))
-	c.Ctx.Response.Header("Cache-Control", "no-cache, no-store, must-revalidate")
-	c.Ctx.WriteString(hs)
+	c.Ctx.Response.Header(context.HeaderContentType, "message/http")
+	c.Ctx.Response.Header(context.HeaderContentLength, fmt.Sprint(len(hs)))
+	c.Ctx.Response.Header(context.HeaderCacheControl, "no-cache, no-store, must-revalidate")
+	_ = c.Ctx.WriteString(hs)
 }
 
 // HandlerFunc call function with the name
-func (c *Controller) HandlerFunc(fnname string) bool {
-	if v, ok := c.methodMapping[fnname]; ok {
+func (c *Controller) HandlerFunc(fnName string) bool {
+	if v, ok := c.methodMapping[fnName]; ok {
 		v()
 		return true
 	}
@@ -239,8 +239,8 @@ func (c *Controller) Render() error {
 		return err
 	}
 
-	if c.Ctx.ResponseWriter.Header().Get("Content-Type") == "" {
-		c.Ctx.Response.Header("Content-Type", "text/html; charset=utf-8")
+	if c.Ctx.ResponseWriter.Header().Get(context.HeaderContentType) == "" {
+		c.Ctx.Response.Header(context.HeaderContentType, "text/html; charset=utf-8")
 	}
 
 	return c.Ctx.Response.Body(rb)
@@ -313,14 +313,19 @@ func (c *Controller) viewPath() string {
 	return c.ViewPath
 }
 
+func (c *Controller) SetStatus(code int) *Controller {
+	c.Ctx.SetStatus(code)
+	return c
+}
+
 // Redirect sends the redirection response to url with status code.
-func (c *Controller) Redirect(url string, code int) {
-	LogAccess(c.Ctx, nil, code)
-	c.Ctx.Redirect(code, url)
+func (c *Controller) Redirect(url string) error {
+	LogAccess(c.Ctx, nil, c.Ctx.Response.Status)
+	return c.Ctx.Redirect(url)
 }
 
 // SetData set the data depending on the accepted
-func (c *Controller) SetData(data interface{}) {
+func (c *Controller) SetData(data interface{}) *Controller {
 	accept := c.Ctx.Request.Header("Accept")
 	switch accept {
 	case context.ApplicationYAML:
@@ -331,9 +336,15 @@ func (c *Controller) SetData(data interface{}) {
 		c.Data["protobuf"] = data
 	case context.ApplicationJSONP:
 		c.Data["jsonp"] = data
-	default:
+	case context.ApplicationJSON:
 		c.Data["json"] = data
+	case context.TextHTML:
+		c.Data["html"] = data
+	default:
+		c.Data["txt"] = data
 	}
+
+	return c
 }
 
 // Abort stops controller handler and show the error data if code is defined in ErrorMap or code string.
@@ -376,48 +387,88 @@ func (c *Controller) URLFor(endpoint string, values ...interface{}) string {
 }
 
 // ServeJSON sends a json response with encoding charset.
-func (c *Controller) ServeJSON(encoding ...bool) {
+func (c *Controller) ServeJSON(encoding ...bool) error {
 	hasIndent := BConfig.RunMode != PROD
 	hasEncoding := len(encoding) > 0 && encoding[0]
-	_ = c.Ctx.Response.JSON(c.Data["json"], hasIndent, hasEncoding)
+	return c.Ctx.Response.JSON(c.Data["json"], hasIndent, hasEncoding)
 }
 
 // ServeJSONP sends a jsonp response.
-func (c *Controller) ServeJSONP() {
+func (c *Controller) ServeJSONP() error {
 	hasIndent := BConfig.RunMode != PROD
-	_ = c.Ctx.Response.JSONP(c.Data["jsonp"], hasIndent)
+	return c.Ctx.Response.JSONP(c.Data["jsonp"], hasIndent)
 }
 
 // ServeXML sends xml response.
-func (c *Controller) ServeXML() {
+func (c *Controller) ServeXML() error {
 	hasIndent := BConfig.RunMode != PROD
-	_ = c.Ctx.Response.XML(c.Data["xml"], hasIndent)
+	return c.Ctx.Response.XML(c.Data["xml"], hasIndent)
 }
 
 // ServeYAML sends yaml response.
-func (c *Controller) ServeYAML() {
-	_ = c.Ctx.Response.YAML(c.Data["yaml"])
+func (c *Controller) ServeYAML() error {
+	return c.Ctx.Response.YAML(c.Data["yaml"])
 }
 
 // ServeProtoBuf sends protobuf response.
-func (c *Controller) ServeProtoBuf() {
-	_ = c.Ctx.Response.ProtoBuf(c.Data["protobuf"])
+func (c *Controller) ServeProtoBuf() error {
+	return c.Ctx.Response.ProtoBuf(c.Data["protobuf"])
+}
+
+func (c *Controller) ServeHTML() error {
+	switch c.Data["html"].(type) {
+	case string:
+		val := c.Data["html"].(string)
+		return c.Ctx.Response.HTML(val)
+	case []byte:
+		val := c.Data["html"].([]byte)
+		return c.Ctx.Response.HTMLBlob(val)
+	default:
+		return errors.New("no data found")
+	}
+}
+
+func (c *Controller) ServeText() error {
+	var data interface{}
+	if v, ok := c.Data["txt"]; ok {
+		data = v
+	} else {
+		for _, v := range c.Data {
+			data = v
+			break
+		}
+	}
+
+	switch data.(type) {
+	case string:
+		val := data.(string)
+		return c.Ctx.Response.Text(val)
+	case []byte:
+		val := data.([]byte)
+		return c.Ctx.Response.TextBlob(val)
+	default:
+		return errors.New("no data found")
+	}
 }
 
 // ServeFormatted serve YAML, XML OR JSON, depending on the value of the Accept header
-func (c *Controller) ServeFormatted(encoding ...bool) {
+func (c *Controller) ServeFormatted(encoding ...bool) error {
 	accept := c.Ctx.Request.Header("Accept")
 	switch accept {
-	case context.ApplicationXML, context.TextXML:
-		c.ServeXML()
 	case context.ApplicationYAML:
-		c.ServeYAML()
-	case context.ApplicationJSONP:
-		c.ServeJSONP()
+		return c.ServeYAML()
+	case context.ApplicationXML, context.TextXML:
+		return c.ServeXML()
 	case context.ApplicationProtoBuf:
-		c.ServeProtoBuf()
+		return c.ServeProtoBuf()
+	case context.ApplicationJSONP:
+		return c.ServeJSONP()
+	case context.ApplicationJSON:
+		return c.ServeJSON(encoding...)
+	case context.TextHTML:
+		return c.ServeHTML()
 	default:
-		c.ServeJSON(encoding...)
+		return c.ServeText()
 	}
 }
 
@@ -633,11 +684,12 @@ func (c *Controller) StartSession() session.Store {
 }
 
 // SetSession puts value into session.
-func (c *Controller) SetSession(name interface{}, value interface{}) {
+func (c *Controller) SetSession(name interface{}, value interface{}) *Controller {
 	if c.CruSession == nil {
 		c.StartSession()
 	}
 	_ = c.CruSession.Set(name, value)
+	return c
 }
 
 // GetSession gets value from session.
@@ -688,14 +740,14 @@ func (c *Controller) SetSecureCookie(Secret, name, value string, others ...inter
 	c.Ctx.SetSecureCookie(Secret, name, value, others...)
 }
 
-// XSRFToken creates a CSRF token string and returns.
+// SetXSRFToken creates a CSRF token string and returns.
 func (c *Controller) XSRFToken() string {
 	if c._xsrfToken == "" {
 		expire := int64(BConfig.WebConfig.XSRFExpire)
 		if c.XSRFExpire > 0 {
 			expire = int64(c.XSRFExpire)
 		}
-		c._xsrfToken = c.Ctx.XSRFToken(BConfig.WebConfig.XSRFKey, expire)
+		c._xsrfToken = c.Ctx.SetXSRFToken(BConfig.WebConfig.XSRFKey, expire)
 	}
 	return c._xsrfToken
 }

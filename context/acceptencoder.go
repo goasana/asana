@@ -199,7 +199,7 @@ type q struct {
 }
 
 func parseEncoding(r *http.Request) string {
-	acceptEncoding := r.Header.Get("Accept-Encoding")
+	acceptEncoding := r.Header.Get(HeaderAcceptEncoding)
 	if acceptEncoding == "" {
 		return ""
 	}

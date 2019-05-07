@@ -61,7 +61,7 @@ func serverStaticRouter(ctx *context.Context) {
 			if ctx.HTTPRequest.URL.RawQuery != "" {
 				redirectURL = redirectURL + "?" + ctx.HTTPRequest.URL.RawQuery
 			}
-			ctx.Redirect(302, redirectURL)
+			ctx.SetStatus(302).Redirect(redirectURL)
 		} else {
 			//serveFile will list dir
 			http.ServeFile(ctx.ResponseWriter, ctx.HTTPRequest, filePath)
@@ -84,9 +84,9 @@ func serverStaticRouter(ctx *context.Context) {
 	}
 
 	if b {
-		ctx.Response.Header("Content-Encoding", n)
+		ctx.Response.Header(context.HeaderContentEncoding, n)
 	} else {
-		ctx.Response.Header("Content-Length", strconv.FormatInt(sch.size, 10))
+		ctx.Response.Header(context.HeaderContentLength, strconv.FormatInt(sch.size, 10))
 	}
 
 	http.ServeContent(ctx.ResponseWriter, ctx.HTTPRequest, filePath, sch.modTime, reader)

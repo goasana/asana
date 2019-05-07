@@ -38,6 +38,8 @@ import (
 // Headers
 const (
 	HeaderAccept                  = "Accept"
+	HeaderReferer                 = "Referer"
+	HeaderUserAgent               = "User-Agent"
 	HeaderAcceptEncoding          = "Accept-Encoding"
 	HeaderExpires                 = "Expires"
 	HeaderAllow                   = "Allow"
@@ -212,7 +214,7 @@ func (response *AsanaResponse) Cookie(name string, value string, others ...inter
 		}
 	}
 
-	response.Context.ResponseWriter.Header().Add("Set-Cookie", b.String())
+	response.Context.ResponseWriter.Header().Add(HeaderSetCookie, b.String())
 
 	return response
 }
@@ -351,46 +353,6 @@ func (response *AsanaResponse) XML(data interface{}, hasIndent bool) error {
 	return response.Header(HeaderContentType, getContentTypeHead(ApplicationXML)).Body(content)
 }
 
-// ServeFormatted serve YAML, XML OR JSON, depending on the value of the Accept header
-func (response *AsanaResponse) ServeFormatted(data interface{}, hasIndent bool, hasEncode ...bool) error {
-	accept := response.Context.Request.Header(HeaderAccept)
-	switch accept {
-	case ApplicationYAML:
-		return response.YAML(data)
-	case ApplicationXML, TextXML:
-		return response.XML(data, hasIndent)
-	case ApplicationProtoBuf:
-		return response.ProtoBuf(data)
-	case ApplicationJSONP:
-		return response.JSONP(data, hasIndent)
-	case ApplicationJSON:
-		return response.JSON(data, hasIndent, len(hasEncode) > 0 && hasEncode[0])
-	case TextHTML:
-		switch data.(type) {
-		case string:
-			val := data.(string)
-			return response.HTML(val)
-		case []byte:
-			val := data.([]byte)
-			return response.HTMLBlob(val)
-		default:
-			panic("format not supportedd")
-		}
-	default:
-		switch data.(type) {
-		case string:
-			val := data.(string)
-			return response.Text(val)
-		case []byte:
-			val := data.([]byte)
-			return response.TextBlob(val)
-		default:
-			panic("format not supportedd")
-		}
-
-	}
-}
-
 // Download forces response for download file.
 // it prepares the download response header automatically.
 func (response *AsanaResponse) Download(file string, filename ...string) {
@@ -437,7 +399,7 @@ func (response *AsanaResponse) ContentType(ext string) *AsanaResponse {
 	}
 	ctype := mime.TypeByExtension(ext)
 	if ctype != "" {
-		response.Header("Content-Type", ctype)
+		response.Header(HeaderContentType, ctype)
 	}
 	return response
 }

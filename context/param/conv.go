@@ -22,7 +22,7 @@ func convertParam(param *MethodParam, paramType reflect.Type, ctx *asanaContext.
 	paramValue := getParamValue(param, ctx)
 	if paramValue == "" {
 		if param.required {
-			ctx.Abort(400, fmt.Sprintf("Missing parameter %s", param.name))
+			ctx.SetStatus(400).Abort(fmt.Sprintf("Missing parameter %s", param.name))
 		} else {
 			paramValue = param.defaultValue
 		}
@@ -31,7 +31,7 @@ func convertParam(param *MethodParam, paramType reflect.Type, ctx *asanaContext.
 	reflectValue, err := parseValue(param, paramValue, paramType)
 	if err != nil {
 		logs.Debug(fmt.Sprintf("Error converting param %s to type %s. Value: %v, Error: %s", param.name, paramType, paramValue, err))
-		ctx.Abort(400, fmt.Sprintf("Invalid parameter %s. Can not convert %v to type %s", param.name, paramValue, paramType))
+		ctx.SetStatus(400).Abort(fmt.Sprintf("Invalid parameter %s. Can not convert %v to type %s", param.name, paramValue, paramType))
 	}
 
 	return reflectValue

@@ -82,21 +82,27 @@ func (ctx *Context) Reset(rw http.ResponseWriter, r *http.Request) {
 }
 
 // Redirect does redirection to localUrl with http header status code.
-func (ctx *Context) Redirect(status int, localUrl string) {
-	http.Redirect(ctx.ResponseWriter, ctx.HTTPRequest, localUrl, status)
+func (ctx *Context) Redirect(localUrl string) error {
+	return ctx.Response.Redirect(localUrl)
+}
+
+func (ctx *Context) SetStatus(code int) *Context {
+	ctx.Response.Status = code
+	return ctx
 }
 
 // Abort stops this request.
 // if asana.ErrorMaps exists, panic body.
-func (ctx *Context) Abort(status int, body string) {
-	ctx.Response.SetStatus(status)
+func (ctx *Context) Abort(body string) error {
 	panic(body)
+	return nil
 }
 
 // WriteString Write string to response body.
 // it sends response body.
-func (ctx *Context) WriteString(content string) {
-	_, _ = ctx.ResponseWriter.Write([]byte(content))
+func (ctx *Context) WriteString(content string) (err error) {
+	_, err = ctx.ResponseWriter.Write([]byte(content))
+	return
 }
 
 // GetCookie Get cookie from request by a given key.
@@ -149,8 +155,8 @@ func (ctx *Context) SetSecureCookie(Secret, name, value string, others ...interf
 	ctx.Response.Cookie(name, cookie, others...)
 }
 
-// XSRFToken creates a xsrf token string and returns.
-func (ctx *Context) XSRFToken(key string, expire int64) string {
+// SetXSRFToken creates a xsrf token string and returns.
+func (ctx *Context) SetXSRFToken(key string, expire int64) string {
 	if ctx._xsrfToken == "" {
 		token, ok := ctx.GetSecureCookie(key, "_xsrf")
 		if !ok {
@@ -174,11 +180,11 @@ func (ctx *Context) CheckXSRFCookie() bool {
 		token = ctx.HTTPRequest.Header.Get("X-Csrftoken")
 	}
 	if token == "" {
-		ctx.Abort(403, "'_xsrf' argument missing from POST")
+		ctx.SetStatus(403).Abort("'_xsrf' argument missing from POST")
 		return false
 	}
 	if ctx._xsrfToken != token {
-		ctx.Abort(403, "XSRF cookie does not match POST argument")
+		ctx.SetStatus(403).Abort("XSRF cookie does not match POST argument")
 		return false
 	}
 	return true
