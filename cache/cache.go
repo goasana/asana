@@ -19,7 +19,7 @@
 //   "github.com/goasana/framework/cache"
 // )
 //
-// bm, err := cache.NewCache("memory", `{"interval":60}`)
+// bm, err := cache.NewCache(cache.MemoryProvider, `{"interval":60}`)
 //
 // Use it like this:
 //
@@ -39,7 +39,7 @@ import (
 // Cache interface contains all behaviors for cache adapter.
 // usage:
 //	cache.Register("file",cache.NewFileCache) // this operation is run in init method of file.go.
-//	c,err := cache.NewCache("file","{....}")
+//	c,err := cache.NewCache(cache.FileProvider,"{....}")
 //	c.Put("key",value, 3600 * time.Second)
 //	v := c.Get("key")
 //
@@ -67,27 +67,29 @@ type Cache interface {
 	StartAndGC(config string) error
 }
 
-type CacheProvider string
+// Provider type
+type Provider string
 
+// Provider Avails
 const (
-	GoRedisProvider   CacheProvider = "goredis"
-	RedisProvider     CacheProvider = "redis"
-	MemCachedProvider CacheProvider = "memcache"
-	SSDBProvider      CacheProvider = "ssdb"
-	GCacheProvider    CacheProvider = "gCache"
-	MemoryProvider    CacheProvider = "memory"
-	FileProvider      CacheProvider = "file"
+	GoRedisProvider   Provider = "goredis"
+	RedisProvider     Provider = "redis"
+	MemCachedProvider Provider = "memcache"
+	SSDBProvider      Provider = "ssdb"
+	GCacheProvider    Provider = "gCache"
+	MemoryProvider    Provider = "memory"
+	FileProvider      Provider = "file"
 )
 
 // Instance is a function create a new Cache Instance
 type Instance func() Cache
 
-var adapters = make(map[CacheProvider]Instance)
+var adapters = make(map[Provider]Instance)
 
 // Register makes a cache adapter available by the adapter name.
 // If Register is called twice with the same name or if driver is nil,
 // it panics.
-func Register(provider CacheProvider, adapter Instance) {
+func Register(provider Provider, adapter Instance) {
 	if adapter == nil {
 		panic("cache: Register adapter is nil")
 	}
@@ -100,7 +102,7 @@ func Register(provider CacheProvider, adapter Instance) {
 // NewCache Create a new cache driver by adapter name and config string.
 // config need to be correct JSON as string: {"interval":360}.
 // it will start gc automatically.
-func NewCache(provider CacheProvider, config string) (adapter Cache, err error) {
+func NewCache(provider Provider, config string) (adapter Cache, err error) {
 	instanceFunc, ok := adapters[provider]
 	if !ok {
 		err = fmt.Errorf("cache: unknown adapter name %q (forgot to import?)", provider)

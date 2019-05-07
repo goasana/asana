@@ -32,45 +32,44 @@ type TestController struct {
 
 func (tc *TestController) Get() {
 	tc.Data["Username"] = "asana"
-	tc.Ctx.Response.Body([]byte("ok"))
+	_ = tc.Response.Body([]byte("ok"))
 }
 
 func (tc *TestController) Post() {
-	tc.Ctx.Response.Body([]byte(tc.Ctx.Request.Query(":name")))
+	_ = tc.Response.Body([]byte(tc.Request.Query(":name")))
 }
 
 func (tc *TestController) Param() {
-	tc.Ctx.Response.Body([]byte(tc.Ctx.Request.Query(":name")))
+	_ = tc.Response.Body([]byte(tc.Request.Query(":name")))
 }
 
 func (tc *TestController) List() {
-	tc.Ctx.Response.Body([]byte("i am list"))
+	_ = tc.Response.Body([]byte("i am list"))
 }
 
 func (tc *TestController) Params() {
-	tc.Ctx.Response.Body([]byte(tc.Ctx.Request.Param("0") + tc.Ctx.Request.Param("1") + tc.Ctx.Request.Param("2")))
+	_ = tc.Response.Body([]byte(tc.Request.Param("0") + tc.Request.Param("1") + tc.Request.Param("2")))
 }
 
 func (tc *TestController) Myext() {
-	tc.Ctx.Response.Body([]byte(tc.Ctx.Request.Param(":ext")))
+	_ = tc.Response.Body([]byte(tc.Request.Param(":ext")))
 }
 
 func (tc *TestController) GetURL() {
-	tc.Ctx.Response.Body([]byte(tc.URLFor(".Myext")))
+	_ = tc.Response.Body([]byte(tc.URLFor(".Myext")))
 }
 
 func (tc *TestController) GetParams() {
-	tc.Ctx.WriteString(tc.Ctx.Request.Query(":last") + "+" +
-		tc.Ctx.Request.Query(":first") + "+" + tc.Ctx.Request.Query("learn"))
+	_ = tc.WriteString(tc.Request.Query(":last") + "+" +
+		tc.Request.Query(":first") + "+" + tc.Request.Query("learn"))
 }
 
 func (tc *TestController) GetManyRouter() {
-	tc.Ctx.WriteString(tc.Ctx.Request.Query(":id") + tc.Ctx.Request.Query(":page"))
+	_ = tc.WriteString(tc.Request.Query(":id") + tc.Request.Query(":page"))
 }
 
 func (tc *TestController) GetEmptyBody() {
-	var res []byte
-	tc.Ctx.Response.Body(res)
+	_ = tc.Response.NoContent()
 }
 
 type JSONController struct {
@@ -79,12 +78,12 @@ type JSONController struct {
 
 func (jc *JSONController) Prepare() {
 	jc.Data["json"] = "prepare"
-	jc.ServeJSON(true)
+	_ = jc.ServeJSON(true)
 }
 
 func (jc *JSONController) Get() {
 	jc.Data["Username"] = "asana"
-	jc.Ctx.Response.Body([]byte("ok"))
+	_ = jc.Response.Body([]byte("ok"))
 }
 
 func TestUrlFor(t *testing.T) {
@@ -313,7 +312,7 @@ func TestRouterGet(t *testing.T) {
 
 	handler := NewControllerRegister()
 	handler.Get("/user", func(ctx *context.Context) {
-		ctx.Response.Body([]byte("Get userlist"))
+		_ = ctx.Response.Body([]byte("Get userlist"))
 	})
 	handler.ServeHTTP(w, r)
 	if w.Body.String() != "Get userlist" {
@@ -327,7 +326,7 @@ func TestRouterPost(t *testing.T) {
 
 	handler := NewControllerRegister()
 	handler.Post("/user/:id", func(ctx *context.Context) {
-		ctx.Response.Body([]byte(ctx.Request.Param(":id")))
+		_ = ctx.Response.Body([]byte(ctx.Request.Param(":id")))
 	})
 	handler.ServeHTTP(w, r)
 	if w.Body.String() != "123" {
@@ -335,8 +334,8 @@ func TestRouterPost(t *testing.T) {
 	}
 }
 
-func sayhello(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("sayhello"))
+func sayhello(w http.ResponseWriter, _ *http.Request) {
+	_, _ = w.Write([]byte("sayhello"))
 }
 
 func TestRouterHandler(t *testing.T) {
@@ -368,7 +367,7 @@ func TestRouterHandlerAll(t *testing.T) {
 //
 
 func asanaFilterFunc(ctx *context.Context) {
-	ctx.WriteString("hello")
+	_ = ctx.WriteString("hello")
 }
 
 type AdminController struct {
@@ -376,7 +375,7 @@ type AdminController struct {
 }
 
 func (a *AdminController) Get() {
-	a.Ctx.WriteString("hello")
+	_ = a.WriteString("hello")
 }
 
 func TestRouterFunc(t *testing.T) {
@@ -423,7 +422,7 @@ func TestInsertFilter(t *testing.T) {
 	testName := "TestInsertFilter"
 
 	mux := NewControllerRegister()
-	mux.InsertFilter("*", BeforeRouter, func(*context.Context) {})
+	_ = mux.InsertFilter("*", BeforeRouter, func(*context.Context) {})
 	if !mux.filters[BeforeRouter][0].returnOnOutput {
 		t.Errorf(
 			"%s: passing no variadic params should set returnOnOutput to true",
@@ -436,7 +435,7 @@ func TestInsertFilter(t *testing.T) {
 	}
 
 	mux = NewControllerRegister()
-	mux.InsertFilter("*", BeforeRouter, func(*context.Context) {}, false)
+	_ = mux.InsertFilter("*", BeforeRouter, func(*context.Context) {}, false)
 	if mux.filters[BeforeRouter][0].returnOnOutput {
 		t.Errorf(
 			"%s: passing false as 1st variadic param should set returnOnOutput to false",
@@ -444,7 +443,7 @@ func TestInsertFilter(t *testing.T) {
 	}
 
 	mux = NewControllerRegister()
-	mux.InsertFilter("*", BeforeRouter, func(*context.Context) {}, true, true)
+	_ = mux.InsertFilter("*", BeforeRouter, func(*context.Context) {}, true, true)
 	if !mux.filters[BeforeRouter][0].resetParams {
 		t.Errorf(
 			"%s: passing true as 2nd variadic param should set resetParams to true",
@@ -461,7 +460,7 @@ func TestParamResetFilter(t *testing.T) {
 
 	mux := NewControllerRegister()
 
-	mux.InsertFilter("*", BeforeExec, asanaResetParams, true, true)
+	_ = mux.InsertFilter("*", BeforeExec, asanaResetParams, true, true)
 
 	mux.Get(route, asanaHandleResetParams)
 
@@ -492,7 +491,7 @@ func TestFilterBeforeRouter(t *testing.T) {
 	url := "/beforeRouter"
 
 	mux := NewControllerRegister()
-	mux.InsertFilter(url, BeforeRouter, asanaBeforeRouter1)
+	_ = mux.InsertFilter(url, BeforeRouter, asanaBeforeRouter1)
 
 	mux.Get(url, asanaFilterFunc)
 
@@ -514,8 +513,8 @@ func TestFilterBeforeExec(t *testing.T) {
 	url := "/beforeExec"
 
 	mux := NewControllerRegister()
-	mux.InsertFilter(url, BeforeRouter, asanaFilterNoOutput)
-	mux.InsertFilter(url, BeforeExec, asanaBeforeExec1)
+	_ = mux.InsertFilter(url, BeforeRouter, asanaFilterNoOutput)
+	_ = mux.InsertFilter(url, BeforeExec, asanaBeforeExec1)
 
 	mux.Get(url, asanaFilterFunc)
 
@@ -540,9 +539,9 @@ func TestFilterAfterExec(t *testing.T) {
 	url := "/afterExec"
 
 	mux := NewControllerRegister()
-	mux.InsertFilter(url, BeforeRouter, asanaFilterNoOutput)
-	mux.InsertFilter(url, BeforeExec, asanaFilterNoOutput)
-	mux.InsertFilter(url, AfterExec, asanaAfterExec1, false)
+	_ = mux.InsertFilter(url, BeforeRouter, asanaFilterNoOutput)
+	_ = mux.InsertFilter(url, BeforeExec, asanaFilterNoOutput)
+	_ = mux.InsertFilter(url, AfterExec, asanaAfterExec1, false)
 
 	mux.Get(url, asanaFilterFunc)
 
@@ -570,10 +569,10 @@ func TestFilterFinishRouter(t *testing.T) {
 	url := "/finishRouter"
 
 	mux := NewControllerRegister()
-	mux.InsertFilter(url, BeforeRouter, asanaFilterNoOutput)
-	mux.InsertFilter(url, BeforeExec, asanaFilterNoOutput)
-	mux.InsertFilter(url, AfterExec, asanaFilterNoOutput)
-	mux.InsertFilter(url, FinishRouter, asanaFinishRouter1)
+	_ = mux.InsertFilter(url, BeforeRouter, asanaFilterNoOutput)
+	_ = mux.InsertFilter(url, BeforeExec, asanaFilterNoOutput)
+	_ = mux.InsertFilter(url, AfterExec, asanaFilterNoOutput)
+	_ = mux.InsertFilter(url, FinishRouter, asanaFinishRouter1)
 
 	mux.Get(url, asanaFilterFunc)
 
@@ -604,8 +603,8 @@ func TestFilterFinishRouterMultiFirstOnly(t *testing.T) {
 	url := "/finishRouterMultiFirstOnly"
 
 	mux := NewControllerRegister()
-	mux.InsertFilter(url, FinishRouter, asanaFinishRouter1, false)
-	mux.InsertFilter(url, FinishRouter, asanaFinishRouter2)
+	_ = mux.InsertFilter(url, FinishRouter, asanaFinishRouter1, false)
+	_ = mux.InsertFilter(url, FinishRouter, asanaFinishRouter2)
 
 	mux.Get(url, asanaFilterFunc)
 
@@ -631,8 +630,8 @@ func TestFilterFinishRouterMulti(t *testing.T) {
 	url := "/finishRouterMulti"
 
 	mux := NewControllerRegister()
-	mux.InsertFilter(url, FinishRouter, asanaFinishRouter1, false)
-	mux.InsertFilter(url, FinishRouter, asanaFinishRouter2, false)
+	_ = mux.InsertFilter(url, FinishRouter, asanaFinishRouter1, false)
+	_ = mux.InsertFilter(url, FinishRouter, asanaFinishRouter2, false)
 
 	mux.Get(url, asanaFilterFunc)
 
@@ -650,27 +649,27 @@ func TestFilterFinishRouterMulti(t *testing.T) {
 	}
 }
 
-func asanaFilterNoOutput(ctx *context.Context) {
+func asanaFilterNoOutput(_ *context.Context) {
 }
 
 func asanaBeforeRouter1(ctx *context.Context) {
-	ctx.WriteString("|BeforeRouter1")
+	_ = ctx.WriteString("|BeforeRouter1")
 }
 
 func asanaBeforeExec1(ctx *context.Context) {
-	ctx.WriteString("|BeforeExec1")
+	_ = ctx.WriteString("|BeforeExec1")
 }
 
 func asanaAfterExec1(ctx *context.Context) {
-	ctx.WriteString("|AfterExec1")
+	_ = ctx.WriteString("|AfterExec1")
 }
 
 func asanaFinishRouter1(ctx *context.Context) {
-	ctx.WriteString("|FinishRouter1")
+	_ = ctx.WriteString("|FinishRouter1")
 }
 
 func asanaFinishRouter2(ctx *context.Context) {
-	ctx.WriteString("|FinishRouter2")
+	_ = ctx.WriteString("|FinishRouter2")
 }
 
 func asanaResetParams(ctx *context.Context) {
@@ -688,12 +687,12 @@ type YAMLController struct {
 
 func (jc *YAMLController) Prepare() {
 	jc.Data["yaml"] = "prepare"
-	jc.ServeYAML()
+	_ = jc.ServeYAML()
 }
 
 func (jc *YAMLController) Get() {
 	jc.Data["Username"] = "asana"
-	jc.Ctx.Response.Body([]byte("ok"))
+	_ = jc.Response.Body([]byte("ok"))
 }
 
 func TestYAMLPrepare(t *testing.T) {
@@ -719,7 +718,7 @@ var expectedProtoObject = &protoexample.Test{
 
 func (jc *ProtoBufController) Prepare() {
 	jc.Data["protobuf"] = expectedProtoObject
-	jc.ServeProtoBuf()
+	_ = jc.ServeProtoBuf()
 }
 
 func TestProtoBufPrepare(t *testing.T) {

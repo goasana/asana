@@ -31,12 +31,12 @@ const parseCodeError = "parse code error"
 func (ec *errorTestController) Get() {
 	errorCode, err := ec.GetInt("code")
 	if err != nil {
-		ec.Abort(parseCodeError)
+		ec.CustomAbort(200, parseCodeError)
 	}
 	if errorCode != 0 {
 		ec.CustomAbort(errorCode, ec.GetString("code"))
 	}
-	ec.Abort("404")
+	ec.CustomAbort(404, "404")
 }
 
 func TestErrorCode_01(t *testing.T) {

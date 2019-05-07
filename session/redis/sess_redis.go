@@ -150,7 +150,7 @@ func (rp *Provider) SessionInit(maxLifeTime int64, savePath string) error {
 	} else {
 		rp.dbNum = 0
 	}
-	var idleTimeout time.Duration = 0
+	var idleTimeout time.Duration
 	if len(configs) > 4 {
 		timeout, err := strconv.Atoi(configs[4])
 		if err == nil && timeout > 0 {

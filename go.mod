@@ -4,6 +4,8 @@ go 1.12
 
 require (
 	github.com/OwnLocal/goes v1.0.0
+	github.com/Unknwon/goconfig v0.0.0-20190425194916-3dba17dd7b9e // indirect
+	github.com/beego/i18n v0.0.0-20161101132742-e9308947f407
 	github.com/bluele/gcache v0.0.0-20190301044115-79ae3b2d8680
 	github.com/bradfitz/gomemcache v0.0.0-20190329173943-551aad21a668
 	github.com/casbin/casbin v1.8.2
@@ -28,6 +30,7 @@ require (
 	github.com/siddontang/go v0.0.0-20180604090527-bdc77568d726 // indirect
 	github.com/siddontang/ledisdb v0.0.0-20190202134119-8ceb77e66a92
 	github.com/siddontang/rdb v0.0.0-20150307021120-fc89ed2e418d // indirect
+	github.com/smartystreets/goconvey v0.0.0-20190330032615-68dc04aab96a // indirect
 	github.com/ssdb/gossdb v0.0.0-20180723034631-88f6b59b84ec
 	github.com/syndtr/goleveldb v1.0.0 // indirect
 	go.uber.org/zap v1.10.0

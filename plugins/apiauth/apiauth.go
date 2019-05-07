@@ -22,7 +22,7 @@
 //
 //	func main(){
 //		// apiauth every request
-//		asana.InsertFilter("*", asana.BeforeRouter,apiauth.APIBaiscAuth("appid","appkey"))
+//		asana.InsertFilter("*", asana.BeforeRouter, apiauth.APIBaiscAuth("appid","appkey"))
 //		asana.Run()
 //	}
 //
@@ -73,9 +73,9 @@ import (
 type AppIDToAppSecret func(string) string
 
 // APIBasicAuth use the basic appid/appkey as the AppIdToAppSecret
-func APIBasicAuth(appId, appKey string) asana.FilterFunc {
+func APIBasicAuth(appID, appKey string) asana.FilterFunc {
 	ft := func(aid string) string {
-		if aid == appId {
+		if aid == appID {
 			return appKey
 		}
 		return ""
@@ -84,8 +84,8 @@ func APIBasicAuth(appId, appKey string) asana.FilterFunc {
 }
 
 // APIBaiscAuth calls APIBasicAuth for previous callers
-func APIBaiscAuth(appId, appKey string) asana.FilterFunc {
-	return APIBasicAuth(appId, appKey)
+func APIBaiscAuth(appID, appKey string) asana.FilterFunc {
+	return APIBasicAuth(appID, appKey)
 }
 
 // APISecretAuth use AppIdToAppSecret verify and

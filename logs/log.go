@@ -329,7 +329,7 @@ func (bl *AsanaLogger) EnableFuncCallDepth(b bool) {
 	bl.enableFuncCallDepth = b
 }
 
-// set prefix
+// SetPrefix set prefix
 func (bl *AsanaLogger) SetPrefix(s string) {
 	bl.prefix = s
 }

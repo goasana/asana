@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package redis for cache provider
+// Package goredis for cache provider
 //
-// depend on github.com/gomodule/redigo/redis
+// depend on github.com/go-redis/redis
 //
-// go install github.com/gomodule/redigo/redis
+// go install github.com/go-redis/redis
 //
 // Usage:
 // import(

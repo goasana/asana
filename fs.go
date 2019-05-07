@@ -6,9 +6,11 @@ import (
 	"path/filepath"
 )
 
+// FileSystem action for file operations
 type FileSystem struct {
 }
 
+// Open open a file
 func (d FileSystem) Open(name string) (http.File, error) {
 	return os.Open(name)
 }

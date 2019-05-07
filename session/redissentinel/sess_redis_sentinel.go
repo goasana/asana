@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package redis for session provider
+// Package redissentinel for session provider
 //
 // depend on github.com/go-redis/redis
 //
@@ -30,7 +30,7 @@
 //	}
 //
 // more detail about params: please check the notes on the function SessionInit in this package
-package redis_sentinel
+package redissentinel
 
 import (
 	"net/http"

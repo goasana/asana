@@ -81,7 +81,7 @@ func Register(name string, provide Provider) {
 	provides[name] = provide
 }
 
-//GetProvider
+// GetProvider get the provider by name
 func GetProvider(name string) (Provider, error) {
 	provider, ok := provides[name]
 	if !ok {

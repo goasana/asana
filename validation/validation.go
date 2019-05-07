@@ -440,6 +440,7 @@ func (v *Validation) RecursiveValid(objc interface{}) (bool, error) {
 	return pass, err
 }
 
+// CanSkipAlso skip from func
 func (v *Validation) CanSkipAlso(skipFunc string) {
 	if _, ok := CanSkipFuncs[skipFunc]; !ok {
 		CanSkipFuncs[skipFunc] = struct{}{}

@@ -41,6 +41,7 @@ const (
 	HeaderReferer                 = "Referer"
 	HeaderUserAgent               = "User-Agent"
 	HeaderAcceptEncoding          = "Accept-Encoding"
+	HeaderAcceptLanguage          = "Accept-Language"
 	HeaderExpires                 = "Expires"
 	HeaderAllow                   = "Allow"
 	HeaderAuthorization           = "Authorization"
@@ -248,38 +249,45 @@ func getContentTypeHead(contentType string) string {
 	return fmt.Sprintf("%s; charset=utf-8", contentType)
 }
 
-// String writes plain text to response body.
+// Text writes plain text to response body.
 func (response *AsanaResponse) Text(data string) error {
 	return response.TextBlob([]byte(data))
 }
 
+// TextBlob writes plain text to response body from []byte.
 func (response *AsanaResponse) TextBlob(data []byte) error {
 	return response.Blob(TextPlain, []byte(data))
 }
 
+// HTML writes html text to response body.
 func (response *AsanaResponse) HTML(html string) error {
 	return response.HTMLBlob([]byte(html))
 }
 
+// HTMLBlob writes html text to response body from []byte.
 func (response *AsanaResponse) HTMLBlob(data []byte) error {
 	return response.Blob(TextHTML, data)
 }
 
+// Blob writes []byte to response body.
 func (response *AsanaResponse) Blob(contentType string, b []byte) error {
 	return response.Header(HeaderContentType, getContentTypeHead(contentType)).Body(b)
 }
 
-func (response *AsanaResponse) Stream(code int, contentType string, r io.Reader) (err error) {
+// Stream writes stream to response body.
+func (response *AsanaResponse) Stream(contentType string, r io.Reader) (err error) {
 	response.Header(HeaderContentType, getContentTypeHead(contentType))
 	_, err = io.Copy(response.Context.ResponseWriter, r)
 	return
 }
 
-func (response *AsanaResponse) NoContent(code int) error {
-	response.Context.ResponseWriter.WriteHeader(code)
+// NoContent white response
+func (response *AsanaResponse) NoContent() error {
+	response.Context.ResponseWriter.WriteHeader(response.Status)
 	return nil
 }
 
+// Redirect header location redirect
 func (response *AsanaResponse) Redirect(url string) error {
 	if !response.IsRedirect() {
 		return errors.New("invalid redirect status code")

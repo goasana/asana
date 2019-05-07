@@ -34,11 +34,11 @@ func TestXsrfReset_01(t *testing.T) {
 	}
 	token := c._xsrfToken
 	c.Reset(&Response{ResponseWriter: httptest.NewRecorder()}, r)
-	if c._xsrfToken != "" {
+	if c.XSRFToken() != "" {
 		t.FailNow()
 	}
 	c.SetXSRFToken("key", 16)
-	if c._xsrfToken == "" {
+	if c.XSRFToken() == "" {
 		t.FailNow()
 	}
 	if token == c._xsrfToken {

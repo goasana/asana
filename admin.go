@@ -328,16 +328,16 @@ func taskStatus(rw http.ResponseWriter, req *http.Request) {
 	data := make(map[interface{}]interface{})
 
 	// Run Task
-	req.ParseForm()
-	taskname := req.Form.Get("taskname")
-	if taskname != "" {
-		if t, ok := toolbox.AdminTaskList[taskname]; ok {
+	_ = req.ParseForm()
+	taskName := req.Form.Get("taskName")
+	if taskName != "" {
+		if t, ok := toolbox.AdminTaskList[taskName]; ok {
 			if err := t.Run(); err != nil {
 				data["Message"] = []string{"error", fmt.Sprintf("%s", err)}
 			}
-			data["Message"] = []string{"success", fmt.Sprintf("%s run success,Now the Status is <br>%s", taskname, t.GetStatus())}
+			data["Message"] = []string{"success", fmt.Sprintf("%s run success,Now the Status is <br>%s", taskName, t.GetStatus())}
 		} else {
-			data["Message"] = []string{"warning", fmt.Sprintf("there's no task which named: %s", taskname)}
+			data["Message"] = []string{"warning", fmt.Sprintf("there's no task which named: %s", taskName)}
 		}
 	}
 

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package redis for session provider
+// Package rediscluster for session provider
 //
 // depend on github.com/go-redis/redis
 //
@@ -30,7 +30,7 @@
 //	}
 //
 // more docs: http://asana.me/docs/module/session.md
-package redis_cluster
+package rediscluster
 
 import (
 	"net/http"

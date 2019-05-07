@@ -19,18 +19,12 @@ import (
 	"errors"
 	"fmt"
 	"html/template"
-	"io"
-	"mime/multipart"
 	"net/http"
-	"net/url"
-	"os"
 	"reflect"
-	"strconv"
 	"strings"
 
 	"github.com/goasana/framework/context"
 	"github.com/goasana/framework/context/param"
-	"github.com/goasana/framework/session"
 )
 
 var (
@@ -87,8 +81,7 @@ func (p ControllerCommentsSlice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 // http context, template and view, session and xsrf.
 type Controller struct {
 	// context data
-	Ctx  *context.Context
-	Data map[interface{}]interface{}
+	*context.Context
 
 	// route controller info
 	controllerName string
@@ -104,14 +97,6 @@ type Controller struct {
 	TplPrefix      string
 	TplExt         string
 	EnableRender   bool
-
-	// xsrf data
-	_xsrfToken string
-	XSRFExpire int
-	EnableXSRF bool
-
-	// session
-	CruSession session.Store
 }
 
 // ControllerInterface is an interface to uniform all controller handler.
@@ -140,13 +125,14 @@ func (c *Controller) Init(ctx *context.Context, controllerName, actionName strin
 	c.TplName = ""
 	c.controllerName = controllerName
 	c.actionName = actionName
-	c.Ctx = ctx
+	c.Context = ctx
 	c.TplExt = "tpl"
 	c.AppController = app
 	c.EnableRender = true
 	c.EnableXSRF = true
 	c.Data = ctx.Request.Data()
 	c.methodMapping = make(map[string]func())
+	c.SetPro(BConfig.RunMode == PROD)
 }
 
 // Prepare runs after Init before request function execution.
@@ -157,37 +143,37 @@ func (c *Controller) Finish() {}
 
 // Get adds a request function to handle GET request.
 func (c *Controller) Get() {
-	http.Error(c.Ctx.ResponseWriter, "Method Not Allowed", http.StatusMethodNotAllowed)
+	http.Error(c.ResponseWriter, "Method Not Allowed", http.StatusMethodNotAllowed)
 }
 
 // Post adds a request function to handle POST request.
 func (c *Controller) Post() {
-	http.Error(c.Ctx.ResponseWriter, "Method Not Allowed", http.StatusMethodNotAllowed)
+	http.Error(c.ResponseWriter, "Method Not Allowed", http.StatusMethodNotAllowed)
 }
 
 // Delete adds a request function to handle DELETE request.
 func (c *Controller) Delete() {
-	http.Error(c.Ctx.ResponseWriter, "Method Not Allowed", http.StatusMethodNotAllowed)
+	http.Error(c.ResponseWriter, "Method Not Allowed", http.StatusMethodNotAllowed)
 }
 
 // Put adds a request function to handle PUT request.
 func (c *Controller) Put() {
-	http.Error(c.Ctx.ResponseWriter, "Method Not Allowed", http.StatusMethodNotAllowed)
+	http.Error(c.ResponseWriter, "Method Not Allowed", http.StatusMethodNotAllowed)
 }
 
 // Head adds a request function to handle HEAD request.
 func (c *Controller) Head() {
-	http.Error(c.Ctx.ResponseWriter, "Method Not Allowed", http.StatusMethodNotAllowed)
+	http.Error(c.ResponseWriter, "Method Not Allowed", http.StatusMethodNotAllowed)
 }
 
 // Patch adds a request function to handle PATCH request.
 func (c *Controller) Patch() {
-	http.Error(c.Ctx.ResponseWriter, "Method Not Allowed", http.StatusMethodNotAllowed)
+	http.Error(c.ResponseWriter, "Method Not Allowed", http.StatusMethodNotAllowed)
 }
 
 // Options adds a request function to handle OPTIONS request.
 func (c *Controller) Options() {
-	http.Error(c.Ctx.ResponseWriter, "Method Not Allowed", http.StatusMethodNotAllowed)
+	http.Error(c.ResponseWriter, "Method Not Allowed", http.StatusMethodNotAllowed)
 }
 
 // Trace adds a request function to handle Trace request.
@@ -205,11 +191,11 @@ func (c *Controller) Trace() {
 		}
 		return
 	}
-	hs := fmt.Sprintf("\r\nTRACE %s %s%s\r\n", c.Ctx.HTTPRequest.RequestURI, c.Ctx.HTTPRequest.Proto, ts(c.Ctx.HTTPRequest.Header))
-	c.Ctx.Response.Header(context.HeaderContentType, "message/http")
-	c.Ctx.Response.Header(context.HeaderContentLength, fmt.Sprint(len(hs)))
-	c.Ctx.Response.Header(context.HeaderCacheControl, "no-cache, no-store, must-revalidate")
-	_ = c.Ctx.WriteString(hs)
+	hs := fmt.Sprintf("\r\nTRACE %s %s%s\r\n", c.HTTPRequest.RequestURI, c.HTTPRequest.Proto, ts(c.HTTPRequest.Header))
+	c.Response.Header(context.HeaderContentType, "message/http")
+	c.Response.Header(context.HeaderContentLength, fmt.Sprint(len(hs)))
+	c.Response.Header(context.HeaderCacheControl, "no-cache, no-store, must-revalidate")
+	_ = c.WriteString(hs)
 }
 
 // HandlerFunc call function with the name
@@ -239,11 +225,11 @@ func (c *Controller) Render() error {
 		return err
 	}
 
-	if c.Ctx.ResponseWriter.Header().Get(context.HeaderContentType) == "" {
-		c.Ctx.Response.Header(context.HeaderContentType, "text/html; charset=utf-8")
+	if c.ResponseWriter.Header().Get(context.HeaderContentType) == "" {
+		c.Response.Header(context.HeaderContentType, "text/html; charset=utf-8")
 	}
 
-	return c.Ctx.Response.Body(rb)
+	return c.Response.Body(rb)
 }
 
 // RenderString returns the rendered template string. Do not send out response.
@@ -313,65 +299,10 @@ func (c *Controller) viewPath() string {
 	return c.ViewPath
 }
 
-func (c *Controller) SetStatus(code int) *Controller {
-	c.Ctx.SetStatus(code)
-	return c
-}
-
 // Redirect sends the redirection response to url with status code.
 func (c *Controller) Redirect(url string) error {
-	LogAccess(c.Ctx, nil, c.Ctx.Response.Status)
-	return c.Ctx.Redirect(url)
-}
-
-// SetData set the data depending on the accepted
-func (c *Controller) SetData(data interface{}) *Controller {
-	accept := c.Ctx.Request.Header("Accept")
-	switch accept {
-	case context.ApplicationYAML:
-		c.Data["yaml"] = data
-	case context.ApplicationXML, context.TextXML:
-		c.Data["xml"] = data
-	case context.ApplicationProtoBuf:
-		c.Data["protobuf"] = data
-	case context.ApplicationJSONP:
-		c.Data["jsonp"] = data
-	case context.ApplicationJSON:
-		c.Data["json"] = data
-	case context.TextHTML:
-		c.Data["html"] = data
-	default:
-		c.Data["txt"] = data
-	}
-
-	return c
-}
-
-// Abort stops controller handler and show the error data if code is defined in ErrorMap or code string.
-func (c *Controller) Abort(code string) {
-	status, err := strconv.Atoi(code)
-	if err != nil {
-		status = 200
-	}
-	c.CustomAbort(status, code)
-}
-
-// CustomAbort stops controller handler and show the error data, it's similar Aborts, but support status code and body.
-func (c *Controller) CustomAbort(status int, body string) {
-	// first panic from ErrorMaps, it is user defined error functions.
-	if _, ok := ErrorMaps[body]; ok {
-		c.Ctx.Response.Status = status
-		panic(body)
-	}
-	// last panic user string
-	c.Ctx.ResponseWriter.WriteHeader(status)
-	_, _ = c.Ctx.ResponseWriter.Write([]byte(body))
-	panic(ErrAbort)
-}
-
-// StopRun makes panic of USERSTOPRUN error and go to recover function if defined.
-func (c *Controller) StopRun() {
-	panic(ErrAbort)
+	LogAccess(c.Context, nil, c.Response.Status)
+	return c.Context.Redirect(url)
 }
 
 // URLFor does another controller handler in this request function.
@@ -386,242 +317,9 @@ func (c *Controller) URLFor(endpoint string, values ...interface{}) string {
 	return URLFor(endpoint, values...)
 }
 
-// ServeJSON sends a json response with encoding charset.
-func (c *Controller) ServeJSON(encoding ...bool) error {
-	hasIndent := BConfig.RunMode != PROD
-	hasEncoding := len(encoding) > 0 && encoding[0]
-	return c.Ctx.Response.JSON(c.Data["json"], hasIndent, hasEncoding)
-}
-
-// ServeJSONP sends a jsonp response.
-func (c *Controller) ServeJSONP() error {
-	hasIndent := BConfig.RunMode != PROD
-	return c.Ctx.Response.JSONP(c.Data["jsonp"], hasIndent)
-}
-
-// ServeXML sends xml response.
-func (c *Controller) ServeXML() error {
-	hasIndent := BConfig.RunMode != PROD
-	return c.Ctx.Response.XML(c.Data["xml"], hasIndent)
-}
-
-// ServeYAML sends yaml response.
-func (c *Controller) ServeYAML() error {
-	return c.Ctx.Response.YAML(c.Data["yaml"])
-}
-
-// ServeProtoBuf sends protobuf response.
-func (c *Controller) ServeProtoBuf() error {
-	return c.Ctx.Response.ProtoBuf(c.Data["protobuf"])
-}
-
-func (c *Controller) ServeHTML() error {
-	switch c.Data["html"].(type) {
-	case string:
-		val := c.Data["html"].(string)
-		return c.Ctx.Response.HTML(val)
-	case []byte:
-		val := c.Data["html"].([]byte)
-		return c.Ctx.Response.HTMLBlob(val)
-	default:
-		return errors.New("no data found")
-	}
-}
-
-func (c *Controller) ServeText() error {
-	var data interface{}
-	if v, ok := c.Data["txt"]; ok {
-		data = v
-	} else {
-		for _, v := range c.Data {
-			data = v
-			break
-		}
-	}
-
-	switch data.(type) {
-	case string:
-		val := data.(string)
-		return c.Ctx.Response.Text(val)
-	case []byte:
-		val := data.([]byte)
-		return c.Ctx.Response.TextBlob(val)
-	default:
-		return errors.New("no data found")
-	}
-}
-
-// ServeFormatted serve YAML, XML OR JSON, depending on the value of the Accept header
-func (c *Controller) ServeFormatted(encoding ...bool) error {
-	accept := c.Ctx.Request.Header("Accept")
-	switch accept {
-	case context.ApplicationYAML:
-		return c.ServeYAML()
-	case context.ApplicationXML, context.TextXML:
-		return c.ServeXML()
-	case context.ApplicationProtoBuf:
-		return c.ServeProtoBuf()
-	case context.ApplicationJSONP:
-		return c.ServeJSONP()
-	case context.ApplicationJSON:
-		return c.ServeJSON(encoding...)
-	case context.TextHTML:
-		return c.ServeHTML()
-	default:
-		return c.ServeText()
-	}
-}
-
-// Request returns the input data map from POST or PUT request body and query string.
-func (c *Controller) Input() url.Values {
-	if c.Ctx.HTTPRequest.Form == nil {
-		_ = c.Ctx.HTTPRequest.ParseForm()
-	}
-	return c.Ctx.HTTPRequest.Form
-}
-
 // ParseForm maps input data map to obj struct.
 func (c *Controller) ParseForm(obj interface{}) error {
 	return ParseForm(c.Input(), obj)
-}
-
-// GetString returns the input value by key string or the default value while it's present and input is blank
-func (c *Controller) GetString(key string, def ...string) string {
-	if v := c.Ctx.Request.Query(key); v != "" {
-		return v
-	}
-	if len(def) > 0 {
-		return def[0]
-	}
-	return ""
-}
-
-// GetStrings returns the input string slice by key string or the default value while it's present and input is blank
-// it's designed for multi-value input field such as checkbox(input[type=checkbox]), multi-selection.
-func (c *Controller) GetStrings(key string, def ...[]string) []string {
-	var defv []string
-	if len(def) > 0 {
-		defv = def[0]
-	}
-
-	if f := c.Input(); f == nil {
-		return defv
-	} else if vs := f[key]; len(vs) > 0 {
-		return vs
-	}
-
-	return defv
-}
-
-// GetInt returns input as an int or the default value while it's present and input is blank
-func (c *Controller) GetInt(key string, def ...int) (int, error) {
-	strv := c.Ctx.Request.Query(key)
-	if len(strv) == 0 && len(def) > 0 {
-		return def[0], nil
-	}
-	return strconv.Atoi(strv)
-}
-
-// GetInt8 return input as an int8 or the default value while it's present and input is blank
-func (c *Controller) GetInt8(key string, def ...int8) (int8, error) {
-	strv := c.Ctx.Request.Query(key)
-	if len(strv) == 0 && len(def) > 0 {
-		return def[0], nil
-	}
-	i64, err := strconv.ParseInt(strv, 10, 8)
-	return int8(i64), err
-}
-
-// GetUint8 return input as an uint8 or the default value while it's present and input is blank
-func (c *Controller) GetUint8(key string, def ...uint8) (uint8, error) {
-	strv := c.Ctx.Request.Query(key)
-	if len(strv) == 0 && len(def) > 0 {
-		return def[0], nil
-	}
-	u64, err := strconv.ParseUint(strv, 10, 8)
-	return uint8(u64), err
-}
-
-// GetInt16 returns input as an int16 or the default value while it's present and input is blank
-func (c *Controller) GetInt16(key string, def ...int16) (int16, error) {
-	strv := c.Ctx.Request.Query(key)
-	if len(strv) == 0 && len(def) > 0 {
-		return def[0], nil
-	}
-	i64, err := strconv.ParseInt(strv, 10, 16)
-	return int16(i64), err
-}
-
-// GetUint16 returns input as an uint16 or the default value while it's present and input is blank
-func (c *Controller) GetUint16(key string, def ...uint16) (uint16, error) {
-	strv := c.Ctx.Request.Query(key)
-	if len(strv) == 0 && len(def) > 0 {
-		return def[0], nil
-	}
-	u64, err := strconv.ParseUint(strv, 10, 16)
-	return uint16(u64), err
-}
-
-// GetInt32 returns input as an int32 or the default value while it's present and input is blank
-func (c *Controller) GetInt32(key string, def ...int32) (int32, error) {
-	strv := c.Ctx.Request.Query(key)
-	if len(strv) == 0 && len(def) > 0 {
-		return def[0], nil
-	}
-	i64, err := strconv.ParseInt(strv, 10, 32)
-	return int32(i64), err
-}
-
-// GetUint32 returns input as an uint32 or the default value while it's present and input is blank
-func (c *Controller) GetUint32(key string, def ...uint32) (uint32, error) {
-	strv := c.Ctx.Request.Query(key)
-	if len(strv) == 0 && len(def) > 0 {
-		return def[0], nil
-	}
-	u64, err := strconv.ParseUint(strv, 10, 32)
-	return uint32(u64), err
-}
-
-// GetInt64 returns input value as int64 or the default value while it's present and input is blank.
-func (c *Controller) GetInt64(key string, def ...int64) (int64, error) {
-	strv := c.Ctx.Request.Query(key)
-	if len(strv) == 0 && len(def) > 0 {
-		return def[0], nil
-	}
-	return strconv.ParseInt(strv, 10, 64)
-}
-
-// GetUint64 returns input value as uint64 or the default value while it's present and input is blank.
-func (c *Controller) GetUint64(key string, def ...uint64) (uint64, error) {
-	strv := c.Ctx.Request.Query(key)
-	if len(strv) == 0 && len(def) > 0 {
-		return def[0], nil
-	}
-	return strconv.ParseUint(strv, 10, 64)
-}
-
-// GetBool returns input value as bool or the default value while it's present and input is blank.
-func (c *Controller) GetBool(key string, def ...bool) (bool, error) {
-	strv := c.Ctx.Request.Query(key)
-	if len(strv) == 0 && len(def) > 0 {
-		return def[0], nil
-	}
-	return strconv.ParseBool(strv)
-}
-
-// GetFloat returns input value as float64 or the default value while it's present and input is blank.
-func (c *Controller) GetFloat(key string, def ...float64) (float64, error) {
-	strv := c.Ctx.Request.Query(key)
-	if len(strv) == 0 && len(def) > 0 {
-		return def[0], nil
-	}
-	return strconv.ParseFloat(strv, 64)
-}
-
-// GetFile returns the file data in file upload field named as key.
-// it returns the first one of multi-uploaded files.
-func (c *Controller) GetFile(key string) (multipart.File, *multipart.FileHeader, error) {
-	return c.Ctx.HTTPRequest.FormFile(key)
 }
 
 // GetFiles return multi-upload files
@@ -651,124 +349,51 @@ func (c *Controller) GetFile(key string) (multipart.File, *multipart.FileHeader,
 //		return
 //	}
 // }
-func (c *Controller) GetFiles(key string) ([]*multipart.FileHeader, error) {
-	if files, ok := c.Ctx.HTTPRequest.MultipartForm.File[key]; ok {
-		return files, nil
+
+// CustomAbort stops controller handler and show the error data, it's similar Aborts, but support status code and body.
+func (c *Controller) CustomAbort(status int, body string) {
+	// first panic from ErrorMaps, it is user defined error functions.
+	if _, ok := ErrorMaps[body]; ok {
+		c.Response.Status = status
+		panic(body)
 	}
-	return nil, http.ErrMissingFile
+	// last panic user string
+	c.ResponseWriter.WriteHeader(status)
+	_, _ = c.ResponseWriter.Write([]byte(body))
+	panic(ErrAbort)
 }
 
-// SaveToFile saves uploaded file to new path.
-// it only operates the first one of mutil-upload form file field.
-func (c *Controller) SaveToFile(fromFile, toFile string) error {
-	file, _, err := c.Ctx.HTTPRequest.FormFile(fromFile)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	f, err := os.OpenFile(toFile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	_, _ = io.Copy(f, file)
-	return nil
-}
 
-// StartSession starts session and load old session data info this controller.
-func (c *Controller) StartSession() session.Store {
-	if c.CruSession == nil {
-		c.CruSession = c.Ctx.Request.CruSession
-	}
-	return c.CruSession
-}
-
-// SetSession puts value into session.
-func (c *Controller) SetSession(name interface{}, value interface{}) *Controller {
-	if c.CruSession == nil {
-		c.StartSession()
-	}
-	_ = c.CruSession.Set(name, value)
-	return c
-}
-
-// GetSession gets value from session.
-func (c *Controller) GetSession(name interface{}) interface{} {
-	if c.CruSession == nil {
-		c.StartSession()
-	}
-	return c.CruSession.Get(name)
-}
-
-// DelSession removes value from session.
-func (c *Controller) DelSession(name interface{}) {
-	if c.CruSession == nil {
-		c.StartSession()
-	}
-	_ = c.CruSession.Delete(name)
+// StopRun makes panic of USERSTOPRUN error and go to recover function if defined.
+func (c *Controller) StopRun() {
+	panic(ErrAbort)
 }
 
 // SessionRegenerateID regenerates session id for this session.
 // the session data have no changes.
 func (c *Controller) SessionRegenerateID() {
 	if c.CruSession != nil {
-		c.CruSession.SessionRelease(c.Ctx.ResponseWriter)
+		c.CruSession.SessionRelease(c.ResponseWriter)
 	}
-	c.CruSession = GlobalSessions.SessionRegenerateID(c.Ctx.ResponseWriter, c.Ctx.HTTPRequest)
-	c.Ctx.Request.CruSession = c.CruSession
+	c.CruSession = GlobalSessions.SessionRegenerateID(c.ResponseWriter, c.HTTPRequest)
+	c.Request.CruSession = c.CruSession
 }
 
 // DestroySession cleans session data and session cookie.
 func (c *Controller) DestroySession() {
-	_ = c.Ctx.Request.CruSession.Flush()
-	c.Ctx.Request.CruSession = nil
-	GlobalSessions.SessionDestroy(c.Ctx.ResponseWriter, c.Ctx.HTTPRequest)
+	_ = c.Request.CruSession.Flush()
+	c.Request.CruSession = nil
+	GlobalSessions.SessionDestroy(c.ResponseWriter, c.HTTPRequest)
 }
 
-// IsAjax returns this request is ajax or not.
-func (c *Controller) IsAjax() bool {
-	return c.Ctx.Request.IsAjax()
-}
-
-// GetSecureCookie returns decoded cookie value from encoded browser cookie values.
-func (c *Controller) GetSecureCookie(Secret, key string) (string, bool) {
-	return c.Ctx.GetSecureCookie(Secret, key)
-}
-
-// SetSecureCookie puts value into cookie after encoded the value.
-func (c *Controller) SetSecureCookie(Secret, name, value string, others ...interface{}) {
-	c.Ctx.SetSecureCookie(Secret, name, value, others...)
-}
-
-// SetXSRFToken creates a CSRF token string and returns.
-func (c *Controller) XSRFToken() string {
-	if c._xsrfToken == "" {
+// GetXSRFToken creates a CSRF token string and returns.
+func (c *Controller) GetXSRFToken() string {
+	if c.XSRFToken() == "" {
 		expire := int64(BConfig.WebConfig.XSRFExpire)
 		if c.XSRFExpire > 0 {
 			expire = int64(c.XSRFExpire)
 		}
-		c._xsrfToken = c.Ctx.SetXSRFToken(BConfig.WebConfig.XSRFKey, expire)
+		c.SetXSRFToken(BConfig.WebConfig.XSRFKey, expire)
 	}
-	return c._xsrfToken
-}
-
-// CheckXSRFCookie checks xsrf token in this request is valid or not.
-// the token can provided in request header "X-Xsrftoken" and "X-CsrfToken"
-// or in form field value named as "_xsrf".
-func (c *Controller) CheckXSRFCookie() bool {
-	if !c.EnableXSRF {
-		return true
-	}
-	return c.Ctx.CheckXSRFCookie()
-}
-
-// XSRFFormHTML writes an input field contains xsrf token value.
-func (c *Controller) XSRFFormHTML() string {
-	return `<input type="hidden" name="_xsrf" value="` +
-		c.XSRFToken() + `" />`
-}
-
-// GetControllerAndAction gets the executing controller name and action name.
-func (c *Controller) GetControllerAndAction() (string, string) {
-	return c.controllerName, c.actionName
+	return c.XSRFToken()
 }

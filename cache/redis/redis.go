@@ -103,7 +103,7 @@ func (rc *Cache) GetMulti(keys []string) []interface{} {
 
 // Put put cache to redis.
 func (rc *Cache) Put(key string, val interface{}, timeout time.Duration) error {
-	var ttl int32 = 0
+	var ttl int32
 	if timeout != 0 {
 		ttl = int32(timeout / time.Second)
 	}
@@ -111,10 +111,9 @@ func (rc *Cache) Put(key string, val interface{}, timeout time.Duration) error {
 	if ttl > 0 {
 		_, err := rc.do("SETEX", key, ttl, val)
 		return err
-	} else {
-		_, err := rc.do("SET", key, ttl, val)
-		return err
 	}
+	_, err := rc.do("SET", key, ttl, val)
+	return err
 }
 
 // Delete delete cache in redis.

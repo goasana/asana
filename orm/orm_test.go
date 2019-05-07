@@ -1692,12 +1692,12 @@ func TestRawQueryRow(t *testing.T) {
 		NullInt64:   sql.NullInt64{Int64: 42, Valid: true},
 		NullFloat64: sql.NullFloat64{Float64: 42.42, Valid: true},
 	}
-	newId, err := dORM.Insert(nData)
+	newID, err := dORM.Insert(nData)
 	throwFailNow(t, err)
 
 	var nd *DataNull
 	query = fmt.Sprintf("SELECT * FROM %sdata_null%s where id=?", Q, Q)
-	err = dORM.Raw(query, newId).QueryRow(&nd)
+	err = dORM.Raw(query, newID).QueryRow(&nd)
 	throwFailNow(t, err)
 
 	throwFailNow(t, AssertNot(nd, nil))
@@ -1808,12 +1808,12 @@ func TestQueryRows(t *testing.T) {
 		NullInt64:   sql.NullInt64{Int64: 42, Valid: true},
 		NullFloat64: sql.NullFloat64{Float64: 42.42, Valid: true},
 	}
-	newId, err := dORM.Insert(nData)
+	newID, err := dORM.Insert(nData)
 	throwFailNow(t, err)
 
 	var nDataList []*DataNull
 	query = fmt.Sprintf("SELECT * FROM %sdata_null%s where id=?", Q, Q)
-	num, err = dORM.Raw(query, newId).QueryRows(&nDataList)
+	num, err = dORM.Raw(query, newID).QueryRows(&nDataList)
 	throwFailNow(t, err)
 	throwFailNow(t, AssertIs(num, 1))
 

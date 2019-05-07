@@ -81,9 +81,9 @@ func SetDefaultSetting(setting AsanaHTTPSettings) {
 }
 
 // NewAsanaRequest return *AsanaHttpRequest with specific method
-func NewAsanaRequest(rawUrl, method string) *AsanaHTTPRequest {
+func NewAsanaRequest(rawURL, method string) *AsanaHTTPRequest {
 	var resp http.Response
-	u, err := url.Parse(rawUrl)
+	u, err := url.Parse(rawURL)
 	if err != nil {
 		log.Println("Httplib:", err)
 	}
@@ -96,7 +96,7 @@ func NewAsanaRequest(rawUrl, method string) *AsanaHTTPRequest {
 		ProtoMinor: 1,
 	}
 	return &AsanaHTTPRequest{
-		url:     rawUrl,
+		url:     rawURL,
 		req:     &req,
 		params:  map[string][]string{},
 		files:   map[string]string{},

@@ -56,7 +56,7 @@ script:
   - unconvert .
   - ineffassign .
   - find . ! \( -path './vendor' -prune \) -type f -name '*.go' -print0 | xargs -0 gofmt -l -s
-  - golint ./...
+  - golint ./... | grep ^vendor
 
 addons:
   postgresql: "9.6"

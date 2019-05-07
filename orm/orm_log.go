@@ -29,7 +29,7 @@ type Log struct {
 	*log.Logger
 }
 
-//costomer log func
+// LogFunc costomer log func
 var LogFunc func(query map[string]interface{})
 
 // NewLog set io.Writer to create a Logger.

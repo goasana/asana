@@ -25,6 +25,7 @@ import (
 
 type fn func(string) string
 
+// default strategy
 var (
 	nameStrategyMap = map[string]fn{
 		defaultNameStrategy:      snakeString,

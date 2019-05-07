@@ -96,7 +96,7 @@ func (rc *Cache) Put(key string, val interface{}, timeout time.Duration) error {
 		}
 	}
 
-	var ttl int32 = 0
+	var ttl int32
 	if timeout != 0 {
 		ttl = int32(timeout / time.Second)
 	}

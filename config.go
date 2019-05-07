@@ -24,7 +24,7 @@ import (
 
 	"github.com/goasana/config"
 	"github.com/goasana/config/encoder"
-	_ "github.com/goasana/config/encoder/yaml"
+	_ "github.com/goasana/config/encoder/yaml" // Default parser
 	"github.com/goasana/config/source"
 	"github.com/goasana/config/source/file"
 	"github.com/goasana/framework/context"

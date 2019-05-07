@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package cors provides handlers to enable ZAP log.
+// Package asanazap provides handlers to enable ZAP log.
 //package main
 //
 //import (
@@ -51,13 +51,15 @@ import (
 	"github.com/goasana/framework/logs"
 )
 
+// BeforeMiddlewareZap For insert in asana.BeforeRouter Filter
 func BeforeMiddlewareZap() func(ctx *context.Context) {
 	return func(ctx *context.Context) {
 		ctx.Request.SetData("start_timer", time.Now())
 	}
 }
 
-func AfterMiddlewareZap(logger *zap.Logger, timeFormat string, utc bool, appendBody bool) func(ctx *context.Context) {
+// FinishMiddlewareZap For insert in asana.FinishRouter Filter
+func FinishMiddlewareZap(logger *zap.Logger, timeFormat string, utc bool, appendBody bool) func(ctx *context.Context) {
 	if appendBody {
 		logs.Warn("[asanazap] Be careful with personal data in body.")
 	}
@@ -108,9 +110,10 @@ func AfterMiddlewareZap(logger *zap.Logger, timeFormat string, utc bool, appendB
 	}
 }
 
+// InitAsanaZapMiddleware add del filters
 func InitAsanaZapMiddleware(logger *zap.Logger, timeFormat string, utc bool, appendBody ...bool) {
 	asana.InsertFilter("*", asana.BeforeRouter, BeforeMiddlewareZap(), false)
-	asana.InsertFilter("*", asana.FinishRouter, AfterMiddlewareZap(logger, timeFormat, utc, len(appendBody) > 0 && appendBody[0]), false)
+	asana.InsertFilter("*", asana.FinishRouter, FinishMiddlewareZap(logger, timeFormat, utc, len(appendBody) > 0 && appendBody[0]), false)
 
 	logs.Info("[asanazap] Logger started")
 }

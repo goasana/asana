@@ -1,4 +1,4 @@
-package redis_sentinel
+package redissentinel
 
 import (
 	"net/http"

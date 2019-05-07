@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"github.com/goasana/framework/context"
 	"github.com/goasana/config/encoder/json"
+	"github.com/goasana/framework/context"
 	"github.com/goasana/framework/logs"
 	"github.com/goasana/framework/session"
 )
@@ -14,7 +14,7 @@ import (
 // register MIME type with content type
 func registerMime() error {
 	for k, v := range mimemaps {
-		mime.AddExtensionType(k, v)
+		_ = mime.AddExtensionType(k, v)
 	}
 	return nil
 }

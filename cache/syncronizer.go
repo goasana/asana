@@ -5,16 +5,19 @@ import (
 	"time"
 )
 
+// Synchronizer caches
 type Synchronizer struct {
 	memories []Cache
 }
 
+// NewSynchronizer create a new Synchronizer
 func NewSynchronizer(caches ...Cache) *Synchronizer {
 	return &Synchronizer{
 		memories: caches,
 	}
 }
 
+// Get get the value
 func (s *Synchronizer) Get(key string, timeout time.Duration) interface{} {
 	results := make(chan interface{}, len(s.memories))
 	someIsNull := false
@@ -46,6 +49,7 @@ func (s *Synchronizer) Get(key string, timeout time.Duration) interface{} {
 	return val
 }
 
+// Put set de value
 func (s *Synchronizer) Put(key string, val interface{}, timeout time.Duration) error {
 	var wg sync.WaitGroup
 
@@ -64,6 +68,7 @@ func (s *Synchronizer) Put(key string, val interface{}, timeout time.Duration) e
 	return <- err
 }
 
+// Delete delete value
 func (s *Synchronizer) Delete(key string) {
 	var wg sync.WaitGroup
 	defer wg.Wait()
@@ -78,6 +83,7 @@ func (s *Synchronizer) Delete(key string) {
 	}
 }
 
+// IsExist check if exists key
 func (s *Synchronizer) IsExist(key string) bool {
 	m := make(chan bool, len(s.memories))
 
@@ -98,6 +104,7 @@ func (s *Synchronizer) IsExist(key string) bool {
 	return false
 }
 
+// ClearAll clear all
 func (s *Synchronizer) ClearAll() {
 	for _, c := range s.memories {
 		go func(c Cache) {
