@@ -179,7 +179,7 @@ type Manager struct {
 	// tryHTTP01 indicates whether the Manager should try "http-01" challenge type
 	// during the authorization flow.
 	tryHTTP01 bool
-	// httpTokens contains response body values for http-01 challenges
+	// httpTokens contains.Body values for http-01 challenges
 	// and is keyed by the URL path at which a challenge response is expected
 	// to be provisioned.
 	// The entries are stored for the duration of the authorization flow.

@@ -193,15 +193,15 @@ func (n *Namespace) Include(cList ...ControllerInterface) *Namespace {
 //Namespace(
 //    asana.NewNamespace("/shop").
 //        Get("/:id", func(ctx *context.Context) {
-//            ctx.Response.Body([]byte("shopinfo"))
+//            ctx.Body([]byte("shopinfo"))
 //    }),
 //    asana.NewNamespace("/order").
 //        Get("/:id", func(ctx *context.Context) {
-//            ctx.Response.Body([]byte("orderinfo"))
+//            ctx.Body([]byte("orderinfo"))
 //    }),
 //    asana.NewNamespace("/crm").
 //        Get("/:id", func(ctx *context.Context) {
-//            ctx.Response.Body([]byte("crminfo"))
+//            ctx.Body([]byte("crminfo"))
 //    }),
 //)
 func (n *Namespace) Namespace(ns ...*Namespace) *Namespace {

@@ -55,10 +55,10 @@ That's cool, but we can almost certainly have done all that in code. What about 
 Or maybe you want to check the status of an alive check ("smoketest") page, which will be a string?
 
 ```go
-	expression, err := govaluate.NewEvaluableExpression("http_response_body == 'service is ok'");
+	expression, err := govaluate.NewEvaluableExpression("http.Body == 'service is ok'");
 
 	parameters := make(map[string]interface{}, 8)
-	parameters["http_response_body"] = "service is ok";
+	parameters["http.Body"] = "service is ok";
 
 	result, err := expression.Evaluate(parameters);
 	// result is now set to "true", the bool value.

@@ -192,9 +192,9 @@ func (c *Controller) Trace() {
 		return
 	}
 	hs := fmt.Sprintf("\r\nTRACE %s %s%s\r\n", c.HTTPRequest.RequestURI, c.HTTPRequest.Proto, ts(c.HTTPRequest.Header))
-	c.Response.Header(context.HeaderContentType, "message/http")
-	c.Response.Header(context.HeaderContentLength, fmt.Sprint(len(hs)))
-	c.Response.Header(context.HeaderCacheControl, "no-cache, no-store, must-revalidate")
+	c.Header(context.HeaderContentType, "message/http")
+	c.Header(context.HeaderContentLength, fmt.Sprint(len(hs)))
+	c.Header(context.HeaderCacheControl, "no-cache, no-store, must-revalidate")
 	_ = c.WriteString(hs)
 }
 
@@ -226,10 +226,10 @@ func (c *Controller) Render() error {
 	}
 
 	if c.ResponseWriter.Header().Get(context.HeaderContentType) == "" {
-		c.Response.Header(context.HeaderContentType, "text/html; charset=utf-8")
+		c.Header(context.HeaderContentType, "text/html; charset=utf-8")
 	}
 
-	return c.Response.Body(rb)
+	return c.Body(rb)
 }
 
 // RenderString returns the rendered template string. Do not send out response.

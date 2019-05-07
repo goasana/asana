@@ -214,7 +214,7 @@ func Allow(opts *Options) asana.FilterFunc {
 			(requestedMethod != "" || requestedHeaders != "") {
 			headers = opts.PreflightHeader(origin, requestedMethod, requestedHeaders)
 			for key, value := range headers {
-				ctx.Response.Header(key, value)
+				ctx.Header(key, value)
 			}
 			ctx.ResponseWriter.WriteHeader(http.StatusOK)
 			return
@@ -222,7 +222,7 @@ func Allow(opts *Options) asana.FilterFunc {
 		headers = opts.Header(origin)
 
 		for key, value := range headers {
-			ctx.Response.Header(key, value)
+			ctx.Header(key, value)
 		}
 	}
 }

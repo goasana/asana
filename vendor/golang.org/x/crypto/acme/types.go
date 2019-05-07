@@ -54,7 +54,7 @@ type Error struct {
 	ProblemType string
 	// Detail is a human-readable explanation specific to this occurrence of the problem.
 	Detail string
-	// Header is the original server error response headers.
+	// Header is the original server error.Headers.
 	// It may be nil.
 	Header http.Header
 }

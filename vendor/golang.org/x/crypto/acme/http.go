@@ -105,7 +105,7 @@ func retryAfter(v string) time.Duration {
 }
 
 // resOkay is a function that reports whether the provided response is okay.
-// It is expected to keep the response body unread.
+// It is expected to keep the.Body unread.
 type resOkay func(*http.Response) bool
 
 // wantStatus returns a function which reports whether the code

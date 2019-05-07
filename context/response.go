@@ -16,23 +16,10 @@ package context
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
-	"html/template"
-	"io"
-	"mime"
-	"net/http"
-	"net/url"
-	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/goasana/config/encoder/json"
-	"github.com/goasana/config/encoder/proto"
-	"github.com/goasana/config/encoder/xml"
-	"github.com/goasana/config/encoder/yaml"
 )
 
 // Headers
@@ -93,7 +80,7 @@ const (
 	HeaderXCSRFToken                      = "X-CSRF-Token"
 )
 
-// AsanaResponse does work for sending response header.
+// AsanaResponse does work for sending.Header.
 type AsanaResponse struct {
 	Context    *Context
 	Status     int
@@ -110,39 +97,6 @@ func NewResponse() *AsanaResponse {
 func (response *AsanaResponse) Reset(ctx *Context) {
 	response.Context = ctx
 	response.Status = 0
-}
-
-// Header sets response header item string via given key.
-func (response *AsanaResponse) Header(key, val string) *AsanaResponse {
-	response.Context.ResponseWriter.Header().Set(key, val)
-	return response
-}
-
-// Body sets response body content.
-// if EnableGzip, compress content string.
-// it sends out response body directly.
-func (response *AsanaResponse) Body(content []byte) error {
-	var encoding string
-	var buf = &bytes.Buffer{}
-	if response.EnableGzip {
-		encoding = ParseEncoding(response.Context.HTTPRequest)
-	}
-	if b, n, _ := WriteBody(encoding, buf, content); b {
-		response.Header(HeaderContentEncoding, n)
-		response.Header(HeaderContentLength, strconv.Itoa(buf.Len()))
-	} else {
-		response.Header(HeaderContentLength, strconv.Itoa(len(content)))
-	}
-	// Write status code if it has been set manually
-	// Set it to 0 afterwards to prevent "multiple response.WriteHeader calls"
-	if response.Status != 0 {
-		response.Context.ResponseWriter.WriteHeader(response.Status)
-		response.Status = 0
-	} else {
-		response.Context.ResponseWriter.Started = true
-	}
-	_, _ = io.Copy(response.Context.ResponseWriter, buf)
-	return nil
 }
 
 // Cookie sets cookie value via given key.
@@ -234,14 +188,14 @@ func sanitizeValue(v string) string {
 
 func jsonRenderer(value interface{}) Renderer {
 	return rendererFunc(func(ctx *Context) {
-		_ = ctx.Response.JSON(value, false, false)
+		_ = ctx.JSON(value, false, false)
 	})
 }
 
 func errorRenderer(err error) Renderer {
 	return rendererFunc(func(ctx *Context) {
 		ctx.Response.SetStatus(500)
-		_ = ctx.Response.Body([]byte(err.Error()))
+		_ = ctx.Body([]byte(err.Error()))
 	})
 }
 
@@ -249,171 +203,9 @@ func getContentTypeHead(contentType string) string {
 	return fmt.Sprintf("%s; charset=utf-8", contentType)
 }
 
-// Text writes plain text to response body.
-func (response *AsanaResponse) Text(data string) error {
-	return response.TextBlob([]byte(data))
-}
-
-// TextBlob writes plain text to response body from []byte.
-func (response *AsanaResponse) TextBlob(data []byte) error {
-	return response.Blob(TextPlain, []byte(data))
-}
-
-// HTML writes html text to response body.
-func (response *AsanaResponse) HTML(html string) error {
-	return response.HTMLBlob([]byte(html))
-}
-
-// HTMLBlob writes html text to response body from []byte.
-func (response *AsanaResponse) HTMLBlob(data []byte) error {
-	return response.Blob(TextHTML, data)
-}
-
-// Blob writes []byte to response body.
-func (response *AsanaResponse) Blob(contentType string, b []byte) error {
-	return response.Header(HeaderContentType, getContentTypeHead(contentType)).Body(b)
-}
-
-// Stream writes stream to response body.
-func (response *AsanaResponse) Stream(contentType string, r io.Reader) (err error) {
-	response.Header(HeaderContentType, getContentTypeHead(contentType))
-	_, err = io.Copy(response.Context.ResponseWriter, r)
-	return
-}
-
-// NoContent white response
-func (response *AsanaResponse) NoContent() error {
-	response.Context.ResponseWriter.WriteHeader(response.Status)
-	return nil
-}
-
-// Redirect header location redirect
-func (response *AsanaResponse) Redirect(url string) error {
-	if !response.IsRedirect() {
-		return errors.New("invalid redirect status code")
-	}
-
-	response.Context.ResponseWriter.Header().Set(HeaderLocation, url)
-	response.Context.ResponseWriter.WriteHeader(response.Status)
-	return nil
-}
-
-// JSON writes json to response bodyresponse.
-// if encoding is true, it converts utf-8 to \u0000 type.
-func (response *AsanaResponse) JSON(data interface{}, hasIndent bool, encoding bool) error {
-	content, err := json.Encode(data, hasIndent)
-	if err != nil {
-		http.Error(response.Context.ResponseWriter, err.Error(), http.StatusInternalServerError)
-		return err
-	}
-	if encoding {
-		content = []byte(stringsToJSON(string(content)))
-	}
-	return response.Header(HeaderContentType, getContentTypeHead(ApplicationJSON)).Body(content)
-}
-
-// ProtoBuf writes protobuf to response body.
-func (response *AsanaResponse) ProtoBuf(data interface{}) error {
-	content, err := proto.Encode(data)
-	if err != nil {
-		http.Error(response.Context.ResponseWriter, err.Error(), http.StatusInternalServerError)
-		return err
-	}
-	return response.Header(HeaderContentType, getContentTypeHead(ApplicationProtoBuf)).Body(content)
-}
-
-// YAML writes yaml to response body.
-func (response *AsanaResponse) YAML(data interface{}) error {
-	content, err := yaml.Encode(data)
-	if err != nil {
-		http.Error(response.Context.ResponseWriter, err.Error(), http.StatusInternalServerError)
-		return err
-	}
-	return response.Header(HeaderContentType, getContentTypeHead(ApplicationYAML)).Body(content)
-}
-
-// JSONP writes jsonp to response body.
-func (response *AsanaResponse) JSONP(data interface{}, hasIndent bool) error {
-	content, err := json.Encode(data, hasIndent)
-	if err != nil {
-		http.Error(response.Context.ResponseWriter, err.Error(), http.StatusInternalServerError)
-		return err
-	}
-	callback := response.Context.Request.Query("callback")
-	if callback == "" {
-		return errors.New(`"callback" parameter required`)
-	}
-	callback = template.JSEscapeString(callback)
-	callbackContent := bytes.NewBufferString(" if(window." + callback + ")" + callback)
-	callbackContent.WriteString("(")
-	callbackContent.Write(content)
-	callbackContent.WriteString(");\r\n")
-	return response.Header(HeaderContentType, getContentTypeHead(ApplicationJSONP)).Body(callbackContent.Bytes())
-}
-
-// XML writes xml string to response body.
-func (response *AsanaResponse) XML(data interface{}, hasIndent bool) error {
-	content, err := xml.Encode(data, hasIndent)
-	if err != nil {
-		http.Error(response.Context.ResponseWriter, err.Error(), http.StatusInternalServerError)
-		return err
-	}
-	return response.Header(HeaderContentType, getContentTypeHead(ApplicationXML)).Body(content)
-}
-
-// Download forces response for download file.
-// it prepares the download response header automatically.
-func (response *AsanaResponse) Download(file string, filename ...string) {
-	// check get file error, file not found or other error.
-	if _, err := os.Stat(file); err != nil {
-		http.ServeFile(response.Context.ResponseWriter, response.Context.HTTPRequest, file)
-		return
-	}
-
-	var fName string
-	if len(filename) > 0 && filename[0] != "" {
-		fName = filename[0]
-	} else {
-		fName = filepath.Base(file)
-	}
-	// https://tools.ietf.org/html/rfc6266#section-4.3
-	fn := url.PathEscape(fName)
-	if fName == fn {
-		fn = "filename=" + fn
-	} else {
-		/**
-		  The parameters "filename" and "filename*" differ only in that
-		  "filename*" uses the encoding defined in [RFC5987], allowing the use
-		  of characters not present in the ISO-8859-1 character set
-		  ([ISO-8859-1]).
-		*/
-		fn = "filename=" + fName + "; filename*=utf-8''" + fn
-	}
-	response.Header(HeaderContentDisposition, "attachment; "+fn)
-	response.Header(HeaderContentDescription, "File Transfer")
-	response.Header(HeaderContentType, "application/octet-stream")
-	response.Header(HeaderContentTransferEncoding, "binary")
-	response.Header(HeaderExpires, "0")
-	response.Header(HeaderCacheControl, "must-revalidate")
-	response.Header(HeaderPragma, "public")
-	http.ServeFile(response.Context.ResponseWriter, response.Context.HTTPRequest, file)
-}
-
-// ContentType sets the content type from ext string.
-// MIME type is given in mime package.
-func (response *AsanaResponse) ContentType(ext string) *AsanaResponse {
-	if !strings.HasPrefix(ext, ".") {
-		ext = "." + ext
-	}
-	ctype := mime.TypeByExtension(ext)
-	if ctype != "" {
-		response.Header(HeaderContentType, ctype)
-	}
-	return response
-}
 
 // SetStatus sets response status code.
-// It writes response header directly.
+// It writes.Header directly.
 func (response *AsanaResponse) SetStatus(status int) *AsanaResponse {
 	response.Status = status
 	return response

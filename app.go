@@ -401,7 +401,7 @@ func AutoPrefix(prefix string, c ControllerInterface) *App {
 // Get used to register router for Get method
 // usage:
 //    asana.Get("/", func(ctx *context.Context){
-//          ctx.Response.Body("hello world")
+//          ctx.Body("hello world")
 //    })
 func Get(rootPath string, f FilterFunc) *App {
 	AsanaApp.Handlers.Get(rootPath, f)
@@ -411,7 +411,7 @@ func Get(rootPath string, f FilterFunc) *App {
 // Post used to register router for Post method
 // usage:
 //    asana.Post("/api", func(ctx *context.Context){
-//          ctx.Response.Body("hello world")
+//          ctx.Body("hello world")
 //    })
 func Post(rootPath string, f FilterFunc) *App {
 	AsanaApp.Handlers.Post(rootPath, f)
@@ -421,7 +421,7 @@ func Post(rootPath string, f FilterFunc) *App {
 // Delete used to register router for Delete method
 // usage:
 //    asana.Delete("/api", func(ctx *context.Context){
-//          ctx.Response.Body("hello world")
+//          ctx.Body("hello world")
 //    })
 func Delete(rootPath string, f FilterFunc) *App {
 	AsanaApp.Handlers.Delete(rootPath, f)
@@ -431,7 +431,7 @@ func Delete(rootPath string, f FilterFunc) *App {
 // Put used to register router for Put method
 // usage:
 //    asana.Put("/api", func(ctx *context.Context){
-//          ctx.Response.Body("hello world")
+//          ctx.Body("hello world")
 //    })
 func Put(rootPath string, f FilterFunc) *App {
 	AsanaApp.Handlers.Put(rootPath, f)
@@ -441,7 +441,7 @@ func Put(rootPath string, f FilterFunc) *App {
 // Head used to register router for Head method
 // usage:
 //    asana.Head("/api", func(ctx *context.Context){
-//          ctx.Response.Body("hello world")
+//          ctx.Body("hello world")
 //    })
 func Head(rootPath string, f FilterFunc) *App {
 	AsanaApp.Handlers.Head(rootPath, f)
@@ -451,7 +451,7 @@ func Head(rootPath string, f FilterFunc) *App {
 // Options used to register router for Options method
 // usage:
 //    asana.Options("/api", func(ctx *context.Context){
-//          ctx.Response.Body("hello world")
+//          ctx.Body("hello world")
 //    })
 func Options(rootPath string, f FilterFunc) *App {
 	AsanaApp.Handlers.Options(rootPath, f)
@@ -461,7 +461,7 @@ func Options(rootPath string, f FilterFunc) *App {
 // Patch used to register router for Patch method
 // usage:
 //    asana.Patch("/api", func(ctx *context.Context){
-//          ctx.Response.Body("hello world")
+//          ctx.Body("hello world")
 //    })
 func Patch(rootPath string, f FilterFunc) *App {
 	AsanaApp.Handlers.Patch(rootPath, f)
@@ -471,7 +471,7 @@ func Patch(rootPath string, f FilterFunc) *App {
 // Any used to register router for all methods
 // usage:
 //    asana.Any("/api", func(ctx *context.Context){
-//          ctx.Response.Body("hello world")
+//          ctx.Body("hello world")
 //    })
 func Any(rootPath string, f FilterFunc) *App {
 	AsanaApp.Handlers.Any(rootPath, f)

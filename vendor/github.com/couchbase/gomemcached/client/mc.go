@@ -457,7 +457,7 @@ func (c *Client) AuthScramSha(user, pass string) (*gomemcached.MCResponse, error
 		return nil, errors.Wrap(err, "Error sending start request.")
 	}
 
-	err = s.HandleStartResponse(string(startResponse.Body))
+	err = s.HandleStartResponse(string(star.Body))
 	if err != nil {
 		return nil, errors.Wrap(err, "Error handling start response.")
 	}
@@ -474,7 +474,7 @@ func (c *Client) AuthScramSha(user, pass string) (*gomemcached.MCResponse, error
 		return nil, errors.Wrap(err, "Error sending final request.")
 	}
 
-	err = s.HandleFinalResponse(string(finalResponse.Body))
+	err = s.HandleFinalResponse(string(fina.Body))
 	if err != nil {
 		return nil, errors.Wrap(err, "Error handling final response.")
 	}

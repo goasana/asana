@@ -291,7 +291,7 @@ func (p *ControllerRegister) Include(cList ...ControllerInterface) {
 // Get add get method
 // usage:
 //    Get("/", func(ctx *context.Context){
-//          ctx.Response.Body("hello world")
+//          ctx.Body("hello world")
 //    })
 func (p *ControllerRegister) Get(pattern string, f FilterFunc) {
 	p.AddMethod("get", pattern, f)
@@ -300,7 +300,7 @@ func (p *ControllerRegister) Get(pattern string, f FilterFunc) {
 // Post add post method
 // usage:
 //    Post("/api", func(ctx *context.Context){
-//          ctx.Response.Body("hello world")
+//          ctx.Body("hello world")
 //    })
 func (p *ControllerRegister) Post(pattern string, f FilterFunc) {
 	p.AddMethod("post", pattern, f)
@@ -309,7 +309,7 @@ func (p *ControllerRegister) Post(pattern string, f FilterFunc) {
 // Put add put method
 // usage:
 //    Put("/api/:id", func(ctx *context.Context){
-//          ctx.Response.Body("hello world")
+//          ctx.Body("hello world")
 //    })
 func (p *ControllerRegister) Put(pattern string, f FilterFunc) {
 	p.AddMethod("put", pattern, f)
@@ -318,7 +318,7 @@ func (p *ControllerRegister) Put(pattern string, f FilterFunc) {
 // Delete add delete method
 // usage:
 //    Delete("/api/:id", func(ctx *context.Context){
-//          ctx.Response.Body("hello world")
+//          ctx.Body("hello world")
 //    })
 func (p *ControllerRegister) Delete(pattern string, f FilterFunc) {
 	p.AddMethod("delete", pattern, f)
@@ -327,7 +327,7 @@ func (p *ControllerRegister) Delete(pattern string, f FilterFunc) {
 // Head add head method
 // usage:
 //    Head("/api/:id", func(ctx *context.Context){
-//          ctx.Response.Body("hello world")
+//          ctx.Body("hello world")
 //    })
 func (p *ControllerRegister) Head(pattern string, f FilterFunc) {
 	p.AddMethod("head", pattern, f)
@@ -336,7 +336,7 @@ func (p *ControllerRegister) Head(pattern string, f FilterFunc) {
 // Patch add patch method
 // usage:
 //    Patch("/api/:id", func(ctx *context.Context){
-//          ctx.Response.Body("hello world")
+//          ctx.Body("hello world")
 //    })
 func (p *ControllerRegister) Patch(pattern string, f FilterFunc) {
 	p.AddMethod("patch", pattern, f)
@@ -345,7 +345,7 @@ func (p *ControllerRegister) Patch(pattern string, f FilterFunc) {
 // Options add options method
 // usage:
 //    Options("/api/:id", func(ctx *context.Context){
-//          ctx.Response.Body("hello world")
+//          ctx.Body("hello world")
 //    })
 func (p *ControllerRegister) Options(pattern string, f FilterFunc) {
 	p.AddMethod("options", pattern, f)
@@ -354,7 +354,7 @@ func (p *ControllerRegister) Options(pattern string, f FilterFunc) {
 // Any add all method
 // usage:
 //    Any("/api/:id", func(ctx *context.Context){
-//          ctx.Response.Body("hello world")
+//          ctx.Body("hello world")
 //    })
 func (p *ControllerRegister) Any(pattern string, f FilterFunc) {
 	p.AddMethod("*", pattern, f)
@@ -363,7 +363,7 @@ func (p *ControllerRegister) Any(pattern string, f FilterFunc) {
 // AddMethod add http method router
 // usage:
 //    AddMethod("get","/api/:id", func(ctx *context.Context){
-//          ctx.Response.Body("hello world")
+//          ctx.Body("hello world")
 //    })
 func (p *ControllerRegister) AddMethod(method, pattern string, f FilterFunc) {
 	method = strings.ToUpper(method)
@@ -678,7 +678,7 @@ func (p *ControllerRegister) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 	context.Response.EnableGzip = BConfig.EnableGzip
 
 	if BConfig.RunMode == DEV {
-		context.Response.Header("Server", BConfig.ServerName)
+		context.Header("Server", BConfig.ServerName)
 	}
 
 	var urlPath = r.URL.Path

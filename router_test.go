@@ -32,31 +32,31 @@ type TestController struct {
 
 func (tc *TestController) Get() {
 	tc.Data["Username"] = "asana"
-	_ = tc.Response.Body([]byte("ok"))
+	_ = tc.Body([]byte("ok"))
 }
 
 func (tc *TestController) Post() {
-	_ = tc.Response.Body([]byte(tc.Request.Query(":name")))
+	_ = tc.Body([]byte(tc.Request.Query(":name")))
 }
 
 func (tc *TestController) Param() {
-	_ = tc.Response.Body([]byte(tc.Request.Query(":name")))
+	_ = tc.Body([]byte(tc.Request.Query(":name")))
 }
 
 func (tc *TestController) List() {
-	_ = tc.Response.Body([]byte("i am list"))
+	_ = tc.Body([]byte("i am list"))
 }
 
 func (tc *TestController) Params() {
-	_ = tc.Response.Body([]byte(tc.Request.Param("0") + tc.Request.Param("1") + tc.Request.Param("2")))
+	_ = tc.Body([]byte(tc.Request.Param("0") + tc.Request.Param("1") + tc.Request.Param("2")))
 }
 
 func (tc *TestController) Myext() {
-	_ = tc.Response.Body([]byte(tc.Request.Param(":ext")))
+	_ = tc.Body([]byte(tc.Request.Param(":ext")))
 }
 
 func (tc *TestController) GetURL() {
-	_ = tc.Response.Body([]byte(tc.URLFor(".Myext")))
+	_ = tc.Body([]byte(tc.URLFor(".Myext")))
 }
 
 func (tc *TestController) GetParams() {
@@ -69,7 +69,7 @@ func (tc *TestController) GetManyRouter() {
 }
 
 func (tc *TestController) GetEmptyBody() {
-	_ = tc.Response.NoContent()
+	_ = tc.NoContent()
 }
 
 type JSONController struct {
@@ -83,7 +83,7 @@ func (jc *JSONController) Prepare() {
 
 func (jc *JSONController) Get() {
 	jc.Data["Username"] = "asana"
-	_ = jc.Response.Body([]byte("ok"))
+	_ = jc.Body([]byte("ok"))
 }
 
 func TestUrlFor(t *testing.T) {
@@ -312,7 +312,7 @@ func TestRouterGet(t *testing.T) {
 
 	handler := NewControllerRegister()
 	handler.Get("/user", func(ctx *context.Context) {
-		_ = ctx.Response.Body([]byte("Get userlist"))
+		_ = ctx.Body([]byte("Get userlist"))
 	})
 	handler.ServeHTTP(w, r)
 	if w.Body.String() != "Get userlist" {
@@ -326,7 +326,7 @@ func TestRouterPost(t *testing.T) {
 
 	handler := NewControllerRegister()
 	handler.Post("/user/:id", func(ctx *context.Context) {
-		_ = ctx.Response.Body([]byte(ctx.Request.Param(":id")))
+		_ = ctx.Body([]byte(ctx.Request.Param(":id")))
 	})
 	handler.ServeHTTP(w, r)
 	if w.Body.String() != "123" {
@@ -468,7 +468,7 @@ func TestParamResetFilter(t *testing.T) {
 	mux.ServeHTTP(rw, r)
 
 	// The two functions, `asanaResetParams` and `asanaHandleResetParams` add
-	// a response header of `Splat`.  The expectation here is that that Header
+	// a.Header of `Splat`.  The expectation here is that that Header
 	// value should match what the _request's_ router set, not the filter's.
 
 	headers := rw.Result().Header
@@ -692,7 +692,7 @@ func (jc *YAMLController) Prepare() {
 
 func (jc *YAMLController) Get() {
 	jc.Data["Username"] = "asana"
-	_ = jc.Response.Body([]byte("ok"))
+	_ = jc.Body([]byte("ok"))
 }
 
 func TestYAMLPrepare(t *testing.T) {

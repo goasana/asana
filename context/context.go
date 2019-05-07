@@ -24,23 +24,31 @@ package context
 
 import (
 	"bufio"
+	"bytes"
 	"crypto/hmac"
 	"crypto/sha1"
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"github.com/goasana/framework/session"
+	"html/template"
 	"io"
+	"mime"
 	"mime/multipart"
 	"net"
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/beego/i18n"
+	"github.com/goasana/config/encoder/json"
+	"github.com/goasana/config/encoder/proto"
+	"github.com/goasana/config/encoder/xml"
+	"github.com/goasana/config/encoder/yaml"
+	"github.com/goasana/framework/session"
 	"github.com/goasana/framework/utils"
 )
 
@@ -119,29 +127,29 @@ func (ctx *Context) SetPro(isPro bool) {
 func (ctx *Context) ServeJSON(encoding ...bool) error {
 	hasIndent := !ctx.isPro
 	hasEncoding := len(encoding) > 0 && encoding[0]
-	return ctx.Response.JSON(ctx.Data["json"], hasIndent, hasEncoding)
+	return ctx.JSON(ctx.Data["json"], hasIndent, hasEncoding)
 }
 
 // ServeJSONP sends a jsonp response.
 func (ctx *Context) ServeJSONP() error {
 	hasIndent := !ctx.isPro
-	return ctx.Response.JSONP(ctx.Data["jsonp"], hasIndent)
+	return ctx.JSONP(ctx.Data["jsonp"], hasIndent)
 }
 
 // ServeXML sends xml response.
 func (ctx *Context) ServeXML() error {
 	hasIndent := !ctx.isPro
-	return ctx.Response.XML(ctx.Data["xml"], hasIndent)
+	return ctx.XML(ctx.Data["xml"], hasIndent)
 }
 
 // ServeYAML sends yaml response.
 func (ctx *Context) ServeYAML() error {
-	return ctx.Response.YAML(ctx.Data["yaml"])
+	return ctx.YAML(ctx.Data["yaml"])
 }
 
 // ServeProtoBuf sends protobuf response.
 func (ctx *Context) ServeProtoBuf() error {
-	return ctx.Response.ProtoBuf(ctx.Data["protobuf"])
+	return ctx.ProtoBuf(ctx.Data["protobuf"])
 }
 
 // ServeHTML sends html response.
@@ -149,10 +157,10 @@ func (ctx *Context) ServeHTML() error {
 	switch ctx.Data["html"].(type) {
 	case string:
 		val := ctx.Data["html"].(string)
-		return ctx.Response.HTML(val)
+		return ctx.HTML(val)
 	case []byte:
 		val := ctx.Data["html"].([]byte)
-		return ctx.Response.HTMLBlob(val)
+		return ctx.HTMLBlob(val)
 	default:
 		return errors.New("no data found")
 	}
@@ -173,10 +181,10 @@ func (ctx *Context) ServeText() error {
 	switch data.(type) {
 	case string:
 		val := data.(string)
-		return ctx.Response.Text(val)
+		return ctx.Text(val)
 	case []byte:
 		val := data.([]byte)
-		return ctx.Response.TextBlob(val)
+		return ctx.TextBlob(val)
 	default:
 		return errors.New("no data found")
 	}
@@ -213,11 +221,6 @@ func (ctx *Context) Reset(rw http.ResponseWriter, r *http.Request) {
 	ctx.Request.Reset(ctx)
 	ctx.Response.Reset(ctx)
 	ctx._xsrfToken = ""
-}
-
-// Redirect does redirection to localUrl with http header status code.
-func (ctx *Context) Redirect(localURL string) error {
-	return ctx.Response.Redirect(localURL)
 }
 
 // Input Request returns the input data map from POST or PUT request body and query string.
@@ -495,8 +498,206 @@ func (ctx *Context) GetLanguage(def ...string) string {
 	return lang
 }
 
-// WriteString Write string to response body.
-// it sends response body.
+
+// Text writes plain text to.Body.
+func (ctx *Context) Text(data string) error {
+	return ctx.TextBlob([]byte(data))
+}
+
+// TextBlob writes plain text to.Body from []byte.
+func (ctx *Context) TextBlob(data []byte) error {
+	return ctx.Blob(TextPlain, []byte(data))
+}
+
+// HTML writes html text to.Body.
+func (ctx *Context) HTML(html string) error {
+	return ctx.HTMLBlob([]byte(html))
+}
+
+// HTMLBlob writes html text to.Body from []byte.
+func (ctx *Context) HTMLBlob(data []byte) error {
+	return ctx.Blob(TextHTML, data)
+}
+
+// Blob writes []byte to.Body.
+func (ctx *Context) Blob(contentType string, b []byte) error {
+	return ctx.Header(HeaderContentType, getContentTypeHead(contentType)).Body(b)
+}
+
+// Stream writes stream to.Body.
+func (ctx *Context) Stream(contentType string, r io.Reader) (err error) {
+	ctx.Header(HeaderContentType, getContentTypeHead(contentType))
+	_, err = io.Copy(ctx.ResponseWriter, r)
+	return
+}
+
+// NoContent white response
+func (ctx *Context) NoContent() error {
+	ctx.ResponseWriter.WriteHeader(ctx.Response.Status)
+	return nil
+}
+
+// Redirect header location redirect
+func (ctx *Context) Redirect(url string) error {
+	if !ctx.Response.IsRedirect() {
+		return errors.New("invalid redirect status code")
+	}
+
+	ctx.ResponseWriter.Header().Set(HeaderLocation, url)
+	ctx.ResponseWriter.WriteHeader(ctx.Response.Status)
+	return nil
+}
+
+// JSON writes json to.Bodyresponse.
+// if encoding is true, it converts utf-8 to \u0000 type.
+func (ctx *Context) JSON(data interface{}, hasIndent bool, encoding bool) error {
+	content, err := json.Encode(data, hasIndent)
+	if err != nil {
+		http.Error(ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		return err
+	}
+	if encoding {
+		content = []byte(stringsToJSON(string(content)))
+	}
+	return ctx.Header(HeaderContentType, getContentTypeHead(ApplicationJSON)).Body(content)
+}
+
+// ProtoBuf writes protobuf to.Body.
+func (ctx *Context) ProtoBuf(data interface{}) error {
+	content, err := proto.Encode(data)
+	if err != nil {
+		http.Error(ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		return err
+	}
+	return ctx.Header(HeaderContentType, getContentTypeHead(ApplicationProtoBuf)).Body(content)
+}
+
+// YAML writes yaml to.Body.
+func (ctx *Context) YAML(data interface{}) error {
+	content, err := yaml.Encode(data)
+	if err != nil {
+		http.Error(ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		return err
+	}
+	return ctx.Header(HeaderContentType, getContentTypeHead(ApplicationYAML)).Body(content)
+}
+
+// JSONP writes jsonp to.Body.
+func (ctx *Context) JSONP(data interface{}, hasIndent bool) error {
+	content, err := json.Encode(data, hasIndent)
+	if err != nil {
+		http.Error(ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		return err
+	}
+	callback := ctx.Request.Query("callback")
+	if callback == "" {
+		return errors.New(`"callback" parameter required`)
+	}
+	callback = template.JSEscapeString(callback)
+	callbackContent := bytes.NewBufferString(" if(window." + callback + ")" + callback)
+	callbackContent.WriteString("(")
+	callbackContent.Write(content)
+	callbackContent.WriteString(");\r\n")
+	return ctx.Header(HeaderContentType, getContentTypeHead(ApplicationJSONP)).Body(callbackContent.Bytes())
+}
+
+// XML writes xml string to.Body.
+func (ctx *Context) XML(data interface{}, hasIndent bool) error {
+	content, err := xml.Encode(data, hasIndent)
+	if err != nil {
+		http.Error(ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		return err
+	}
+	return ctx.Header(HeaderContentType, getContentTypeHead(ApplicationXML)).Body(content)
+}
+
+
+// Header sets.Header item string via given key.
+func (ctx *Context) Header(key, val string) *Context {
+	ctx.ResponseWriter.Header().Set(key, val)
+	return ctx
+}
+
+// Body sets.Body content.
+// if EnableGzip, compress content string.
+// it sends out.Body directly.
+func (ctx *Context) Body(content []byte) error {
+	var encoding string
+	var buf = &bytes.Buffer{}
+	if ctx.Response.EnableGzip {
+		encoding = ParseEncoding(ctx.HTTPRequest)
+	}
+	if b, n, _ := WriteBody(encoding, buf, content); b {
+		ctx.Header(HeaderContentEncoding, n)
+		ctx.Header(HeaderContentLength, strconv.Itoa(buf.Len()))
+	} else {
+		ctx.Header(HeaderContentLength, strconv.Itoa(len(content)))
+	}
+	// Write status code if it has been set manually
+	// Set it to 0 afterwards to prevent "multiple response.WriteHeader calls"
+	if ctx.Response.Status != 0 {
+		ctx.ResponseWriter.WriteHeader(ctx.Response.Status)
+		ctx.Response.Status = 0
+	} else {
+		ctx.ResponseWriter.Started = true
+	}
+	_, _ = io.Copy(ctx.ResponseWriter, buf)
+	return nil
+}
+
+// Download forces response for download file.
+// it prepares the download.Header automatically.
+func (ctx *Context) Download(file string, filename ...string) {
+	// check get file error, file not found or other error.
+	if _, err := os.Stat(file); err != nil {
+		http.ServeFile(ctx.ResponseWriter, ctx.HTTPRequest, file)
+		return
+	}
+
+	var fName string
+	if len(filename) > 0 && filename[0] != "" {
+		fName = filename[0]
+	} else {
+		fName = filepath.Base(file)
+	}
+	// https://tools.ietf.org/html/rfc6266#section-4.3
+	fn := url.PathEscape(fName)
+	if fName == fn {
+		fn = "filename=" + fn
+	} else {
+		/**
+		  The parameters "filename" and "filename*" differ only in that
+		  "filename*" uses the encoding defined in [RFC5987], allowing the use
+		  of characters not present in the ISO-8859-1 character set
+		  ([ISO-8859-1]).
+		*/
+		fn = "filename=" + fName + "; filename*=utf-8''" + fn
+	}
+	ctx.Header(HeaderContentDisposition, "attachment; "+fn)
+	ctx.Header(HeaderContentDescription, "File Transfer")
+	ctx.Header(HeaderContentType, "application/octet-stream")
+	ctx.Header(HeaderContentTransferEncoding, "binary")
+	ctx.Header(HeaderExpires, "0")
+	ctx.Header(HeaderCacheControl, "must-revalidate")
+	ctx.Header(HeaderPragma, "public")
+	http.ServeFile(ctx.ResponseWriter, ctx.HTTPRequest, file)
+}
+
+// ContentType sets the content type from ext string.
+// MIME type is given in mime package.
+func (ctx *Context) ContentType(ext string) *Context {
+	if !strings.HasPrefix(ext, ".") {
+		ext = "." + ext
+	}
+	ctype := mime.TypeByExtension(ext)
+	if ctype != "" {
+		ctx.Header(HeaderContentType, ctype)
+	}
+	return ctx
+}
+
+// WriteString Write string to.Body.
+// it sends.Body.
 func (ctx *Context) WriteString(content string) (err error) {
 	_, err = ctx.ResponseWriter.Write([]byte(content))
 	return
@@ -633,7 +834,7 @@ func (r *Response) Write(p []byte) (int, error) {
 	return r.ResponseWriter.Write(p)
 }
 
-// WriteHeader sends an HTTP response header with status code,
+// WriteHeader sends an HTTP.Header with status code,
 // and sets `started` to true.
 func (r *Response) WriteHeader(code int) {
 	if r.Status > 0 {
