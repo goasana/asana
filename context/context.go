@@ -70,7 +70,7 @@ func NewContext() *Context {
 	return &Context{
 		Request:  NewRequest(),
 		Response: NewResponse(),
-		Data: map[interface{}]interface{}{},
+		Data:     map[interface{}]interface{}{},
 	}
 }
 
@@ -123,7 +123,7 @@ func (ctx *Context) SetPro(isPro bool) {
 	ctx.isPro = isPro
 }
 
-	// ServeJSON sends a json response with encoding charset.
+// ServeJSON sends a json response with encoding charset.
 func (ctx *Context) ServeJSON(encoding ...bool) error {
 	hasIndent := !ctx.isPro
 	hasEncoding := len(encoding) > 0 && encoding[0]
@@ -434,12 +434,10 @@ func (ctx *Context) DelSession(name interface{}) {
 	_ = ctx.CruSession.Delete(name)
 }
 
-
 // IsAjax returns this request is ajax or not.
 func (ctx *Context) IsAjax() bool {
 	return ctx.Request.IsAjax()
 }
-
 
 // XSRFFormHTML writes an input field contains xsrf token value.
 func (ctx *Context) XSRFFormHTML() string {
@@ -475,7 +473,6 @@ func isJWTHeader(header string) bool {
 	return false
 }
 
-
 // GetLanguage get the language accepted
 func (ctx *Context) GetLanguage(def ...string) string {
 	al := ctx.Request.Header(HeaderAcceptLanguage)
@@ -497,7 +494,6 @@ func (ctx *Context) GetLanguage(def ...string) string {
 
 	return lang
 }
-
 
 // Text writes plain text to.Body.
 func (ctx *Context) Text(data string) error {
@@ -610,7 +606,6 @@ func (ctx *Context) XML(data interface{}, hasIndent bool) error {
 	}
 	return ctx.Header(HeaderContentType, getContentTypeHead(ApplicationXML)).Body(content)
 }
-
 
 // Header sets.Header item string via given key.
 func (ctx *Context) Header(key, val string) *Context {
