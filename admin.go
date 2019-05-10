@@ -23,11 +23,11 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/goasana/config/encoder/json"
 	"github.com/goasana/asana/grace"
 	"github.com/goasana/asana/logs"
 	"github.com/goasana/asana/toolbox"
 	"github.com/goasana/asana/utils"
+	"github.com/goasana/config/encoder/json"
 )
 
 // AsanaAdminApp is the default adminApp used by admin module.

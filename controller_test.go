@@ -16,12 +16,12 @@ package asana
 
 import (
 	"math"
+	"os"
+	"path/filepath"
 	"strconv"
 	"testing"
 
 	"github.com/goasana/asana/context"
-	"os"
-	"path/filepath"
 )
 
 func TestGetInt(t *testing.T) {

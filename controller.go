@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/goasana/asana/context/parsers"
 	"html/template"
 	"net/http"
 	"reflect"
@@ -26,6 +25,7 @@ import (
 
 	"github.com/goasana/asana/context"
 	"github.com/goasana/asana/context/param"
+	"github.com/goasana/asana/context/parsers"
 )
 
 var (

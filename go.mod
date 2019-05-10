@@ -33,6 +33,8 @@ require (
 	github.com/smartystreets/goconvey v0.0.0-20190330032615-68dc04aab96a // indirect
 	github.com/ssdb/gossdb v0.0.0-20180723034631-88f6b59b84ec
 	github.com/syndtr/goleveldb v1.0.0 // indirect
+	github.com/ugorji/go v1.1.4
 	go.uber.org/zap v1.10.0
 	golang.org/x/crypto v0.0.0-20190506204251-e1dfcc566284
+	gopkg.in/yaml.v2 v2.2.2
 )
