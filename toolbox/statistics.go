@@ -111,7 +111,7 @@ func (m *URLMap) GetMap() map[string]interface{} {
 			resultLists = append(resultLists, result)
 		}
 	}
-	content["Data"] = resultLists
+	content["data"] = resultLists
 	return content
 }
 

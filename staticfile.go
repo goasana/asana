@@ -33,7 +33,7 @@ import (
 var errNotStaticRequest = errors.New("request not a static file request")
 
 func serverStaticRouter(ctx *context.Context) {
-	if ctx.Request.Method() != "GET" && ctx.Request.Method() != "HEAD" {
+	if ctx.Method() != "GET" && ctx.Method() != "HEAD" {
 		return
 	}
 
@@ -55,7 +55,7 @@ func serverStaticRouter(ctx *context.Context) {
 		return
 	}
 	if fileInfo.IsDir() {
-		requestURL := ctx.Request.URL()
+		requestURL := ctx.URL()
 		if requestURL[len(requestURL)-1] != '/' {
 			redirectURL := requestURL + "/"
 			if ctx.HTTPRequest.URL.RawQuery != "" {
@@ -84,9 +84,9 @@ func serverStaticRouter(ctx *context.Context) {
 	}
 
 	if b {
-		ctx.Header(context.HeaderContentEncoding, n)
+		ctx.SetHeader(context.HeaderContentEncoding, n)
 	} else {
-		ctx.Header(context.HeaderContentLength, strconv.FormatInt(sch.size, 10))
+		ctx.SetHeader(context.HeaderContentLength, strconv.FormatInt(sch.size, 10))
 	}
 
 	http.ServeContent(ctx.ResponseWriter, ctx.HTTPRequest, filePath, sch.modTime, reader)
@@ -200,7 +200,7 @@ func lookupFile(ctx *context.Context) (bool, string, os.FileInfo, error) {
 	if !fi.IsDir() {
 		return false, fp, fi, err
 	}
-	if requestURL := ctx.Request.URL(); requestURL[len(requestURL)-1] == '/' {
+	if requestURL := ctx.URL(); requestURL[len(requestURL)-1] == '/' {
 		ifp := filepath.Join(fp, "index.html")
 		if ifi, _ := os.Stat(ifp); ifi != nil && ifi.Mode().IsRegular() {
 			return false, ifp, ifi, err

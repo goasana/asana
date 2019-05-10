@@ -24,16 +24,16 @@ func TestXsrfReset_01(t *testing.T) {
 	r := &http.Request{}
 	c := NewContext()
 	c.HTTPRequest = r
-	c.ResponseWriter = &Response{}
+	c.ResponseWriter = &ResponseWriter{}
 	c.ResponseWriter.reset(httptest.NewRecorder())
-	c.Response.Reset(c)
-	c.Request.Reset(c)
+	c.Response().Reset(c)
+	c.Request().Reset(c)
 	c.SetXSRFToken("key", 16)
 	if c._xsrfToken == "" {
 		t.FailNow()
 	}
 	token := c._xsrfToken
-	c.Reset(&Response{ResponseWriter: httptest.NewRecorder()}, r)
+	c.Reset(&ResponseWriter{ResponseWriter: httptest.NewRecorder()}, r)
 	if c.XSRFToken() != "" {
 		t.FailNow()
 	}

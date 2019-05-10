@@ -86,9 +86,9 @@ func showErr(err interface{}, ctx *context.Context, stack string) {
 	t, _ := template.New("asanaerrortemp").Parse(tpl)
 	data := map[string]string{
 		"AppError":      fmt.Sprintf("%s:%v", BConfig.AppName, err),
-		"RequestMethod": ctx.Request.Method(),
-		"RequestURL":    ctx.Request.URI(),
-		"RemoteAddr":    ctx.Request.IP(),
+		"RequestMethod": ctx.Method(),
+		"RequestURL":    ctx.URI(),
+		"RemoteAddr":    ctx.IP(),
 		"Stack":         stack,
 		"AsanaVersion":  VERSION,
 		"GoVersion":     runtime.Version(),
@@ -416,10 +416,10 @@ func exception(errCode string, ctx *context.Context) {
 		if err == nil {
 			return v
 		}
-		if ctx.Response.Status == 0 {
+		if ctx.GetStatus() == 0 {
 			return 503
 		}
-		return ctx.Response.Status
+		return ctx.GetStatus()
 	}
 
 	for _, ec := range []string{errCode, "503", "500"} {
@@ -430,7 +430,7 @@ func exception(errCode string, ctx *context.Context) {
 	}
 	//if 50x error has been removed from errorMap
 	ctx.ResponseWriter.WriteHeader(atoi(errCode))
-	ctx.WriteString(errCode)
+	ctx.Text(errCode)
 }
 
 func executeError(err *errorInfo, ctx *context.Context, code int) {
@@ -443,7 +443,7 @@ func executeError(err *errorInfo, ctx *context.Context, code int) {
 		return
 	}
 	if err.errorType == errorTypeController {
-		ctx.Response.SetStatus(code)
+		ctx.SetStatus(code)
 		//Invoke the request handler
 		vc := reflect.New(err.controllerType)
 		execController, ok := vc.Interface().(ControllerInterface)

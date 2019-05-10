@@ -80,7 +80,7 @@ func (fd *FlashData) Error(msg string, args ...interface{}) {
 // Store does the saving operation of flash data.
 // the data are encoded and saved in cookie.
 func (fd *FlashData) Store(c *Controller) {
-	c.Data["flash"] = fd.Data
+	c.SetFlash("flash", fd.Data)
 	var flashValue string
 	for key, value := range fd.Data {
 		flashValue += "\x00" + key + "\x23" + BConfig.WebConfig.FlashSeparator + "\x23" + value + "\x00"
@@ -105,6 +105,6 @@ func ReadFromRequest(c *Controller) *FlashData {
 		//read one time then delete it
 		c.SetCookie(BConfig.WebConfig.FlashName, "", -1, "/")
 	}
-	c.Data["flash"] = flash.Data
+	c.SetFlash("flash", flash.Data)
 	return flash
 }

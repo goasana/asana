@@ -43,7 +43,7 @@
 // func (this *MainController) Post() {
 // 	this.TplName = "index.tpl"
 //
-// 	this.Data["Success"] = cpt.VerifyReq(this.Ctx.HTTPRequest)
+// 	this.data["Success"] = cpt.VerifyReq(this.Ctx.HTTPRequest)
 // }
 // ```
 //
@@ -135,11 +135,11 @@ func (c *Captcha) Handler(ctx *context.Context) {
 
 	key := c.key(id)
 
-	if len(ctx.Request.Query("reload")) > 0 {
+	if len(ctx.Query("reload")) > 0 {
 		chars = c.genRandChars()
 		if err := c.store.Put(key, chars, c.Expiration); err != nil {
-			ctx.Response.SetStatus(500)
-			ctx.WriteString("captcha reload error")
+			ctx.SetStatus(500)
+			_ = ctx.Text("captcha reload error")
 			logs.Error("Reload Create Captcha Error:", err)
 			return
 		}
@@ -147,8 +147,8 @@ func (c *Captcha) Handler(ctx *context.Context) {
 		if v, ok := c.store.Get(key).([]byte); ok {
 			chars = v
 		} else {
-			ctx.Response.SetStatus(404)
-			ctx.WriteString("captcha not found")
+			ctx.SetStatus(404)
+			_ = ctx.Text("captcha not found")
 			return
 		}
 	}

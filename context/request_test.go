@@ -97,12 +97,12 @@ func TestBind(t *testing.T) {
 
 		for _, item := range c.valueGp {
 			got := item.empty
-			err := asanaInput.Bind(&got, item.field)
+			err := asanaInput.BindForm(&got, item.field)
 			if err != nil {
 				t.Fatal(err)
 			}
 			if !reflect.DeepEqual(got, item.want) {
-				t.Fatalf("Bind %q error,should be:\n%#v \ngot:\n%#v", item.field, item.want, got)
+				t.Fatalf("BindForm %q error,should be:\n%#v \ngot:\n%#v", item.field, item.want, got)
 			}
 		}
 

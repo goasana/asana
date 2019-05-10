@@ -638,14 +638,14 @@ func (p *ControllerRegister) execFilter(context *context.Context, urlPath string
 			return true
 		}
 		if filterR.resetParams {
-			preFilterParams = context.Request.Params()
+			preFilterParams = context.Params()
 		}
 		if ok := filterR.ValidRouter(urlPath, context); ok {
 			filterR.filterFunc(context)
 			if filterR.resetParams {
-				context.Request.ResetParams()
+				context.ResetParams()
 				for k, v := range preFilterParams {
-					context.Request.SetParam(k, v)
+					context.SetParam(k, v)
 				}
 			}
 		}
@@ -667,18 +667,18 @@ func (p *ControllerRegister) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 		routerInfo   *ControllerInfo
 		isRunnable   bool
 	)
-	context := p.pool.Get().(*context.Context)
-	context.Reset(rw, r)
+	ctx := p.pool.Get().(*context.Context)
+	ctx.Reset(rw, r)
 
-	defer p.pool.Put(context)
+	defer p.pool.Put(ctx)
 	if BConfig.RecoverFunc != nil {
-		defer BConfig.RecoverFunc(context)
+		defer BConfig.RecoverFunc(ctx)
 	}
 
-	context.Response.EnableGzip = BConfig.EnableGzip
+	ctx.EnableGzip = BConfig.EnableGzip
 
 	if BConfig.RunMode == DEV {
-		context.Header("Server", BConfig.ServerName)
+		ctx.SetHeader("Server", BConfig.ServerName)
 	}
 
 	var urlPath = r.URL.Path
@@ -689,86 +689,86 @@ func (p *ControllerRegister) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 
 	// filter wrong http method
 	if !HTTPMETHOD[r.Method] {
-		exception("405", context)
+		exception("405", ctx)
 		goto Admin
 	}
 
 	// filter for static file
-	if len(p.filters[BeforeStatic]) > 0 && p.execFilter(context, urlPath, BeforeStatic) {
+	if len(p.filters[BeforeStatic]) > 0 && p.execFilter(ctx, urlPath, BeforeStatic) {
 		goto Admin
 	}
 
-	serverStaticRouter(context)
+	serverStaticRouter(ctx)
 
-	if context.ResponseWriter.Started {
+	if ctx.ResponseWriter.Started {
 		findRouter = true
 		goto Admin
 	}
 
 	if r.Method != http.MethodGet && r.Method != http.MethodHead {
-		if BConfig.CopyRequestBody && !context.Request.IsUpload() {
-			context.Request.CopyBody(BConfig.MaxMemory)
+		if BConfig.CopyRequestBody && !ctx.IsUpload() {
+			ctx.CopyBody(BConfig.MaxMemory)
 		}
-		_ = context.Request.ParseFormOrMulitForm(BConfig.MaxMemory)
+		_ = ctx.ParseFormOrMultiForm(BConfig.MaxMemory)
 	}
 
 	// session init
 	if BConfig.WebConfig.Session.SessionOn {
 		var err error
-		context.Request.CruSession, err = GlobalSessions.SessionStart(rw, r)
+		ctx.CruSession, err = GlobalSessions.SessionStart(rw, r)
 		if err != nil {
 			logs.Error(err)
-			exception("503", context)
+			exception("503", ctx)
 			goto Admin
 		}
 		defer func() {
-			if context.Request.CruSession != nil {
-				context.Request.CruSession.SessionRelease(rw)
+			if ctx.CruSession != nil {
+				ctx.CruSession.SessionRelease(rw)
 			}
 		}()
 	}
-	if len(p.filters[BeforeRouter]) > 0 && p.execFilter(context, urlPath, BeforeRouter) {
+	if len(p.filters[BeforeRouter]) > 0 && p.execFilter(ctx, urlPath, BeforeRouter) {
 		goto Admin
 	}
 	// User can define RunController and RunMethod in filter
-	if context.Request.RunController != nil && context.Request.RunMethod != "" {
+	if ctx.RunController != nil && ctx.RunMethod != "" {
 		findRouter = true
-		runMethod = context.Request.RunMethod
-		runRouter = context.Request.RunController
+		runMethod = ctx.RunMethod
+		runRouter = ctx.RunController
 	} else {
-		routerInfo, findRouter = p.FindRouter(context)
+		routerInfo, findRouter = p.FindRouter(ctx)
 	}
 
 	//if no matches to url, throw a not found exception
 	if !findRouter {
-		exception("404", context)
+		exception("404", ctx)
 		goto Admin
 	}
-	if splat := context.Request.Param(":splat"); splat != "" {
+	if splat := ctx.Param(":splat"); splat != "" {
 		for k, v := range strings.Split(splat, "/") {
-			context.Request.SetParam(strconv.Itoa(k), v)
+			ctx.SetParam(strconv.Itoa(k), v)
 		}
 	}
 
 	//execute middleware filters
-	if len(p.filters[BeforeExec]) > 0 && p.execFilter(context, urlPath, BeforeExec) {
+	if len(p.filters[BeforeExec]) > 0 && p.execFilter(ctx, urlPath, BeforeExec) {
 		goto Admin
 	}
 
 	//check policies
-	if p.execPolicy(context, urlPath) {
+	if p.execPolicy(ctx, urlPath) {
 		goto Admin
 	}
 
 	if routerInfo != nil {
 		//store router pattern into context
-		context.Request.SetData("RouterPattern", routerInfo.pattern)
+		ctx.Request().SetFlash("RouterPattern", routerInfo.pattern)
 		if routerInfo.routerType == routerTypeRESTFul {
 			if _, ok := routerInfo.methods[r.Method]; ok {
 				isRunnable = true
-				routerInfo.runFunction(context)
+				routerInfo.runFunction(ctx)
 			} else {
-				exception("405", context)
+				exception("405", ctx)
 				goto Admin
 			}
 		} else if routerInfo.routerType == routerTypeHandler {
@@ -778,10 +778,10 @@ func (p *ControllerRegister) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 			runRouter = routerInfo.controllerType
 			methodParams = routerInfo.methodParams
 			method := r.Method
-			if r.Method == http.MethodPost && context.Request.Query("_method") == http.MethodPut {
+			if r.Method == http.MethodPost && ctx.Query("_method") == http.MethodPut {
 				method = http.MethodPut
 			}
-			if r.Method == http.MethodPost && context.Request.Query("_method") == http.MethodDelete {
+			if r.Method == http.MethodPost && ctx.Query("_method") == http.MethodDelete {
 				method = http.MethodDelete
 			}
 			if m, ok := routerInfo.methods[method]; ok {
@@ -810,7 +810,7 @@ func (p *ControllerRegister) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 		}
 
 		//call the controller init function
-		execController.Init(context, runRouter.Name(), runMethod, execController)
+		execController.Init(ctx, runRouter.Name(), runMethod, execController)
 
 		//call prepare function
 		execController.Prepare()
@@ -819,14 +819,14 @@ func (p *ControllerRegister) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 		if BConfig.WebConfig.EnableXSRF {
 			execController.XSRFToken()
 			if r.Method == http.MethodPost || r.Method == http.MethodDelete || r.Method == http.MethodPut ||
-				(r.Method == http.MethodPost && (context.Request.Query("_method") == http.MethodDelete || context.Request.Query("_method") == http.MethodPut)) {
+				(r.Method == http.MethodPost && (ctx.Query("_method") == http.MethodDelete || ctx.Query("_method") == http.MethodPut)) {
 				execController.CheckXSRFCookie()
 			}
 		}
 
 		execController.URLMapping()
 
-		if !context.ResponseWriter.Started {
+		if !ctx.ResponseWriter.Started {
 			//exec main logic
 			switch runMethod {
 			case http.MethodGet:
@@ -849,18 +849,18 @@ func (p *ControllerRegister) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 				if !execController.HandlerFunc(runMethod) {
 					vc := reflect.ValueOf(execController)
 					method := vc.MethodByName(runMethod)
-					in := param.ConvertParams(methodParams, method.Type(), context)
+					in := param.ConvertParams(methodParams, method.Type(), ctx)
 					out := method.Call(in)
 
 					//For backward compatibility we only handle response if we had incoming methodParams
 					if methodParams != nil {
-						p.handleParamResponse(context, execController, out)
+						p.handleParamResponse(ctx, execController, out)
 					}
 				}
 			}
 
 			//render template
-			if !context.ResponseWriter.Started && context.Response.Status == 0 {
+			if !ctx.ResponseWriter.Started && ctx.GetStatus() == 0 {
 				if BConfig.WebConfig.AutoRender {
 					if err := execController.Render(); err != nil {
 						logs.Error(err)
@@ -874,26 +874,26 @@ func (p *ControllerRegister) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 	}
 
 	//execute middleware filters
-	if len(p.filters[AfterExec]) > 0 && p.execFilter(context, urlPath, AfterExec) {
+	if len(p.filters[AfterExec]) > 0 && p.execFilter(ctx, urlPath, AfterExec) {
 		goto Admin
 	}
 
-	if len(p.filters[FinishRouter]) > 0 && p.execFilter(context, urlPath, FinishRouter) {
+	if len(p.filters[FinishRouter]) > 0 && p.execFilter(ctx, urlPath, FinishRouter) {
 		goto Admin
 	}
 
 Admin:
 	//admin module record QPS
 
-	statusCode := context.ResponseWriter.Status
+	statusCode := ctx.ResponseWriter.Status
 	if statusCode == 0 {
 		statusCode = 200
 	}
 
-	LogAccess(context, &startTime, statusCode)
+	LogAccess(ctx, &startTime, statusCode)
 
 	timeDur := time.Since(startTime)
-	context.ResponseWriter.Elapsed = timeDur
+	ctx.ResponseWriter.Elapsed = timeDur
 	if BConfig.Listen.EnableAdmin {
 		pattern := ""
 		if routerInfo != nil {
@@ -912,7 +912,7 @@ Admin:
 	if BConfig.RunMode == DEV && !BConfig.Log.AccessLogs {
 		match := map[bool]string{true: "match", false: "nomatch"}
 		devInfo := fmt.Sprintf("|%15s|%s %3d %s|%13s|%8s|%s %-7s %s %-3s",
-			context.Request.IP(),
+			ctx.IP(),
 			logs.ColorByStatus(statusCode), statusCode, logs.ResetColor(),
 			timeDur.String(),
 			match[findRouter],
@@ -925,8 +925,8 @@ Admin:
 		logs.Debug(devInfo)
 	}
 	// Call WriteHeader if status code has been set changed
-	if context.Response.Status != 0 {
-		context.ResponseWriter.WriteHeader(context.Response.Status)
+	if ctx.GetStatus() != 0 {
+		ctx.ResponseWriter.WriteHeader(ctx.GetStatus())
 	}
 }
 
@@ -939,18 +939,18 @@ func (p *ControllerRegister) handleParamResponse(context *context.Context, execC
 			context.RenderMethodResult(resultValue)
 		}
 	}
-	if !context.ResponseWriter.Started && len(results) > 0 && context.Response.Status == 0 {
-		context.Response.SetStatus(200)
+	if !context.ResponseWriter.Started && len(results) > 0 && context.GetStatus() == 0 {
+		context.SetStatus(200)
 	}
 }
 
 // FindRouter Find Router info for URL
 func (p *ControllerRegister) FindRouter(context *context.Context) (routerInfo *ControllerInfo, isFind bool) {
-	var urlPath = context.Request.URL()
+	var urlPath = context.URL()
 	if !BConfig.RouterCaseSensitive {
 		urlPath = strings.ToLower(urlPath)
 	}
-	httpMethod := context.Request.Method()
+	httpMethod := context.Method()
 	if t, ok := p.routers[httpMethod]; ok {
 		runObject := t.Match(urlPath, context)
 		if r, ok := runObject.(*ControllerInfo); ok {
@@ -991,7 +991,7 @@ func LogAccess(ctx *context.Context, startTime *time.Time, statusCode int) {
 		elapsedTime = time.Since(*startTime)
 	}
 	record := &logs.AccessLogRecord{
-		RemoteAddr:     ctx.Request.IP(),
+		RemoteAddr:     ctx.IP(),
 		RequestTime:    requestTime,
 		RequestMethod:  r.Method,
 		Request:        fmt.Sprintf("%s %s %s", r.Method, r.RequestURI, r.Proto),

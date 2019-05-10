@@ -23,7 +23,7 @@ import (
 )
 
 var FilterUser = func(ctx *context.Context) {
-	_ = ctx.Body([]byte("i am " + ctx.Request.Param(":last") + ctx.Request.Param(":first")))
+	_ = ctx.Body([]byte("i am " + ctx.Param(":last") + ctx.Param(":first")))
 }
 
 func TestFilter(t *testing.T) {

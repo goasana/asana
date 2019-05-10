@@ -91,43 +91,43 @@ func APIBaiscAuth(appID, appKey string) asana.FilterFunc {
 // APISecretAuth use AppIdToAppSecret verify and
 func APISecretAuth(f AppIDToAppSecret, timeout int) asana.FilterFunc {
 	return func(ctx *context.Context) {
-		if ctx.Request.Query("appid") == "" {
+		if ctx.Query("appid") == "" {
 			ctx.ResponseWriter.WriteHeader(403)
-			ctx.WriteString("miss query param: appid")
+			ctx.Text("miss query param: appid")
 			return
 		}
-		appSecret := f(ctx.Request.Query("appid"))
+		appSecret := f(ctx.Query("appid"))
 		if appSecret == "" {
 			ctx.ResponseWriter.WriteHeader(403)
-			ctx.WriteString("not exist this appid")
+			ctx.Text("not exist this appid")
 			return
 		}
-		if ctx.Request.Query("signature") == "" {
+		if ctx.Query("signature") == "" {
 			ctx.ResponseWriter.WriteHeader(403)
-			ctx.WriteString("miss query param: signature")
+			ctx.Text("miss query param: signature")
 			return
 		}
-		if ctx.Request.Query("timestamp") == "" {
+		if ctx.Query("timestamp") == "" {
 			ctx.ResponseWriter.WriteHeader(403)
-			ctx.WriteString("miss query param: timestamp")
+			ctx.Text("miss query param: timestamp")
 			return
 		}
-		u, err := time.Parse("2006-01-02 15:04:05", ctx.Request.Query("timestamp"))
+		u, err := time.Parse("2006-01-02 15:04:05", ctx.Query("timestamp"))
 		if err != nil {
 			ctx.ResponseWriter.WriteHeader(403)
-			ctx.WriteString("timestamp format is error, should 2006-01-02 15:04:05")
+			ctx.Text("timestamp format is error, should 2006-01-02 15:04:05")
 			return
 		}
 		t := time.Now()
 		if t.Sub(u).Seconds() > float64(timeout) {
 			ctx.ResponseWriter.WriteHeader(403)
-			ctx.WriteString("timeout! the request time is long ago, please try again")
+			ctx.Text("timeout! the request time is long ago, please try again")
 			return
 		}
-		if ctx.Request.Query("signature") !=
-			Signature(appSecret, ctx.Request.Method(), ctx.HTTPRequest.Form, ctx.Request.URL()) {
+		if ctx.Query("signature") !=
+			Signature(appSecret, ctx.Method(), ctx.HTTPRequest.Form, ctx.URL()) {
 			ctx.ResponseWriter.WriteHeader(403)
-			ctx.WriteString("auth failed")
+			ctx.Text("auth failed")
 		}
 	}
 }

@@ -75,7 +75,7 @@ var qpsTpl = `{{define "content"}}
 	</thead>
 
 	<tbody>
-	{{range $i, $elem := .Content.Data}}
+	{{range $i, $elem := .Content.data}}
 
 	<tr>
 	    <td>{{index $elem 0}}</td>
@@ -125,7 +125,7 @@ var routerAndFilterTpl = `{{define "content"}}
 	</thead>
 
 	<tbody>
-	{{$slice := index $.Content.Data .}}
+	{{$slice := index $.Content.data .}}
 	{{range $i, $elem := $slice}}
 
 	<tr>
@@ -179,7 +179,7 @@ bg-warning
 </thead>
 
 <tbody>
-{{range $i, $slice := .Content.Data}}
+{{range $i, $slice := .Content.data}}
 <tr>
 	{{range $slice}}
 	<td>
@@ -211,7 +211,7 @@ var healthCheckTpl = `
 </tr>
 </thead>
 <tbody>
-{{range $i, $slice := .Content.Data}}
+{{range $i, $slice := .Content.data}}
 	{{ $header := index $slice 0}}
 	{{ if eq "success" $header}}
 	<tr class="success">

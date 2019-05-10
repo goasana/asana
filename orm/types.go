@@ -71,7 +71,7 @@ type Ormer interface {
 	// user := User{Id: 2}
 	//	user.Langs = append(user.Langs, "zh-CN", "en-US")
 	//	user.Extra.Name = "asana"
-	//	user.Extra.Data = "orm"
+	//	user.Extra.data = "orm"
 	//	num, err = Ormer.Update(&user, "Langs", "Extra")
 	Update(md interface{}, cols ...string) (int64, error)
 	// delete model in database

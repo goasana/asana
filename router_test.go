@@ -31,16 +31,17 @@ type TestController struct {
 }
 
 func (tc *TestController) Get() {
-	tc.Data["Username"] = "asana"
+	tc.Response().PutData("Username", "asana")
+
 	_ = tc.Body([]byte("ok"))
 }
 
 func (tc *TestController) Post() {
-	_ = tc.Body([]byte(tc.Request.Query(":name")))
+	_ = tc.Body([]byte(tc.Request().Query(":name")))
 }
 
 func (tc *TestController) Param() {
-	_ = tc.Body([]byte(tc.Request.Query(":name")))
+	_ = tc.Body([]byte(tc.Request().Query(":name")))
 }
 
 func (tc *TestController) List() {
@@ -48,11 +49,11 @@ func (tc *TestController) List() {
 }
 
 func (tc *TestController) Params() {
-	_ = tc.Body([]byte(tc.Request.Param("0") + tc.Request.Param("1") + tc.Request.Param("2")))
+	_ = tc.Body([]byte(tc.Request().Param("0") + tc.Request().Param("1") + tc.Request().Param("2")))
 }
 
 func (tc *TestController) Myext() {
-	_ = tc.Body([]byte(tc.Request.Param(":ext")))
+	_ = tc.Body([]byte(tc.Request().Param(":ext")))
 }
 
 func (tc *TestController) GetURL() {
@@ -60,12 +61,12 @@ func (tc *TestController) GetURL() {
 }
 
 func (tc *TestController) GetParams() {
-	_ = tc.WriteString(tc.Request.Query(":last") + "+" +
-		tc.Request.Query(":first") + "+" + tc.Request.Query("learn"))
+	_ = tc.Text(tc.Request().Query(":last") + "+" +
+		tc.Request().Query(":first") + "+" + tc.Request().Query("learn"))
 }
 
 func (tc *TestController) GetManyRouter() {
-	_ = tc.WriteString(tc.Request.Query(":id") + tc.Request.Query(":page"))
+	_ = tc.Text(tc.Query(":id") + tc.Request().Query(":page"))
 }
 
 func (tc *TestController) GetEmptyBody() {
@@ -77,12 +78,13 @@ type JSONController struct {
 }
 
 func (jc *JSONController) Prepare() {
-	jc.Data["json"] = "prepare"
+	jc.Response().PutData("json", "prepare")
 	_ = jc.ServeJSON(true)
 }
 
 func (jc *JSONController) Get() {
-	jc.Data["Username"] = "asana"
+	jc.Response().PutData("Username", "asana")
+
 	_ = jc.Body([]byte("ok"))
 }
 
@@ -326,7 +328,7 @@ func TestRouterPost(t *testing.T) {
 
 	handler := NewControllerRegister()
 	handler.Post("/user/:id", func(ctx *context.Context) {
-		_ = ctx.Body([]byte(ctx.Request.Param(":id")))
+		_ = ctx.Body([]byte(ctx.Param(":id")))
 	})
 	handler.ServeHTTP(w, r)
 	if w.Body.String() != "123" {
@@ -367,7 +369,7 @@ func TestRouterHandlerAll(t *testing.T) {
 //
 
 func asanaFilterFunc(ctx *context.Context) {
-	_ = ctx.WriteString("hello")
+	_ = ctx.Text("hello")
 }
 
 type AdminController struct {
@@ -375,7 +377,7 @@ type AdminController struct {
 }
 
 func (a *AdminController) Get() {
-	_ = a.WriteString("hello")
+	_ = a.Text("hello")
 }
 
 func TestRouterFunc(t *testing.T) {
@@ -653,31 +655,31 @@ func asanaFilterNoOutput(_ *context.Context) {
 }
 
 func asanaBeforeRouter1(ctx *context.Context) {
-	_ = ctx.WriteString("|BeforeRouter1")
+	_ = ctx.Text("|BeforeRouter1")
 }
 
 func asanaBeforeExec1(ctx *context.Context) {
-	_ = ctx.WriteString("|BeforeExec1")
+	_ = ctx.Text("|BeforeExec1")
 }
 
 func asanaAfterExec1(ctx *context.Context) {
-	_ = ctx.WriteString("|AfterExec1")
+	_ = ctx.Text("|AfterExec1")
 }
 
 func asanaFinishRouter1(ctx *context.Context) {
-	_ = ctx.WriteString("|FinishRouter1")
+	_ = ctx.Text("|FinishRouter1")
 }
 
 func asanaFinishRouter2(ctx *context.Context) {
-	_ = ctx.WriteString("|FinishRouter2")
+	_ = ctx.Text("|FinishRouter2")
 }
 
 func asanaResetParams(ctx *context.Context) {
-	ctx.ResponseWriter.Header().Set("splat", ctx.Request.Param(":splat"))
+	ctx.ResponseWriter.Header().Set("splat", ctx.Param(":splat"))
 }
 
 func asanaHandleResetParams(ctx *context.Context) {
-	ctx.ResponseWriter.Header().Set("splat", ctx.Request.Param(":splat"))
+	ctx.ResponseWriter.Header().Set("splat", ctx.Param(":splat"))
 }
 
 // YAML
@@ -686,12 +688,13 @@ type YAMLController struct {
 }
 
 func (jc *YAMLController) Prepare() {
-	jc.Data["yaml"] = "prepare"
+	jc.Response().PutData("yaml", "prepare")
 	_ = jc.ServeYAML()
 }
 
 func (jc *YAMLController) Get() {
-	jc.Data["Username"] = "asana"
+	jc.Response().PutData("Username", "asana")
+
 	_ = jc.Body([]byte("ok"))
 }
 
@@ -717,7 +720,8 @@ var expectedProtoObject = &protoexample.Test{
 }
 
 func (jc *ProtoBufController) Prepare() {
-	jc.Data["protobuf"] = expectedProtoObject
+	jc.Response().PutData("protobuf", expectedProtoObject)
+
 	_ = jc.ServeProtoBuf()
 }
 

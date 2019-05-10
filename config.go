@@ -181,7 +181,7 @@ func recoverPanic(ctx *context.Context) {
 			}
 		}
 		var stack string
-		logs.Critical("the request url is ", ctx.Request.URL())
+		logs.Critical("the request url is ", ctx.URL())
 		logs.Critical("Handler crashed with error", err)
 		for i := 1; ; i++ {
 			_, file, line, ok := runtime.Caller(i)
@@ -194,8 +194,8 @@ func recoverPanic(ctx *context.Context) {
 		if BConfig.RunMode == DEV && BConfig.EnableErrorsRender {
 			showErr(err, ctx, stack)
 		}
-		if ctx.Response.Status != 0 {
-			ctx.ResponseWriter.WriteHeader(ctx.Response.Status)
+		if ctx.GetStatus() != 0 {
+			ctx.ResponseWriter.WriteHeader(ctx.GetStatus())
 		} else {
 			ctx.ResponseWriter.WriteHeader(500)
 		}

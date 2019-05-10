@@ -23,33 +23,16 @@
 package context
 
 import (
-	"bufio"
-	"bytes"
-	"crypto/hmac"
-	"crypto/sha1"
-	"encoding/base64"
-	"errors"
-	"fmt"
-	"html/template"
 	"io"
 	"mime"
 	"mime/multipart"
-	"net"
 	"net/http"
 	"net/url"
 	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
-	"time"
 
-	"github.com/beego/i18n"
-	"github.com/goasana/config/encoder/json"
-	"github.com/goasana/config/encoder/proto"
-	"github.com/goasana/config/encoder/xml"
-	"github.com/goasana/config/encoder/yaml"
 	"github.com/goasana/asana/session"
-	"github.com/goasana/asana/utils"
 )
 
 //commonly used mime-types
@@ -60,167 +43,116 @@ const (
 	ApplicationXML      = "application/xml"
 	ApplicationYAML     = "application/x-yaml"
 	ApplicationProtoBuf = "application/x-protobuf"
+	ApplicationMSGPack  = "application/x-msgpack"
 	TextXML             = "text/xml"
 	TextHTML            = "text/html"
 	TextPlain           = "text/plain"
 )
 
-// NewContext return the Context with Request and Response
+// Headers
+const (
+	HeaderAccept                  = "Accept"
+	HeaderReferer                 = "Referer"
+	HeaderUserAgent               = "User-Agent"
+	HeaderAcceptEncoding          = "Accept-Encoding"
+	HeaderAcceptLanguage          = "Accept-Language"
+	HeaderExpires                 = "Expires"
+	HeaderAllow                   = "Allow"
+	HeaderAuthorization           = "Authorization"
+	HeaderCacheControl            = "Cache-Control"
+	HeaderPragma                  = "Pragma"
+	HeaderContentDisposition      = "Content-Disposition"
+	HeaderContentDescription      = "Content-Description"
+	HeaderContentEncoding         = "Content-Encoding"
+	HeaderContentTransferEncoding = "Content-Transfer-Encoding"
+	HeaderContentLength           = "Content-Length"
+	HeaderContentType             = "Content-Type"
+	HeaderCookie                  = "Cookie"
+	HeaderSetCookie               = "Set-Cookie"
+	HeaderIfModifiedSince         = "If-Modified-Since"
+	HeaderLastModified            = "Last-Modified"
+	HeaderLocation                = "Location"
+	HeaderUpgrade                 = "Upgrade"
+	HeaderVary                    = "Vary"
+	HeaderWWWAuthenticate         = "WWW-Authenticate"
+	HeaderXForwardedFor           = "X-Forwarded-For"
+	HeaderXForwardedProto         = "X-Forwarded-Proto"
+	HeaderXForwardedProtocol      = "X-Forwarded-Protocol"
+	HeaderXForwardedSsl           = "X-Forwarded-Ssl"
+	HeaderXUrlScheme              = "X-Url-Scheme"
+	HeaderXHTTPMethodOverride     = "X-HTTP-Method-Override"
+	HeaderXRealIP                 = "X-Real-IP"
+	HeaderXRequestID              = "X-Request-ID"
+	HeaderXRequestedWith          = "X-Requested-With"
+	HeaderServer                  = "Server"
+	HeaderOrigin                  = "Origin"
+
+	// Access control
+	HeaderAccessControlRequestMethod    = "Access-Control-Request-Method"
+	HeaderAccessControlRequestHeaders   = "Access-Control-Request-Headers"
+	HeaderAccessControlAllowOrigin      = "Access-Control-Allow-Origin"
+	HeaderAccessControlAllowMethods     = "Access-Control-Allow-Methods"
+	HeaderAccessControlAllowHeaders     = "Access-Control-Allow-Headers"
+	HeaderAccessControlAllowCredentials = "Access-Control-Allow-Credentials"
+	HeaderAccessControlExposeHeaders    = "Access-Control-Expose-Headers"
+	HeaderAccessControlMaxAge           = "Access-Control-Max-Age"
+
+	// Security
+	HeaderStrictTransportSecurity         = "Strict-Transport-Security"
+	HeaderXContentTypeOptions             = "X-Content-Type-Options"
+	HeaderXXSSProtection                  = "X-XSS-Protection"
+	HeaderXFrameOptions                   = "X-Frame-Options"
+	HeaderContentSecurityPolicy           = "Content-Security-Policy"
+	HeaderContentSecurityPolicyReportOnly = "Content-Security-Policy-Report-Only"
+	HeaderXCSRFToken                      = "X-CSRF-Token"
+)
+
+// NewContext return the Context with Request and ResponseWriter
 func NewContext() *Context {
 	return &Context{
-		Request:  NewRequest(),
-		Response: NewResponse(),
-		Data:     map[interface{}]interface{}{},
+		asanaRequest:  NewRequest(),
+		asanaResponse: NewResponse(),
 	}
 }
 
-// Context Http request context struct including AsanaRequest, AsanaResponse, http.HTTPRequest and http.ResponseWriter.
-// AsanaRequest and AsanaResponse provides some api to operate request and response more easily.
+// Context Http request context struct including asanaRequest, asanaResponse, http.HTTPRequest and http.ResponseWriter.
+// asanaRequest and asanaResponse provides some api to operate request and response more easily.
 type Context struct {
-	Data map[interface{}]interface{}
+	*asanaRequest
+	*asanaResponse
 
-	Request        *AsanaRequest
-	Response       *AsanaResponse
-	HTTPRequest    *http.Request
-	ResponseWriter *Response
-	_xsrfToken     string
-
+	CruSession session.Store
 	// xsrf data
 	XSRFExpire int
 	EnableXSRF bool
 
-	// session
-	CruSession session.Store
-
-	isPro bool
+	IsPro bool
 }
 
-// SetData set the data depending on the accepted
-func (ctx *Context) SetData(data interface{}) *Context {
-	accept := ctx.Request.Header("Accept")
-	switch accept {
-	case ApplicationYAML:
-		ctx.Data["yaml"] = data
-	case ApplicationXML, TextXML:
-		ctx.Data["xml"] = data
-	case ApplicationProtoBuf:
-		ctx.Data["protobuf"] = data
-	case ApplicationJSONP:
-		ctx.Data["jsonp"] = data
-	case ApplicationJSON:
-		ctx.Data["json"] = data
-	case TextHTML:
-		ctx.Data["html"] = data
-	default:
-		ctx.Data["txt"] = data
-	}
-
-	return ctx
+func (ctx *Context) Request() Request {
+	return ctx.asanaRequest
 }
 
-// SetPro set if environment is production
-func (ctx *Context) SetPro(isPro bool) {
-	ctx.isPro = isPro
+func (ctx *Context) Response() Response {
+	return ctx.asanaResponse
 }
 
-// ServeJSON sends a json response with encoding charset.
-func (ctx *Context) ServeJSON(encoding ...bool) error {
-	hasIndent := !ctx.isPro
-	hasEncoding := len(encoding) > 0 && encoding[0]
-	return ctx.JSON(ctx.Data["json"], hasIndent, hasEncoding)
+// Session returns current session item value by a given key.
+// if non-existed, return nil.
+func (ctx *Context) Session(key interface{}) interface{} {
+	return ctx.CruSession.Get(key)
 }
 
-// ServeJSONP sends a jsonp response.
-func (ctx *Context) ServeJSONP() error {
-	hasIndent := !ctx.isPro
-	return ctx.JSONP(ctx.Data["jsonp"], hasIndent)
-}
-
-// ServeXML sends xml response.
-func (ctx *Context) ServeXML() error {
-	hasIndent := !ctx.isPro
-	return ctx.XML(ctx.Data["xml"], hasIndent)
-}
-
-// ServeYAML sends yaml response.
-func (ctx *Context) ServeYAML() error {
-	return ctx.YAML(ctx.Data["yaml"])
-}
-
-// ServeProtoBuf sends protobuf response.
-func (ctx *Context) ServeProtoBuf() error {
-	return ctx.ProtoBuf(ctx.Data["protobuf"])
-}
-
-// ServeHTML sends html response.
-func (ctx *Context) ServeHTML() error {
-	switch ctx.Data["html"].(type) {
-	case string:
-		val := ctx.Data["html"].(string)
-		return ctx.HTML(val)
-	case []byte:
-		val := ctx.Data["html"].([]byte)
-		return ctx.HTMLBlob(val)
-	default:
-		return errors.New("no data found")
-	}
-}
-
-// ServeText sends text plain response.
-func (ctx *Context) ServeText() error {
-	var data interface{}
-	if v, ok := ctx.Data["txt"]; ok {
-		data = v
-	} else {
-		for _, v := range ctx.Data {
-			data = v
-			break
-		}
-	}
-
-	switch data.(type) {
-	case string:
-		val := data.(string)
-		return ctx.Text(val)
-	case []byte:
-		val := data.([]byte)
-		return ctx.TextBlob(val)
-	default:
-		return errors.New("no data found")
-	}
-}
-
-// ServeFormatted serve YAML, XML, JSON, ProtoBuffer, Html or Text, depending on the value of the Accept header
-func (ctx *Context) ServeFormatted(encoding ...bool) error {
-	accept := ctx.Request.Header("Accept")
-	switch accept {
-	case ApplicationYAML:
-		return ctx.ServeYAML()
-	case ApplicationXML, TextXML:
-		return ctx.ServeXML()
-	case ApplicationProtoBuf:
-		return ctx.ServeProtoBuf()
-	case ApplicationJSONP:
-		return ctx.ServeJSONP()
-	case ApplicationJSON:
-		return ctx.ServeJSON(encoding...)
-	case TextHTML:
-		return ctx.ServeHTML()
-	default:
-		return ctx.ServeText()
-	}
-}
-
-// Reset init Context, AsanaRequest and AsanaResponse
+// Reset init Context, asanaRequest and asanaResponse
 func (ctx *Context) Reset(rw http.ResponseWriter, r *http.Request) {
 	ctx.HTTPRequest = r
 	if ctx.ResponseWriter == nil {
-		ctx.ResponseWriter = &Response{}
+		ctx.ResponseWriter = &ResponseWriter{}
 	}
+	ctx.CruSession = nil
 	ctx.ResponseWriter.reset(rw)
-	ctx.Request.Reset(ctx)
-	ctx.Response.Reset(ctx)
-	ctx._xsrfToken = ""
+	ctx.Request().Reset(ctx)
+	ctx.Response().Reset(ctx)
 }
 
 // Input Request returns the input data map from POST or PUT request body and query string.
@@ -233,7 +165,7 @@ func (ctx *Context) Input() url.Values {
 
 // GetString returns the input value by key string or the default value while it's present and input is blank
 func (ctx *Context) GetString(key string, def ...string) string {
-	if v := ctx.Request.Query(key); v != "" {
+	if v := ctx.Query(key); v != "" {
 		return v
 	}
 	if len(def) > 0 {
@@ -261,7 +193,7 @@ func (ctx *Context) GetStrings(key string, def ...[]string) []string {
 
 // GetInt returns input as an int or the default value while it's present and input is blank
 func (ctx *Context) GetInt(key string, def ...int) (int, error) {
-	strv := ctx.Request.Query(key)
+	strv := ctx.Query(key)
 	if len(strv) == 0 && len(def) > 0 {
 		return def[0], nil
 	}
@@ -270,7 +202,7 @@ func (ctx *Context) GetInt(key string, def ...int) (int, error) {
 
 // GetInt8 return input as an int8 or the default value while it's present and input is blank
 func (ctx *Context) GetInt8(key string, def ...int8) (int8, error) {
-	strv := ctx.Request.Query(key)
+	strv := ctx.Query(key)
 	if len(strv) == 0 && len(def) > 0 {
 		return def[0], nil
 	}
@@ -280,7 +212,7 @@ func (ctx *Context) GetInt8(key string, def ...int8) (int8, error) {
 
 // GetUint8 return input as an uint8 or the default value while it's present and input is blank
 func (ctx *Context) GetUint8(key string, def ...uint8) (uint8, error) {
-	strv := ctx.Request.Query(key)
+	strv := ctx.Query(key)
 	if len(strv) == 0 && len(def) > 0 {
 		return def[0], nil
 	}
@@ -290,7 +222,7 @@ func (ctx *Context) GetUint8(key string, def ...uint8) (uint8, error) {
 
 // GetInt16 returns input as an int16 or the default value while it's present and input is blank
 func (ctx *Context) GetInt16(key string, def ...int16) (int16, error) {
-	strv := ctx.Request.Query(key)
+	strv := ctx.Query(key)
 	if len(strv) == 0 && len(def) > 0 {
 		return def[0], nil
 	}
@@ -300,7 +232,7 @@ func (ctx *Context) GetInt16(key string, def ...int16) (int16, error) {
 
 // GetUint16 returns input as an uint16 or the default value while it's present and input is blank
 func (ctx *Context) GetUint16(key string, def ...uint16) (uint16, error) {
-	strv := ctx.Request.Query(key)
+	strv := ctx.Query(key)
 	if len(strv) == 0 && len(def) > 0 {
 		return def[0], nil
 	}
@@ -310,7 +242,7 @@ func (ctx *Context) GetUint16(key string, def ...uint16) (uint16, error) {
 
 // GetInt32 returns input as an int32 or the default value while it's present and input is blank
 func (ctx *Context) GetInt32(key string, def ...int32) (int32, error) {
-	strv := ctx.Request.Query(key)
+	strv := ctx.Query(key)
 	if len(strv) == 0 && len(def) > 0 {
 		return def[0], nil
 	}
@@ -320,7 +252,7 @@ func (ctx *Context) GetInt32(key string, def ...int32) (int32, error) {
 
 // GetUint32 returns input as an uint32 or the default value while it's present and input is blank
 func (ctx *Context) GetUint32(key string, def ...uint32) (uint32, error) {
-	strv := ctx.Request.Query(key)
+	strv := ctx.Query(key)
 	if len(strv) == 0 && len(def) > 0 {
 		return def[0], nil
 	}
@@ -330,7 +262,7 @@ func (ctx *Context) GetUint32(key string, def ...uint32) (uint32, error) {
 
 // GetInt64 returns input value as int64 or the default value while it's present and input is blank.
 func (ctx *Context) GetInt64(key string, def ...int64) (int64, error) {
-	strv := ctx.Request.Query(key)
+	strv := ctx.Query(key)
 	if len(strv) == 0 && len(def) > 0 {
 		return def[0], nil
 	}
@@ -339,7 +271,7 @@ func (ctx *Context) GetInt64(key string, def ...int64) (int64, error) {
 
 // GetUint64 returns input value as uint64 or the default value while it's present and input is blank.
 func (ctx *Context) GetUint64(key string, def ...uint64) (uint64, error) {
-	strv := ctx.Request.Query(key)
+	strv := ctx.Query(key)
 	if len(strv) == 0 && len(def) > 0 {
 		return def[0], nil
 	}
@@ -348,7 +280,7 @@ func (ctx *Context) GetUint64(key string, def ...uint64) (uint64, error) {
 
 // GetBool returns input value as bool or the default value while it's present and input is blank.
 func (ctx *Context) GetBool(key string, def ...bool) (bool, error) {
-	strv := ctx.Request.Query(key)
+	strv := ctx.Query(key)
 	if len(strv) == 0 && len(def) > 0 {
 		return def[0], nil
 	}
@@ -357,7 +289,7 @@ func (ctx *Context) GetBool(key string, def ...bool) (bool, error) {
 
 // GetFloat returns input value as float64 or the default value while it's present and input is blank.
 func (ctx *Context) GetFloat(key string, def ...float64) (float64, error) {
-	strv := ctx.Request.Query(key)
+	strv := ctx.Query(key)
 	if len(strv) == 0 && len(def) > 0 {
 		return def[0], nil
 	}
@@ -370,12 +302,33 @@ func (ctx *Context) GetFile(key string) (multipart.File, *multipart.FileHeader, 
 	return ctx.HTTPRequest.FormFile(key)
 }
 
-// SetStatus sets de code http
-func (ctx *Context) SetStatus(code int) *Context {
-	ctx.Response.Status = code
-	return ctx
-}
-
+//GetFiles return multi-upload files
+//files, err:=c.GetFiles("myfiles")
+//	if err != nil {
+//		http.Error(w, err.Error(), http.StatusNoContent)
+//		return
+//	}
+//for i, _ := range files {
+//	//for each fileheader, get a handle to the actual file
+//	file, err := files[i].Open()
+//	defer file.Close()
+//	if err != nil {
+//		http.Error(w, err.Error(), http.StatusInternalServerError)
+//		return
+//	}
+//	//create destination file making sure the path is writeable.
+//	dst, err := os.Create("upload/" + files[i].Filename)
+//	defer dst.Close()
+//	if err != nil {
+//		http.Error(w, err.Error(), http.StatusInternalServerError)
+//		return
+//	}
+//	//copy the uploaded file to the destination file
+//	if _, err := io.Copy(dst, file); err != nil {
+//		http.Error(w, err.Error(), http.StatusInternalServerError)
+//		return
+//	}
+//}
 // GetFiles get files
 func (ctx *Context) GetFiles(key string) ([]*multipart.FileHeader, error) {
 	if files, ok := ctx.HTTPRequest.MultipartForm.File[key]; ok {
@@ -404,7 +357,7 @@ func (ctx *Context) SaveToFile(fromFile, toFile string) error {
 // StartSession starts session and load old session data info this controller.
 func (ctx *Context) StartSession() session.Store {
 	if ctx.CruSession == nil {
-		ctx.CruSession = ctx.Request.CruSession
+		ctx.CruSession = ctx.CruSession
 	}
 	return ctx.CruSession
 }
@@ -436,246 +389,13 @@ func (ctx *Context) DelSession(name interface{}) {
 
 // IsAjax returns this request is ajax or not.
 func (ctx *Context) IsAjax() bool {
-	return ctx.Request.IsAjax()
+	return ctx.IsAjax()
 }
 
 // XSRFFormHTML writes an input field contains xsrf token value.
 func (ctx *Context) XSRFFormHTML() string {
 	return `<input type="hidden" name="_xsrf" value="` +
 		ctx._xsrfToken + `" />`
-}
-
-// Abort stops this request.
-// if asana.ErrorMaps exists, panic body.
-func (ctx *Context) Abort(body string) error {
-	panic(body)
-	return nil
-}
-
-// GetJWT get token
-func (ctx *Context) GetJWT() (string, error) {
-	authHeader := ctx.Request.Header(HeaderAuthorization)
-	authHeaderParts := strings.Fields(authHeader)
-	if len(authHeaderParts) != 2 || !isJWTHeader(authHeaderParts[0]) {
-		return "", errors.New("authorization header format must be Bearer|JWT|Token {token}")
-	}
-
-	return authHeaderParts[1], nil
-}
-
-func isJWTHeader(header string) bool {
-	for _, v := range strings.Fields("bearer jwt token") {
-		if strings.ToLower(header) == v {
-			return true
-		}
-	}
-
-	return false
-}
-
-// GetLanguage get the language accepted
-func (ctx *Context) GetLanguage(def ...string) string {
-	al := ctx.Request.Header(HeaderAcceptLanguage)
-
-	var lang string
-	if len(def) > 0 {
-		lang = def[0]
-	}
-
-	if len(al) > 0 {
-		if len(al) > 4 {
-			if i18n.IsExist(al[:5]) {
-				lang = al[:5]
-			} else if i18n.IsExist(al[:2]) {
-				lang = al[:2]
-			}
-		}
-	}
-
-	return lang
-}
-
-// Text writes plain text to.Body.
-func (ctx *Context) Text(data string) error {
-	return ctx.TextBlob([]byte(data))
-}
-
-// TextBlob writes plain text to.Body from []byte.
-func (ctx *Context) TextBlob(data []byte) error {
-	return ctx.Blob(TextPlain, []byte(data))
-}
-
-// HTML writes html text to.Body.
-func (ctx *Context) HTML(html string) error {
-	return ctx.HTMLBlob([]byte(html))
-}
-
-// HTMLBlob writes html text to.Body from []byte.
-func (ctx *Context) HTMLBlob(data []byte) error {
-	return ctx.Blob(TextHTML, data)
-}
-
-// Blob writes []byte to.Body.
-func (ctx *Context) Blob(contentType string, b []byte) error {
-	return ctx.Header(HeaderContentType, getContentTypeHead(contentType)).Body(b)
-}
-
-// Stream writes stream to.Body.
-func (ctx *Context) Stream(contentType string, r io.Reader) (err error) {
-	ctx.Header(HeaderContentType, getContentTypeHead(contentType))
-	_, err = io.Copy(ctx.ResponseWriter, r)
-	return
-}
-
-// NoContent white response
-func (ctx *Context) NoContent() error {
-	ctx.ResponseWriter.WriteHeader(ctx.Response.Status)
-	return nil
-}
-
-// Redirect header location redirect
-func (ctx *Context) Redirect(url string) error {
-	if !ctx.Response.IsRedirect() {
-		return errors.New("invalid redirect status code")
-	}
-
-	ctx.ResponseWriter.Header().Set(HeaderLocation, url)
-	ctx.ResponseWriter.WriteHeader(ctx.Response.Status)
-	return nil
-}
-
-// JSON writes json to.Bodyresponse.
-// if encoding is true, it converts utf-8 to \u0000 type.
-func (ctx *Context) JSON(data interface{}, hasIndent bool, encoding bool) error {
-	content, err := json.Encode(data, hasIndent)
-	if err != nil {
-		http.Error(ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
-		return err
-	}
-	if encoding {
-		content = []byte(stringsToJSON(string(content)))
-	}
-	return ctx.Header(HeaderContentType, getContentTypeHead(ApplicationJSON)).Body(content)
-}
-
-// ProtoBuf writes protobuf to.Body.
-func (ctx *Context) ProtoBuf(data interface{}) error {
-	content, err := proto.Encode(data)
-	if err != nil {
-		http.Error(ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
-		return err
-	}
-	return ctx.Header(HeaderContentType, getContentTypeHead(ApplicationProtoBuf)).Body(content)
-}
-
-// YAML writes yaml to.Body.
-func (ctx *Context) YAML(data interface{}) error {
-	content, err := yaml.Encode(data)
-	if err != nil {
-		http.Error(ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
-		return err
-	}
-	return ctx.Header(HeaderContentType, getContentTypeHead(ApplicationYAML)).Body(content)
-}
-
-// JSONP writes jsonp to.Body.
-func (ctx *Context) JSONP(data interface{}, hasIndent bool) error {
-	content, err := json.Encode(data, hasIndent)
-	if err != nil {
-		http.Error(ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
-		return err
-	}
-	callback := ctx.Request.Query("callback")
-	if callback == "" {
-		return errors.New(`"callback" parameter required`)
-	}
-	callback = template.JSEscapeString(callback)
-	callbackContent := bytes.NewBufferString(" if(window." + callback + ")" + callback)
-	callbackContent.WriteString("(")
-	callbackContent.Write(content)
-	callbackContent.WriteString(");\r\n")
-	return ctx.Header(HeaderContentType, getContentTypeHead(ApplicationJSONP)).Body(callbackContent.Bytes())
-}
-
-// XML writes xml string to.Body.
-func (ctx *Context) XML(data interface{}, hasIndent bool) error {
-	content, err := xml.Encode(data, hasIndent)
-	if err != nil {
-		http.Error(ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
-		return err
-	}
-	return ctx.Header(HeaderContentType, getContentTypeHead(ApplicationXML)).Body(content)
-}
-
-// Header sets.Header item string via given key.
-func (ctx *Context) Header(key, val string) *Context {
-	ctx.ResponseWriter.Header().Set(key, val)
-	return ctx
-}
-
-// Body sets.Body content.
-// if EnableGzip, compress content string.
-// it sends out.Body directly.
-func (ctx *Context) Body(content []byte) error {
-	var encoding string
-	var buf = &bytes.Buffer{}
-	if ctx.Response.EnableGzip {
-		encoding = ParseEncoding(ctx.HTTPRequest)
-	}
-	if b, n, _ := WriteBody(encoding, buf, content); b {
-		ctx.Header(HeaderContentEncoding, n)
-		ctx.Header(HeaderContentLength, strconv.Itoa(buf.Len()))
-	} else {
-		ctx.Header(HeaderContentLength, strconv.Itoa(len(content)))
-	}
-	// Write status code if it has been set manually
-	// Set it to 0 afterwards to prevent "multiple response.WriteHeader calls"
-	if ctx.Response.Status != 0 {
-		ctx.ResponseWriter.WriteHeader(ctx.Response.Status)
-		ctx.Response.Status = 0
-	} else {
-		ctx.ResponseWriter.Started = true
-	}
-	_, _ = io.Copy(ctx.ResponseWriter, buf)
-	return nil
-}
-
-// Download forces response for download file.
-// it prepares the download.Header automatically.
-func (ctx *Context) Download(file string, filename ...string) {
-	// check get file error, file not found or other error.
-	if _, err := os.Stat(file); err != nil {
-		http.ServeFile(ctx.ResponseWriter, ctx.HTTPRequest, file)
-		return
-	}
-
-	var fName string
-	if len(filename) > 0 && filename[0] != "" {
-		fName = filename[0]
-	} else {
-		fName = filepath.Base(file)
-	}
-	// https://tools.ietf.org/html/rfc6266#section-4.3
-	fn := url.PathEscape(fName)
-	if fName == fn {
-		fn = "filename=" + fn
-	} else {
-		/**
-		  The parameters "filename" and "filename*" differ only in that
-		  "filename*" uses the encoding defined in [RFC5987], allowing the use
-		  of characters not present in the ISO-8859-1 character set
-		  ([ISO-8859-1]).
-		*/
-		fn = "filename=" + fName + "; filename*=utf-8''" + fn
-	}
-	ctx.Header(HeaderContentDisposition, "attachment; "+fn)
-	ctx.Header(HeaderContentDescription, "File Transfer")
-	ctx.Header(HeaderContentType, "application/octet-stream")
-	ctx.Header(HeaderContentTransferEncoding, "binary")
-	ctx.Header(HeaderExpires, "0")
-	ctx.Header(HeaderCacheControl, "must-revalidate")
-	ctx.Header(HeaderPragma, "public")
-	http.ServeFile(ctx.ResponseWriter, ctx.HTTPRequest, file)
 }
 
 // ContentType sets the content type from ext string.
@@ -686,85 +406,9 @@ func (ctx *Context) ContentType(ext string) *Context {
 	}
 	ctype := mime.TypeByExtension(ext)
 	if ctype != "" {
-		ctx.Header(HeaderContentType, ctype)
+		ctx.SetHeader(HeaderContentType, ctype)
 	}
 	return ctx
-}
-
-// WriteString Write string to.Body.
-// it sends.Body.
-func (ctx *Context) WriteString(content string) (err error) {
-	_, err = ctx.ResponseWriter.Write([]byte(content))
-	return
-}
-
-// GetCookie Get cookie from request by a given key.
-// It's alias of AsanaRequest.Cookie.
-func (ctx *Context) GetCookie(key string) string {
-	return ctx.Request.Cookie(key)
-}
-
-// SetCookie Set cookie for response.
-// It's alias of AsanaResponse.Cookie.
-func (ctx *Context) SetCookie(name string, value string, others ...interface{}) {
-	ctx.Response.Cookie(name, value, others...)
-}
-
-// GetSecureCookie Get secure cookie from request by a given key.
-func (ctx *Context) GetSecureCookie(Secret, key string) (string, bool) {
-	val := ctx.Request.Cookie(key)
-	if val == "" {
-		return "", false
-	}
-
-	parts := strings.SplitN(val, "|", 3)
-
-	if len(parts) != 3 {
-		return "", false
-	}
-
-	vs := parts[0]
-	timestamp := parts[1]
-	sig := parts[2]
-
-	h := hmac.New(sha1.New, []byte(Secret))
-	_, _ = fmt.Fprintf(h, "%s%s", vs, timestamp)
-
-	if fmt.Sprintf("%02x", h.Sum(nil)) != sig {
-		return "", false
-	}
-	res, _ := base64.URLEncoding.DecodeString(vs)
-	return string(res), true
-}
-
-// SetSecureCookie Set Secure cookie for response.
-func (ctx *Context) SetSecureCookie(Secret, name, value string, others ...interface{}) *Context {
-	vs := base64.URLEncoding.EncodeToString([]byte(value))
-	timestamp := strconv.FormatInt(time.Now().UnixNano(), 10)
-	h := hmac.New(sha1.New, []byte(Secret))
-	_, _ = fmt.Fprintf(h, "%s%s", vs, timestamp)
-	sig := fmt.Sprintf("%02x", h.Sum(nil))
-	cookie := strings.Join([]string{vs, timestamp, sig}, "|")
-	ctx.Response.Cookie(name, cookie, others...)
-	return ctx
-}
-
-// SetXSRFToken creates a xsrf token string and returns.
-func (ctx *Context) SetXSRFToken(key string, expire int64) string {
-	if ctx._xsrfToken == "" {
-		token, ok := ctx.GetSecureCookie(key, "_xsrf")
-		if !ok {
-			token = string(utils.RandomCreateBytes(32))
-			ctx.SetSecureCookie(key, "_xsrf", token, expire)
-		}
-		ctx._xsrfToken = token
-	}
-	return ctx._xsrfToken
-}
-
-// XSRFToken get _xsrfToken value
-func (ctx *Context) XSRFToken() string {
-	return ctx._xsrfToken
 }
 
 // CheckXSRFCookie checks xsrf token in this request is valid or not.
@@ -775,7 +419,7 @@ func (ctx *Context) CheckXSRFCookie() bool {
 		return true
 	}
 
-	token := ctx.Request.Query("_xsrf")
+	token := ctx.Query("_xsrf")
 	if token == "" {
 		token = ctx.HTTPRequest.Header.Get(HeaderXCSRFToken)
 	}
@@ -788,79 +432,4 @@ func (ctx *Context) CheckXSRFCookie() bool {
 		return false
 	}
 	return true
-}
-
-// RenderMethodResult renders the return value of a controller method to the output
-func (ctx *Context) RenderMethodResult(result interface{}) {
-	if result != nil {
-		renderer, ok := result.(Renderer)
-		if !ok {
-			err, ok := result.(error)
-			if ok {
-				renderer = errorRenderer(err)
-			} else {
-				renderer = jsonRenderer(result)
-			}
-		}
-		renderer.Render(ctx)
-	}
-}
-
-//Response is a wrapper for the http.ResponseWriter
-//started set to true if response was written to then don't execute other handler
-type Response struct {
-	http.ResponseWriter
-	Started bool
-	Status  int
-	Elapsed time.Duration
-}
-
-func (r *Response) reset(rw http.ResponseWriter) {
-	r.ResponseWriter = rw
-	r.Status = 0
-	r.Started = false
-}
-
-// Write writes the data to the connection as part of an HTTP reply,
-// and sets `started` to true.
-// started means the response has sent out.
-func (r *Response) Write(p []byte) (int, error) {
-	r.Started = true
-	return r.ResponseWriter.Write(p)
-}
-
-// WriteHeader sends an HTTP.Header with status code,
-// and sets `started` to true.
-func (r *Response) WriteHeader(code int) {
-	if r.Status > 0 {
-		//prevent multiple response.WriteHeader calls
-		return
-	}
-	r.Status = code
-	r.Started = true
-	r.ResponseWriter.WriteHeader(code)
-}
-
-// Hijack hijacker for http
-func (r *Response) Hijack() (net.Conn, *bufio.ReadWriter, error) {
-	hj, ok := r.ResponseWriter.(http.Hijacker)
-	if !ok {
-		return nil, nil, errors.New("webserver doesn't support hijacking")
-	}
-	return hj.Hijack()
-}
-
-// Flush http.Flusher
-func (r *Response) Flush() {
-	if f, ok := r.ResponseWriter.(http.Flusher); ok {
-		f.Flush()
-	}
-}
-
-// Pusher http.Pusher
-func (r *Response) Pusher() (pusher http.Pusher) {
-	if pusher, ok := r.ResponseWriter.(http.Pusher); ok {
-		return pusher
-	}
-	return nil
 }

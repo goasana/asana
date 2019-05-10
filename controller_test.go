@@ -25,9 +25,8 @@ import (
 )
 
 func TestGetInt(t *testing.T) {
-	i := context.NewRequest()
-	i.SetParam("age", "40")
-	ctx := &context.Context{Request: i}
+	ctx := context.NewContext()
+	ctx.SetParam("age", "40")
 	ctrlr := Controller{Context: ctx}
 	val, _ := ctrlr.GetInt("age")
 	if val != 40 {
@@ -36,21 +35,19 @@ func TestGetInt(t *testing.T) {
 }
 
 func TestGetInt8(t *testing.T) {
-	i := context.NewRequest()
-	i.SetParam("age", "40")
-	ctx := &context.Context{Request: i}
+	ctx := context.NewContext()
+	ctx.SetParam("age", "40")
 	ctrlr := Controller{Context: ctx}
 	val, _ := ctrlr.GetInt8("age")
 	if val != 40 {
 		t.Errorf("TestGetInt8 expect 40,get %T,%v", val, val)
 	}
-	//Response: int8
+	//ResponseWriter: int8
 }
 
 func TestGetInt16(t *testing.T) {
-	i := context.NewRequest()
-	i.SetParam("age", "40")
-	ctx := &context.Context{Request: i}
+	ctx := context.NewContext()
+	ctx.SetParam("age", "40")
 	ctrlr := Controller{Context: ctx}
 	val, _ := ctrlr.GetInt16("age")
 	if val != 40 {
@@ -59,9 +56,8 @@ func TestGetInt16(t *testing.T) {
 }
 
 func TestGetInt32(t *testing.T) {
-	i := context.NewRequest()
-	i.SetParam("age", "40")
-	ctx := &context.Context{Request: i}
+	ctx := context.NewContext()
+	ctx.SetParam("age", "40")
 	ctrlr := Controller{Context: ctx}
 	val, _ := ctrlr.GetInt32("age")
 	if val != 40 {
@@ -70,9 +66,8 @@ func TestGetInt32(t *testing.T) {
 }
 
 func TestGetInt64(t *testing.T) {
-	i := context.NewRequest()
-	i.SetParam("age", "40")
-	ctx := &context.Context{Request: i}
+	ctx := context.NewContext()
+	ctx.SetParam("age", "40")
 	ctrlr := Controller{Context: ctx}
 	val, _ := ctrlr.GetInt64("age")
 	if val != 40 {
@@ -81,9 +76,8 @@ func TestGetInt64(t *testing.T) {
 }
 
 func TestGetUint8(t *testing.T) {
-	i := context.NewRequest()
-	i.SetParam("age", strconv.FormatUint(math.MaxUint8, 10))
-	ctx := &context.Context{Request: i}
+	ctx := context.NewContext()
+	ctx.SetParam("age", strconv.FormatUint(math.MaxUint8, 10))
 	ctrlr := Controller{Context: ctx}
 	val, _ := ctrlr.GetUint8("age")
 	if val != math.MaxUint8 {
@@ -92,9 +86,8 @@ func TestGetUint8(t *testing.T) {
 }
 
 func TestGetUint16(t *testing.T) {
-	i := context.NewRequest()
-	i.SetParam("age", strconv.FormatUint(math.MaxUint16, 10))
-	ctx := &context.Context{Request: i}
+	ctx := context.NewContext()
+	ctx.SetParam("age", strconv.FormatUint(math.MaxUint16, 10))
 	ctrlr := Controller{Context: ctx}
 	val, _ := ctrlr.GetUint16("age")
 	if val != math.MaxUint16 {
@@ -103,9 +96,8 @@ func TestGetUint16(t *testing.T) {
 }
 
 func TestGetUint32(t *testing.T) {
-	i := context.NewRequest()
-	i.SetParam("age", strconv.FormatUint(math.MaxUint32, 10))
-	ctx := &context.Context{Request: i}
+	ctx := context.NewContext()
+	ctx.SetParam("age", strconv.FormatUint(math.MaxUint32, 10))
 	ctrlr := Controller{Context: ctx}
 	val, _ := ctrlr.GetUint32("age")
 	if val != math.MaxUint32 {
@@ -114,9 +106,8 @@ func TestGetUint32(t *testing.T) {
 }
 
 func TestGetUint64(t *testing.T) {
-	i := context.NewRequest()
-	i.SetParam("age", strconv.FormatUint(math.MaxUint64, 10))
-	ctx := &context.Context{Request: i}
+	ctx := context.NewContext()
+	ctx.SetParam("age", strconv.FormatUint(math.MaxUint64, 10))
 	ctrlr := Controller{Context: ctx}
 	val, _ := ctrlr.GetUint64("age")
 	if val != math.MaxUint64 {
@@ -155,9 +146,9 @@ func TestAdditionalViewPaths(t *testing.T) {
 		TplName:  "file1.tpl",
 		ViewPath: dir1,
 	}
-	ctrl.Data = map[interface{}]interface{}{
+	ctrl.Response().SetData(map[interface{}]interface{}{
 		"Content": "value2",
-	}
+	})
 	if result, err := ctrl.RenderString(); err != nil {
 		t.Fatal(err)
 	} else {

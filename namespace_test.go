@@ -44,7 +44,7 @@ func TestNamespacePost(t *testing.T) {
 
 	ns := NewNamespace("/v1")
 	ns.Post("/user/:id", func(ctx *context.Context) {
-		_ = ctx.Body([]byte(ctx.Request.Param(":id")))
+		_ = ctx.Body([]byte(ctx.Param(":id")))
 	})
 	AddNamespace(ns)
 	AsanaApp.Handlers.ServeHTTP(w, r)
@@ -79,7 +79,7 @@ func TestNamespaceNestParam(t *testing.T) {
 	ns.Namespace(
 		NewNamespace("/admin").
 			Get("/order/:id", func(ctx *context.Context) {
-				_ = ctx.Body([]byte(ctx.Request.Param(":id")))
+				_ = ctx.Body([]byte(ctx.Param(":id")))
 			}),
 	)
 	AddNamespace(ns)
@@ -124,7 +124,7 @@ func TestNamespaceFilter(t *testing.T) {
 		_ = ctx.Body([]byte("this is Filter"))
 	}).
 		Get("/user/:id", func(ctx *context.Context) {
-			_ = ctx.Body([]byte(ctx.Request.Param(":id")))
+			_ = ctx.Body([]byte(ctx.Param(":id")))
 		})
 	AddNamespace(ns)
 	AsanaApp.Handlers.ServeHTTP(w, r)
@@ -139,7 +139,7 @@ func TestNamespaceCond(t *testing.T) {
 
 	ns := NewNamespace("/v2")
 	ns.Cond(func(ctx *context.Context) bool {
-		return ctx.Request.Domain() == "asana.me"
+		return ctx.Domain() == "asana.me"
 	}).
 		AutoRouter(&TestController{})
 	AddNamespace(ns)
@@ -156,7 +156,7 @@ func TestNamespaceInside(t *testing.T) {
 		NSAutoRouter(&TestController{}),
 		NSNamespace("/shop",
 			NSGet("/order/:id", func(ctx *context.Context) {
-				_ = ctx.Body([]byte(ctx.Request.Param(":id")))
+				_ = ctx.Body([]byte(ctx.Param(":id")))
 			}),
 		),
 	)

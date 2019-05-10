@@ -213,7 +213,7 @@ func (b *AsanaHTTPRequest) DumpRequest() []byte {
 	return b.dump
 }
 
-// SetTimeout sets connect time out and read-write time out for AsanaRequest.
+// SetTimeout sets connect time out and read-write time out for asanaRequest.
 func (b *AsanaHTTPRequest) SetTimeout(connectTimeout, readWriteTimeout time.Duration) *AsanaHTTPRequest {
 	b.setting.ConnectTimeout = connectTimeout
 	b.setting.ReadWriteTimeout = readWriteTimeout
@@ -521,7 +521,7 @@ func (b *AsanaHTTPRequest) DoRequest() (resp *http.Response, err error) {
 }
 
 // String returns the body string in response.
-// it calls Response inner.
+// it calls ResponseWriter inner.
 func (b *AsanaHTTPRequest) String() (string, error) {
 	data, err := b.Bytes()
 	if err != nil {
@@ -532,7 +532,7 @@ func (b *AsanaHTTPRequest) String() (string, error) {
 }
 
 // Bytes returns the body []byte in response.
-// it calls Response inner.
+// it calls ResponseWriter inner.
 func (b *AsanaHTTPRequest) Bytes() ([]byte, error) {
 	if b.body != nil {
 		return b.body, nil
@@ -558,7 +558,7 @@ func (b *AsanaHTTPRequest) Bytes() ([]byte, error) {
 }
 
 // ToFile saves the body data in response to one file.
-// it calls Response inner.
+// it calls ResponseWriter inner.
 func (b *AsanaHTTPRequest) ToFile(filename string) error {
 	f, err := os.Create(filename)
 	if err != nil {
@@ -579,7 +579,7 @@ func (b *AsanaHTTPRequest) ToFile(filename string) error {
 }
 
 // ToJSON returns the map that marshals from the body bytes as json in response .
-// it calls Response inner.
+// it calls ResponseWriter inner.
 func (b *AsanaHTTPRequest) ToJSON(v interface{}) error {
 	data, err := b.Bytes()
 	if err != nil {
@@ -589,7 +589,7 @@ func (b *AsanaHTTPRequest) ToJSON(v interface{}) error {
 }
 
 // ToXML returns the map that marshals from the body bytes as xml in response .
-// it calls Response inner.
+// it calls ResponseWriter inner.
 func (b *AsanaHTTPRequest) ToXML(v interface{}) error {
 	data, err := b.Bytes()
 	if err != nil {
@@ -599,7 +599,7 @@ func (b *AsanaHTTPRequest) ToXML(v interface{}) error {
 }
 
 // ToYAML returns the map that marshals from the body bytes as yaml in response .
-// it calls Response inner.
+// it calls ResponseWriter inner.
 func (b *AsanaHTTPRequest) ToYAML(v interface{}) error {
 	data, err := b.Bytes()
 	if err != nil {
@@ -608,7 +608,7 @@ func (b *AsanaHTTPRequest) ToYAML(v interface{}) error {
 	return yaml.Decode(data, v)
 }
 
-// Response executes request client gets response mannually.
+// ResponseWriter executes request client gets response mannually.
 func (b *AsanaHTTPRequest) Response() (*http.Response, error) {
 	return b.getResponse()
 }

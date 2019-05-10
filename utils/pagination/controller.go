@@ -18,9 +18,9 @@ import (
 	"github.com/goasana/asana/context"
 )
 
-// SetPaginator Instantiates a Paginator and assigns it to context.Request.Data("paginator").
+// SetPaginator Instantiates a Paginator and assigns it to context.Request.data("paginator").
 func SetPaginator(context *context.Context, per int, nums int64) (paginator *Paginator) {
 	paginator = NewPaginator(context.HTTPRequest, per, nums)
-	context.Request.SetData("paginator", &paginator)
+	context.Request().SetFlash("paginator", &paginator)
 	return
 }

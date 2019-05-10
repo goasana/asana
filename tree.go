@@ -346,7 +346,7 @@ func (t *Tree) match(treePattern string, pattern string, wildcardValues []string
 					if subTree.prefix == seg[:len(seg)-len(str)] {
 						runObject = subTree.match(treePattern, pattern, wildcardValues, ctx)
 						if runObject != nil {
-							ctx.Request.SetParam(":ext", str[1:])
+							ctx.SetParam(":ext", str[1:])
 						}
 					}
 				}
@@ -399,7 +399,7 @@ func (leaf *leafInfo) match(treePattern string, wildcardValues []string, ctx *co
 		}
 		// match *
 		if len(leaf.wildcards) == 1 && leaf.wildcards[0] == ":splat" {
-			ctx.Request.SetParam(":splat", treePattern)
+			ctx.SetParam(":splat", treePattern)
 			return true
 		}
 		// match *.* or :id
@@ -408,26 +408,26 @@ func (leaf *leafInfo) match(treePattern string, wildcardValues []string, ctx *co
 				lastOne := wildcardValues[len(wildcardValues)-1]
 				strs := strings.SplitN(lastOne, ".", 2)
 				if len(strs) == 2 {
-					ctx.Request.SetParam(":ext", strs[1])
+					ctx.SetParam(":ext", strs[1])
 				}
-				ctx.Request.SetParam(":path", path.Join(path.Join(wildcardValues[:len(wildcardValues)-1]...), strs[0]))
+				ctx.SetParam(":path", path.Join(path.Join(wildcardValues[:len(wildcardValues)-1]...), strs[0]))
 				return true
 			} else if len(wildcardValues) < 2 {
 				return false
 			}
 			var index int
 			for index = 0; index < len(leaf.wildcards)-2; index++ {
-				ctx.Request.SetParam(leaf.wildcards[index], wildcardValues[index])
+				ctx.SetParam(leaf.wildcards[index], wildcardValues[index])
 			}
 			lastOne := wildcardValues[len(wildcardValues)-1]
 			strs := strings.SplitN(lastOne, ".", 2)
 			if len(strs) == 2 {
-				ctx.Request.SetParam(":ext", strs[1])
+				ctx.SetParam(":ext", strs[1])
 			}
 			if index > (len(wildcardValues) - 1) {
-				ctx.Request.SetParam(":path", "")
+				ctx.SetParam(":path", "")
 			} else {
-				ctx.Request.SetParam(":path", path.Join(path.Join(wildcardValues[index:len(wildcardValues)-1]...), strs[0]))
+				ctx.SetParam(":path", path.Join(path.Join(wildcardValues[index:len(wildcardValues)-1]...), strs[0]))
 			}
 			return true
 		}
@@ -436,7 +436,7 @@ func (leaf *leafInfo) match(treePattern string, wildcardValues []string, ctx *co
 			return false
 		}
 		for j, v := range leaf.wildcards {
-			ctx.Request.SetParam(v, wildcardValues[j])
+			ctx.SetParam(v, wildcardValues[j])
 		}
 		return true
 	}
@@ -447,7 +447,7 @@ func (leaf *leafInfo) match(treePattern string, wildcardValues []string, ctx *co
 	matches := leaf.regexps.FindStringSubmatch(path.Join(wildcardValues...))
 	for i, match := range matches[1:] {
 		if i < len(leaf.wildcards) {
-			ctx.Request.SetParam(leaf.wildcards[i], match)
+			ctx.SetParam(leaf.wildcards[i], match)
 		}
 	}
 	return true

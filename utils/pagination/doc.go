@@ -15,12 +15,12 @@ In your asana.Controller:
  }
 
  func (this *PostsController) ListAllPosts() {
-     // sets this.Data["paginator"] with the current offset (from the url query param)
+     // sets this.data["paginator"] with the current offset (from the url query param)
      postsPerPage := 20
      paginator := pagination.SetPaginator(this.Ctx, postsPerPage, CountPosts())
 
      // fetch the next 20 posts
-     this.Data["posts"] = ListPostsByOffsetAndLimit(paginator.Offset(), postsPerPage)
+     this.data["posts"] = ListPostsByOffsetAndLimit(paginator.Offset(), postsPerPage)
  }
 
 

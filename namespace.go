@@ -48,7 +48,7 @@ func NewNamespace(prefix string, params ...LinkNamespace) *Namespace {
 // if cond return true can run this namespace, else can't
 // usage:
 // ns.Cond(func (ctx *context.Context) bool{
-//       if ctx.Request.Domain() == "api.asana.me" {
+//       if ctx.Domain() == "api.asana.me" {
 //         return true
 //       }
 //       return false
@@ -78,7 +78,7 @@ func (n *Namespace) Cond(cond namespaceCond) *Namespace {
 // FilterFunc
 // usage:
 // Filter("before", func (ctx *context.Context){
-//       _, ok := ctx.Request.Session("uid").(int)
+//       _, ok := ctx.Session("uid").(int)
 //       if !ok && ctx.HTTPRequest.RequestURI != "/login" {
 //          ctx.Redirect(302, "/login")
 //        }

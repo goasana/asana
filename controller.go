@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/goasana/asana/context/parsers"
 	"html/template"
 	"net/http"
 	"reflect"
@@ -130,9 +131,8 @@ func (c *Controller) Init(ctx *context.Context, controllerName, actionName strin
 	c.AppController = app
 	c.EnableRender = true
 	c.EnableXSRF = true
-	c.Data = ctx.Request.Data()
 	c.methodMapping = make(map[string]func())
-	c.SetPro(BConfig.RunMode == PROD)
+	c.IsPro = BConfig.RunMode == PROD
 }
 
 // Prepare runs after Init before request function execution.
@@ -192,10 +192,10 @@ func (c *Controller) Trace() {
 		return
 	}
 	hs := fmt.Sprintf("\r\nTRACE %s %s%s\r\n", c.HTTPRequest.RequestURI, c.HTTPRequest.Proto, ts(c.HTTPRequest.Header))
-	c.Header(context.HeaderContentType, "message/http")
-	c.Header(context.HeaderContentLength, fmt.Sprint(len(hs)))
-	c.Header(context.HeaderCacheControl, "no-cache, no-store, must-revalidate")
-	_ = c.WriteString(hs)
+	c.SetHeader(context.HeaderContentType, "message/http")
+	c.SetHeader(context.HeaderContentLength, fmt.Sprint(len(hs)))
+	c.SetHeader(context.HeaderCacheControl, "no-cache, no-store, must-revalidate")
+	_ = c.Text(hs)
 }
 
 // HandlerFunc call function with the name
@@ -226,7 +226,7 @@ func (c *Controller) Render() error {
 	}
 
 	if c.ResponseWriter.Header().Get(context.HeaderContentType) == "" {
-		c.Header(context.HeaderContentType, "text/html; charset=utf-8")
+		c.SetHeader(context.HeaderContentType, "text/html; charset=utf-8")
 	}
 
 	return c.Body(rb)
@@ -243,25 +243,25 @@ func (c *Controller) RenderBytes() ([]byte, error) {
 	buf, err := c.renderTemplate()
 	//if the controller has set layout, then first get the tplName's content set the content to the layout
 	if err == nil && c.Layout != "" {
-		c.Data["LayoutContent"] = template.HTML(buf.String())
+		c.Response().PutData("LayoutContent", template.HTML(buf.String()))
 
 		if c.LayoutSections != nil {
 			for sectionName, sectionTpl := range c.LayoutSections {
 				if sectionTpl == "" {
-					c.Data[sectionName] = ""
+					c.Response().PutData(sectionName, "")
 					continue
 				}
 				buf.Reset()
-				err = ExecuteViewPathTemplate(&buf, sectionTpl, c.viewPath(), c.Data)
+				err = ExecuteViewPathTemplate(&buf, sectionTpl, c.viewPath(), c.Response().GetData())
 				if err != nil {
 					return nil, err
 				}
-				c.Data[sectionName] = template.HTML(buf.String())
+				c.Response().PutData(sectionName, template.HTML(buf.String()))
 			}
 		}
 
 		buf.Reset()
-		_ = ExecuteViewPathTemplate(&buf, c.Layout, c.viewPath(), c.Data)
+		_ = ExecuteViewPathTemplate(&buf, c.Layout, c.viewPath(), c.Response().GetData())
 	}
 	return buf.Bytes(), err
 }
@@ -289,7 +289,7 @@ func (c *Controller) renderTemplate() (bytes.Buffer, error) {
 		}
 		_ = BuildTemplate(c.viewPath(), buildFiles...)
 	}
-	return buf, ExecuteViewPathTemplate(&buf, c.TplName, c.viewPath(), c.Data)
+	return buf, ExecuteViewPathTemplate(&buf, c.TplName, c.viewPath(), c.Context.Response().GetData())
 }
 
 func (c *Controller) viewPath() string {
@@ -301,7 +301,7 @@ func (c *Controller) viewPath() string {
 
 // Redirect sends the redirection response to url with status code.
 func (c *Controller) Redirect(url string) error {
-	LogAccess(c.Context, nil, c.Response.Status)
+	LogAccess(c.Context, nil, c.GetStatus())
 	return c.Context.Redirect(url)
 }
 
@@ -322,39 +322,26 @@ func (c *Controller) ParseForm(obj interface{}) error {
 	return ParseForm(c.Input(), obj)
 }
 
-// GetFiles return multi-upload files
-// files, err:=c.GetFiles("myfiles")
-//	if err != nil {
-//		http.Error(w, err.Error(), http.StatusNoContent)
-//		return
-//	}
-// for i, _ := range files {
-//	//for each fileheader, get a handle to the actual file
-//	file, err := files[i].Open()
-//	defer file.Close()
-//	if err != nil {
-//		http.Error(w, err.Error(), http.StatusInternalServerError)
-//		return
-//	}
-//	//create destination file making sure the path is writeable.
-//	dst, err := os.Create("upload/" + files[i].Filename)
-//	defer dst.Close()
-//	if err != nil {
-//		http.Error(w, err.Error(), http.StatusInternalServerError)
-//		return
-//	}
-//	//copy the uploaded file to the destination file
-//	if _, err := io.Copy(dst, file); err != nil {
-//		http.Error(w, err.Error(), http.StatusInternalServerError)
-//		return
-//	}
-// }
+// ParseBody input data map to obj struct depending on the type of content.
+func (c *Controller) ParseBody(obj interface{}) error {
+	if c.AcceptsJSON() {
+		return parsers.GetProvider(parsers.JSON).Parse(c.HTTPRequest, obj)
+	} else if c.AcceptsYAML() {
+		return parsers.GetProvider(parsers.YAML).Parse(c.HTTPRequest, obj)
+	} else if c.AcceptsXML() {
+		return parsers.GetProvider(parsers.XML).Parse(c.HTTPRequest, obj)
+	} else if c.AcceptsProtoBuf() {
+		return parsers.GetProvider(parsers.PROTOBUF).Parse(c.HTTPRequest, obj)
+	}
+	return c.ParseBody(obj)
+}
 
 // CustomAbort stops controller handler and show the error data, it's similar Aborts, but support status code and body.
 func (c *Controller) CustomAbort(status int, body string) {
 	// first panic from ErrorMaps, it is user defined error functions.
+	c.Response().SetStatus(status)
+
 	if _, ok := ErrorMaps[body]; ok {
-		c.Response.Status = status
 		panic(body)
 	}
 	// last panic user string
@@ -362,7 +349,6 @@ func (c *Controller) CustomAbort(status int, body string) {
 	_, _ = c.ResponseWriter.Write([]byte(body))
 	panic(ErrAbort)
 }
-
 
 // StopRun makes panic of USERSTOPRUN error and go to recover function if defined.
 func (c *Controller) StopRun() {
@@ -376,13 +362,13 @@ func (c *Controller) SessionRegenerateID() {
 		c.CruSession.SessionRelease(c.ResponseWriter)
 	}
 	c.CruSession = GlobalSessions.SessionRegenerateID(c.ResponseWriter, c.HTTPRequest)
-	c.Request.CruSession = c.CruSession
+	c.CruSession = c.CruSession
 }
 
 // DestroySession cleans session data and session cookie.
 func (c *Controller) DestroySession() {
-	_ = c.Request.CruSession.Flush()
-	c.Request.CruSession = nil
+	_ = c.CruSession.Flush()
+	c.CruSession = nil
 	GlobalSessions.SessionDestroy(c.ResponseWriter, c.HTTPRequest)
 }
 

@@ -704,7 +704,7 @@ func ge(arg1, arg2 interface{}) (bool, error) {
 
 // MapGet getting value from map by keys
 // usage:
-// Data["m"] = M{
+// data["m"] = M{
 //     "a": 1,
 //     "1": map[string]float64{
 //         "c": 4,

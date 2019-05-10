@@ -78,7 +78,7 @@ func qpsIndex(rw http.ResponseWriter, _ *http.Request) {
 
 	// do html escape before display path, avoid xss
 	if content, ok := (data["Content"]).(M); ok {
-		if resultLists, ok := (content["Data"]).([][]string); ok {
+		if resultLists, ok := (content["data"]).([][]string); ok {
 			for i := range resultLists {
 				if len(resultLists[i]) > 0 {
 					resultLists[i][0] = template.HTMLEscapeString(resultLists[i][0])
@@ -160,7 +160,7 @@ func listConf(rw http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		content["Data"] = filterTypeData
+		content["data"] = filterTypeData
 		content["Methods"] = filterTypes
 
 		data["Content"] = content
@@ -210,7 +210,7 @@ func PrintTree() M {
 		methodsData[method] = resultList
 	}
 
-	content["Data"] = methodsData
+	content["data"] = methodsData
 	content["Methods"] = methods
 	return content
 }
@@ -316,7 +316,7 @@ func healthcheck(rw http.ResponseWriter, _ *http.Request) {
 		*resultList = append(*resultList, result)
 	}
 
-	content["Data"] = resultList
+	content["data"] = resultList
 	data["Content"] = content
 	data["Title"] = "Health Check"
 	execTpl(rw, data, healthCheckTpl, defaultScriptsTpl)
@@ -362,7 +362,7 @@ func taskStatus(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	content["Fields"] = fields
-	content["Data"] = resultList
+	content["data"] = resultList
 	data["Content"] = content
 	data["Title"] = "Tasks"
 	execTpl(rw, data, tasksTpl, defaultScriptsTpl)
