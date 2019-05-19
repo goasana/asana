@@ -199,7 +199,7 @@ type q struct {
 }
 
 func parseEncoding(r *http.Request) string {
-	acceptEncoding := r.Header.Get(HeaderAcceptEncoding)
+	acceptEncoding := strings.ToLower(r.Header.Get(HeaderAcceptEncoding))
 	if acceptEncoding == "" {
 		return ""
 	}
@@ -212,7 +212,8 @@ func parseEncoding(r *http.Request) string {
 		vs := strings.Split(v, ";")
 		var cf acceptEncoder
 		var ok bool
-		if cf, ok = encoderMap[vs[0]]; !ok {
+		val := strings.Replace(strings.ToLower(vs[0]), "application/", "", 1)
+		if cf, ok = encoderMap[val]; !ok {
 			continue
 		}
 		if len(vs) == 1 {

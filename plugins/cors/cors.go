@@ -46,19 +46,6 @@ import (
 	"github.com/goasana/asana/context"
 )
 
-const (
-	headerAllowOrigin      = "Access-Control-Allow-Origin"
-	headerAllowCredentials = "Access-Control-Allow-Credentials"
-	headerAllowHeaders     = "Access-Control-Allow-Headers"
-	headerAllowMethods     = "Access-Control-Allow-Methods"
-	headerExposeHeaders    = "Access-Control-Expose-Headers"
-	headerMaxAge           = "Access-Control-Max-Age"
-
-	headerOrigin         = "Origin"
-	headerRequestMethod  = "Access-Control-HTTPRequest-Method"
-	headerRequestHeaders = "Access-Control-HTTPRequest-Headers"
-)
-
 var (
 	defaultAllowHeaders = []string{"Origin", "Accept", "Content-Type", "Authorization"}
 	// Regex patterns are generated from AllowOrigins. These are used and generated internally.
@@ -94,31 +81,31 @@ func (o *Options) Header(origin string) (headers map[string]string) {
 
 	// add allow origin
 	if o.AllowAllOrigins {
-		headers[headerAllowOrigin] = "*"
+		headers[context.HeaderAccessControlAllowOrigin] = "*"
 	} else {
-		headers[headerAllowOrigin] = origin
+		headers[context.HeaderAccessControlAllowOrigin] = origin
 	}
 
 	// add allow credentials
-	headers[headerAllowCredentials] = strconv.FormatBool(o.AllowCredentials)
+	headers[context.HeaderAccessControlAllowCredentials] = strconv.FormatBool(o.AllowCredentials)
 
 	// add allow methods
 	if len(o.AllowMethods) > 0 {
-		headers[headerAllowMethods] = strings.Join(o.AllowMethods, ",")
+		headers[context.HeaderAccessControlAllowMethods] = strings.Join(o.AllowMethods, ",")
 	}
 
 	// add allow headers
 	if len(o.AllowHeaders) > 0 {
-		headers[headerAllowHeaders] = strings.Join(o.AllowHeaders, ",")
+		headers[context.HeaderAccessControlAllowHeaders] = strings.Join(o.AllowHeaders, ",")
 	}
 
 	// add exposed header
 	if len(o.ExposeHeaders) > 0 {
-		headers[headerExposeHeaders] = strings.Join(o.ExposeHeaders, ",")
+		headers[context.HeaderAccessControlExposeHeaders] = strings.Join(o.ExposeHeaders, ",")
 	}
 	// add a max age header
 	if o.MaxAge > time.Duration(0) {
-		headers[headerMaxAge] = strconv.FormatInt(int64(o.MaxAge/time.Second), 10)
+		headers[context.HeaderAccessControlMaxAge] = strconv.FormatInt(int64(o.MaxAge/time.Second), 10)
 	}
 	return
 }
@@ -132,7 +119,7 @@ func (o *Options) PreflightHeader(origin, rMethod, rHeaders string) (headers map
 	// verify if requested method is allowed
 	for _, method := range o.AllowMethods {
 		if method == rMethod {
-			headers[headerAllowMethods] = strings.Join(o.AllowMethods, ",")
+			headers[context.HeaderAccessControlAllowMethods] = strings.Join(o.AllowMethods, ",")
 			break
 		}
 	}
@@ -150,26 +137,26 @@ func (o *Options) PreflightHeader(origin, rMethod, rHeaders string) (headers map
 		}
 	}
 
-	headers[headerAllowCredentials] = strconv.FormatBool(o.AllowCredentials)
+	headers[context.HeaderAccessControlAllowCredentials] = strconv.FormatBool(o.AllowCredentials)
 	// add allow origin
 	if o.AllowAllOrigins {
-		headers[headerAllowOrigin] = "*"
+		headers[context.HeaderAccessControlAllowOrigin] = "*"
 	} else {
-		headers[headerAllowOrigin] = origin
+		headers[context.HeaderAccessControlAllowOrigin] = origin
 	}
 
 	// add allowed headers
 	if len(allowed) > 0 {
-		headers[headerAllowHeaders] = strings.Join(allowed, ",")
+		headers[context.HeaderAccessControlAllowHeaders] = strings.Join(allowed, ",")
 	}
 
 	// add exposed headers
 	if len(o.ExposeHeaders) > 0 {
-		headers[headerExposeHeaders] = strings.Join(o.ExposeHeaders, ",")
+		headers[context.HeaderAccessControlExposeHeaders] = strings.Join(o.ExposeHeaders, ",")
 	}
 	// add a max age header
 	if o.MaxAge > time.Duration(0) {
-		headers[headerMaxAge] = strconv.FormatInt(int64(o.MaxAge/time.Second), 10)
+		headers[context.HeaderAccessControlMaxAge] = strconv.FormatInt(int64(o.MaxAge/time.Second), 10)
 	}
 	return
 }
@@ -202,9 +189,9 @@ func Allow(opts *Options) asana.FilterFunc {
 
 	return func(ctx *context.Context) {
 		var (
-			origin           = ctx.Header(headerOrigin)
-			requestedMethod  = ctx.Header(headerRequestMethod)
-			requestedHeaders = ctx.Header(headerRequestHeaders)
+			origin           = ctx.Header(context.HeaderOrigin)
+			requestedMethod  = ctx.Header(context.HeaderAccessControlRequestMethod)
+			requestedHeaders = ctx.Header(context.HeaderAccessControlRequestHeaders)
 			// additional headers to be added
 			// to the response.
 			headers map[string]string

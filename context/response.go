@@ -211,24 +211,21 @@ func (res *asanaResponse) SetData(data map[interface{}]interface{}) Response {
 
 // SetFlash set the data depending on the accepted
 func (res *asanaResponse) SetBody(data interface{}) Response {
-	accept := res.Context.Header("Accept")
-	switch accept {
-	case ApplicationYAML:
+	if res.Context.Accepts(ApplicationYAML) {
 		res.PutData("yaml", data)
-	case ApplicationXML, TextXML:
-		res.PutData("yaml", data)
-	case ApplicationProtoBuf:
+	} else if res.Context.Accepts(ApplicationXML, TextXML) {
+		res.PutData("xml", data)
+	} else if res.Context.Accepts(ApplicationProtoBuf) {
 		res.PutData("protobuf", data)
-	case ApplicationJSONP:
+	} else if res.Context.Accepts(ApplicationJSONP) {
 		res.PutData("jsonp", data)
-	case ApplicationJSON:
+	} else if res.Context.Accepts(ApplicationJSON) {
 		res.PutData("json", data)
-	case TextHTML:
+	} else if res.Context.Accepts(TextHTML) {
 		res.PutData("html", data)
-	default:
+	} else {
 		res.PutData("txt", data)
 	}
-
 	return res
 }
 
@@ -536,7 +533,7 @@ func (res *asanaResponse) RenderMethodResult(result interface{}) Response {
 func (res *asanaResponse) Body(content []byte) error {
 	var encoding string
 	var buf = &bytes.Buffer{}
-	if res.EnableGzip {
+	if res.EnableGzip || res.Context.IsPro {
 		encoding = ParseEncoding(res.Context.HTTPRequest)
 	}
 	if b, n, _ := WriteBody(encoding, buf, content); b {
