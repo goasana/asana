@@ -65,7 +65,7 @@ func Test_AllowAll(t *testing.T) {
 	r, _ := http.NewRequest("PUT", "/foo", nil)
 	handler.ServeHTTP(recorder, r)
 
-	if recorder.Header().Get(headerAllowOrigin) != "*" {
+	if recorder.Header().Get(context.HeaderAccessControlAllowOrigin) != "*" {
 		t.Errorf("Allow-Origin header should be *")
 	}
 }
@@ -84,7 +84,7 @@ func Test_AllowRegexMatch(t *testing.T) {
 	r.Header.Add("Origin", origin)
 	handler.ServeHTTP(recorder, r)
 
-	headerValue := recorder.Header().Get(headerAllowOrigin)
+	headerValue := recorder.Header().Get(context.HeaderAccessControlAllowOrigin)
 	if headerValue != origin {
 		t.Errorf("Allow-Origin header should be %v, found %v", origin, headerValue)
 	}
@@ -104,7 +104,7 @@ func Test_AllowRegexNoMatch(t *testing.T) {
 	r.Header.Add("Origin", origin)
 	handler.ServeHTTP(recorder, r)
 
-	headerValue := recorder.Header().Get(headerAllowOrigin)
+	headerValue := recorder.Header().Get(context.HeaderAccessControlAllowOrigin)
 	if headerValue != "" {
 		t.Errorf("Allow-Origin header should not exist, found %v", headerValue)
 	}
@@ -127,11 +127,11 @@ func Test_OtherHeaders(t *testing.T) {
 	r, _ := http.NewRequest("PUT", "/foo", nil)
 	handler.ServeHTTP(recorder, r)
 
-	credentialsVal := recorder.Header().Get(headerAllowCredentials)
-	methodsVal := recorder.Header().Get(headerAllowMethods)
-	headersVal := recorder.Header().Get(headerAllowHeaders)
-	exposedHeadersVal := recorder.Header().Get(headerExposeHeaders)
-	maxAgeVal := recorder.Header().Get(headerMaxAge)
+	credentialsVal := recorder.Header().Get(context.HeaderAccessControlAllowCredentials)
+	methodsVal := recorder.Header().Get(context.HeaderAccessControlAllowMethods)
+	headersVal := recorder.Header().Get(context.HeaderAccessControlAllowHeaders)
+	exposedHeadersVal := recorder.Header().Get(context.HeaderAccessControlExposeHeaders)
+	maxAgeVal := recorder.Header().Get(context.HeaderAccessControlMaxAge)
 
 	if credentialsVal != "true" {
 		t.Errorf("Allow-Credentials is expected to be true, found %v", credentialsVal)
@@ -167,7 +167,7 @@ func Test_DefaultAllowHeaders(t *testing.T) {
 	r, _ := http.NewRequest("PUT", "/foo", nil)
 	handler.ServeHTTP(recorder, r)
 
-	headersVal := recorder.Header().Get(headerAllowHeaders)
+	headersVal := recorder.Header().Get(context.HeaderAccessControlAllowHeaders)
 	if headersVal != "Origin,Accept,Content-Type,Authorization" {
 		t.Errorf("Allow-Headers is expected to be Origin,Accept,Content-Type,Authorization; found %v", headersVal)
 	}
@@ -187,14 +187,14 @@ func Test_Preflight(t *testing.T) {
 	})
 
 	r, _ := http.NewRequest("OPTIONS", "/foo", nil)
-	r.Header.Add(headerRequestMethod, "PUT")
-	r.Header.Add(headerRequestHeaders, "X-whatever, x-casesensitive")
+	r.Header.Add(context.HeaderAccessControlRequestMethod, "PUT")
+	r.Header.Add(context.HeaderAccessControlRequestHeaders, "X-whatever, x-casesensitive")
 	handler.ServeHTTP(recorder, r)
 
 	headers := recorder.Header()
-	methodsVal := headers.Get(headerAllowMethods)
-	headersVal := headers.Get(headerAllowHeaders)
-	originVal := headers.Get(headerAllowOrigin)
+	methodsVal := headers.Get(context.HeaderAccessControlAllowMethods)
+	headersVal := headers.Get(context.HeaderAccessControlAllowHeaders)
+	originVal := headers.Get(context.HeaderAccessControlAllowOrigin)
 
 	if methodsVal != "PUT,PATCH" {
 		t.Errorf("Allow-Methods is expected to be PUT,PATCH, found %v", methodsVal)
