@@ -62,7 +62,7 @@ func NewRedisCache() cache.Cache {
 
 // Get cache from redis.
 func (rc *Cache) Get(key string) interface{} {
-	v, err := rc.p.Get(key).Result()
+	v, err := rc.p.Get(key).Bytes()
 	if err == nil {
 		return v
 	}
