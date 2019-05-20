@@ -6,6 +6,7 @@ import (
 	"net/http"
 )
 
+// JSON provider
 const JSON Provider = "json"
 
 type jsonParser struct{}

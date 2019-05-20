@@ -7,6 +7,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// YAML provider
 const YAML Provider = "yaml"
 
 type yamlParser struct{}

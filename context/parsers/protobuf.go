@@ -7,6 +7,7 @@ import (
 	"github.com/goasana/config/encoder/proto"
 )
 
+// PROTOBUF provider
 const PROTOBUF Provider  = "protobuf"
 
 type protobufParser struct{}

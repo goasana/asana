@@ -6,6 +6,7 @@ import (
 	"net/http"
 )
 
+// XML provider
 const XML Provider = "xml"
 
 type xmlParser struct{}

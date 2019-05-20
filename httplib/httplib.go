@@ -608,7 +608,7 @@ func (b *AsanaHTTPRequest) ToYAML(v interface{}) error {
 	return yaml.Decode(data, v)
 }
 
-// ResponseWriter executes request client gets response mannually.
+// Response executes request client gets response mannually.
 func (b *AsanaHTTPRequest) Response() (*http.Response, error) {
 	return b.getResponse()
 }

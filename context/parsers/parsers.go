@@ -4,9 +4,10 @@ import (
 	"net/http"
 )
 
-
+// Provider type for parsers
 type Provider string
 
+// Parser interface
 type Parser interface {
 	ParseBody(body []byte, obj interface{}) error
 	Parse(req *http.Request, obj interface{}) error
@@ -15,10 +16,12 @@ type Parser interface {
 
 var providers = make(map[Provider]Parser)
 
+// Register a parser
 func Register(b Parser) {
 	providers[b.Name()] = b
 }
 
+// GetProvider get provider by name
 func GetProvider(name Provider) Parser {
 	if len(providers) == 0 {
 		panic("no providers found")

@@ -8,6 +8,7 @@ import (
 	"github.com/ugorji/go/codec"
 )
 
+// MSGPACK provider
 const MSGPACK Provider = "msgpack"
 
 type msgpackParser struct{}

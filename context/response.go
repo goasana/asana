@@ -40,6 +40,7 @@ import (
 	"github.com/goasana/config/encoder/yaml"
 )
 
+// Response actions for response
 type Response interface {
 	Reset(res *Context) Response
 	SetCookie(name string, value string, others ...interface{}) Response
@@ -96,9 +97,9 @@ type asanaResponse struct {
 
 var _ Response = (*asanaResponse)(nil)
 
-// NewResponse returns new asanaResponse.
+// newResponse returns new asanaResponse.
 // it contains nothing now.
-func NewResponse() *asanaResponse {
+func newResponse() *asanaResponse {
 	return &asanaResponse{
 		data: make(map[interface{}]interface{}),
 	}

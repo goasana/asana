@@ -110,8 +110,8 @@ const (
 // NewContext return the Context with Request and ResponseWriter
 func NewContext() *Context {
 	return &Context{
-		asanaRequest:  NewRequest(),
-		asanaResponse: NewResponse(),
+		asanaRequest:  newRequest(),
+		asanaResponse: newResponse(),
 	}
 }
 
@@ -129,10 +129,12 @@ type Context struct {
 	IsPro bool
 }
 
+// Request get actions for requests
 func (ctx *Context) Request() Request {
 	return ctx.asanaRequest
 }
 
+// Response get actions for response
 func (ctx *Context) Response() Response {
 	return ctx.asanaResponse
 }
