@@ -22,15 +22,22 @@ First you must import it
 
 Then init a Cache (example with memory adapter)
 
-	bm, err := cache.NewCache("memory", `{"interval":60}`)	
+	bm, err := cache.NewCache(cache.MemCachedProvider, `{"interval":60}`)
 
-Use it like this:	
-	
+##### Providers:
+* RedisProvider
+* MemCachedProvider
+* SSDBProvider
+* GCacheProvider
+* MemoryProvider
+* FileProvider
+
+Use it like this:
+
 	bm.Put("asana", 1, 10 * time.Second)
 	bm.Get("asana")
 	bm.IsExist("asana")
 	bm.Delete("asana")
-
 
 ## Memory adapter
 
@@ -40,6 +47,13 @@ Configure memory adapter like this:
 
 interval means the gc time. The cache will check at each time interval, whether item has expired.
 
+## GCache adapter
+
+GCache adapter use the [gcache](http://github.com/bluele/gcache) client.
+
+Configure like this:
+
+	{"size":60,"type":"lru"}
 
 ## Memcache adapter
 
@@ -49,10 +63,9 @@ Configure like this:
 
 	{"conn":"127.0.0.1:11211"}
 
-
 ## Redis adapter
 
-Redis adapter use the [redigo](http://github.com/gomodule/redigo) client.
+Redis adapter use the [goredis](http://github.com/go-redis/redis) client.
 
 Configure like this:
 

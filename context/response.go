@@ -84,15 +84,12 @@ type Response interface {
 
 // asanaResponse does work for sending.Header.
 type asanaResponse struct {
-	data map[interface{}]interface{}
-
+	data           map[interface{}]interface{}
 	ResponseWriter *ResponseWriter
-
-	Context    *Context
-	status     int
-	EnableGzip bool
-
-	_xsrfToken string
+	Context        *Context
+	status         int
+	EnableGzip     bool
+	_xsrfToken     string
 }
 
 var _ Response = (*asanaResponse)(nil)

@@ -24,7 +24,7 @@
 //   "github.com/goasana/asana/cache"
 // )
 //
-//  bm, err := cache.NewCache("memcache", `{"conn":"127.0.0.1:11211"}`)
+//  bm, err := cache.NewCache(cache.MemCachedProvider, `{"conn":"127.0.0.1:11211"}`)
 //
 //  more docs http://asana.me/docs/module/cache.md
 package memcache

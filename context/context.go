@@ -356,36 +356,19 @@ func (ctx *Context) SaveToFile(fromFile, toFile string) error {
 	return nil
 }
 
-// StartSession starts session and load old session data info this controller.
-func (ctx *Context) StartSession() session.Store {
-	if ctx.CruSession == nil {
-		ctx.CruSession = ctx.CruSession
-	}
-	return ctx.CruSession
-}
-
 // SetSession puts value into session.
 func (ctx *Context) SetSession(name interface{}, value interface{}) *Context {
-	if ctx.CruSession == nil {
-		ctx.StartSession()
-	}
 	_ = ctx.CruSession.Set(name, value)
 	return ctx
 }
 
 // GetSession gets value from session.
 func (ctx *Context) GetSession(name interface{}) interface{} {
-	if ctx.CruSession == nil {
-		ctx.StartSession()
-	}
 	return ctx.CruSession.Get(name)
 }
 
 // DelSession removes value from session.
 func (ctx *Context) DelSession(name interface{}) {
-	if ctx.CruSession == nil {
-		ctx.StartSession()
-	}
 	_ = ctx.CruSession.Delete(name)
 }
 

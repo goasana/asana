@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/goasana/config/encoder"
 	"html/template"
 	"net/http"
 	"reflect"
@@ -25,7 +26,6 @@ import (
 
 	"github.com/goasana/asana/context"
 	"github.com/goasana/asana/context/param"
-	"github.com/goasana/asana/context/parsers"
 )
 
 var (
@@ -325,13 +325,13 @@ func (c *Controller) ParseForm(obj interface{}) error {
 // ParseBody input data map to obj struct depending on the type of content.
 func (c *Controller) ParseBody(obj interface{}) error {
 	if c.AcceptsJSON() {
-		return parsers.GetProvider(parsers.JSON).Parse(c.HTTPRequest, obj)
+		return encoder.GetEncoder(encoder.JSON).Decode(c.RequestBody, obj)
 	} else if c.AcceptsYAML() {
-		return parsers.GetProvider(parsers.YAML).Parse(c.HTTPRequest, obj)
+		return encoder.GetEncoder(encoder.YAML).Decode(c.RequestBody, obj)
 	} else if c.AcceptsXML() {
-		return parsers.GetProvider(parsers.XML).Parse(c.HTTPRequest, obj)
+		return encoder.GetEncoder(encoder.XML).Decode(c.RequestBody, obj)
 	} else if c.AcceptsProtoBuf() {
-		return parsers.GetProvider(parsers.PROTOBUF).Parse(c.HTTPRequest, obj)
+		return encoder.GetEncoder(encoder.PROTO).Decode(c.RequestBody, obj)
 	}
 	return c.ParseBody(obj)
 }
@@ -362,7 +362,6 @@ func (c *Controller) SessionRegenerateID() {
 		c.CruSession.SessionRelease(c.ResponseWriter)
 	}
 	c.CruSession = GlobalSessions.SessionRegenerateID(c.ResponseWriter, c.HTTPRequest)
-	c.CruSession = c.CruSession
 }
 
 // DestroySession cleans session data and session cookie.

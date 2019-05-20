@@ -15,6 +15,7 @@
 package redis
 
 import (
+	"strconv"
 	"testing"
 	"time"
 
@@ -40,11 +41,11 @@ func TestRedisCache(t *testing.T) {
 	if bm.IsExist("asana") {
 		t.Error("check err")
 	}
-	if err = bm.Put("asana", 1, timeoutDuration); err != nil {
+	if err = bm.Put("asana", 1, 0); err != nil {
 		t.Error("set Error", err)
 	}
 
-	if v, _ := redis.Int(bm.Get("asana"), err); v != 1 {
+	if v, _ := strconv.Atoi(bm.Get("asana").(string)); v != 1 {
 		t.Error("get err")
 	}
 
@@ -52,7 +53,7 @@ func TestRedisCache(t *testing.T) {
 		t.Error("Incr Error", err)
 	}
 
-	if v, _ := redis.Int(bm.Get("asana"), err); v != 2 {
+	if v, _ := strconv.Atoi(bm.Get("asana").(string)); v != 2 {
 		t.Error("get err")
 	}
 
@@ -60,7 +61,7 @@ func TestRedisCache(t *testing.T) {
 		t.Error("Decr Error", err)
 	}
 
-	if v, _ := redis.Int(bm.Get("asana"), err); v != 1 {
+	if v, _ := strconv.Atoi(bm.Get("asana").(string)); v != 1 {
 		t.Error("get err")
 	}
 	_ = bm.Delete("asana")
@@ -92,10 +93,10 @@ func TestRedisCache(t *testing.T) {
 	if len(vv) != 2 {
 		t.Error("GetMulti ERROR")
 	}
-	if v, _ := redis.String(vv[0], nil); v != "author" {
+	if v := vv[0]; v != "author" {
 		t.Error("GetMulti ERROR")
 	}
-	if v, _ := redis.String(vv[1], nil); v != "author1" {
+	if v := vv[1]; v != "author1" {
 		t.Error("GetMulti ERROR")
 	}
 

@@ -14,7 +14,7 @@ import (
 // Cache SSDB adapter
 type Cache struct {
 	conn     *ssdb.Client
-	conninfo []string
+	connInfo []string
 }
 
 //NewSsdbCache create new ssdb adapter.
@@ -206,7 +206,7 @@ func (rc *Cache) StartAndGC(config string) error {
 	if _, ok := cf["conn"]; !ok {
 		return errors.New("config has no conn key")
 	}
-	rc.conninfo = strings.Split(cf["conn"], ";")
+	rc.connInfo = strings.Split(cf["conn"], ";")
 	if rc.conn == nil {
 		if err := rc.connectInit(); err != nil {
 			return err
@@ -217,7 +217,7 @@ func (rc *Cache) StartAndGC(config string) error {
 
 // connect to ssdb and keep the connection.
 func (rc *Cache) connectInit() error {
-	conninfoArray := strings.Split(rc.conninfo[0], ":")
+	conninfoArray := strings.Split(rc.connInfo[0], ":")
 	host := conninfoArray[0]
 	port, e := strconv.Atoi(conninfoArray[1])
 	if e != nil {

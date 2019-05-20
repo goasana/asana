@@ -28,7 +28,7 @@ func TestCacheIncr(t *testing.T) {
 	}
 	//timeoutDuration := 10 * time.Second
 
-	bm.Put("edwardhey", 0, time.Second*20)
+	_ = bm.Put("edwardhey", 0, time.Second*20)
 	wg := sync.WaitGroup{}
 	wg.Add(10)
 	for i := 0; i < 10; i++ {
@@ -85,7 +85,7 @@ func TestCache(t *testing.T) {
 	if v := bm.Get("asana"); v.(int) != 1 {
 		t.Error("get err")
 	}
-	bm.Delete("asana")
+	_ = bm.Delete("asana")
 	if bm.IsExist("asana") {
 		t.Error("delete err")
 	}
@@ -162,7 +162,7 @@ func TestGCache(t *testing.T) {
 	if v := bm.Get("asana"); v.(int) != 1 {
 		t.Error("get err")
 	}
-	bm.Delete("asana")
+	_ = bm.Delete("asana")
 	if bm.IsExist("asana") {
 		t.Error("delete err")
 	}
@@ -289,7 +289,7 @@ func TestFileCache(t *testing.T) {
 	if v := bm.Get("asana"); v.(int) != 1 {
 		t.Error("get err")
 	}
-	bm.Delete("asana")
+	_ = bm.Delete("asana")
 	if bm.IsExist("asana") {
 		t.Error("delete err")
 	}
@@ -324,5 +324,5 @@ func TestFileCache(t *testing.T) {
 		t.Error("GetMulti ERROR")
 	}
 
-	os.RemoveAll("cache")
+	_ = os.RemoveAll("cache")
 }

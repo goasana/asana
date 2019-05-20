@@ -72,7 +72,6 @@ type Provider string
 
 // Provider Avails
 const (
-	GoRedisProvider   Provider = "goredis"
 	RedisProvider     Provider = "redis"
 	MemCachedProvider Provider = "memcache"
 	SSDBProvider      Provider = "ssdb"

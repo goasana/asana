@@ -35,7 +35,7 @@ import (
 // it contains data and expire time.
 type FileCacheItem struct {
 	Data       interface{}
-	Lastaccess time.Time
+	LastAccess time.Time
 	Expired    time.Time
 }
 
@@ -156,7 +156,7 @@ func (fc *FileCache) Put(key string, val interface{}, timeout time.Duration) err
 	} else {
 		item.Expired = time.Now().Add(timeout)
 	}
-	item.Lastaccess = time.Now()
+	item.LastAccess = time.Now()
 	data, err := GobEncode(item)
 	if err != nil {
 		return err

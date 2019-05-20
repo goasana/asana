@@ -2,7 +2,6 @@ package alils
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
 	"io/ioutil"
 	"net/http"
 	"net/http/httputil"
@@ -238,7 +237,7 @@ func (s *LogStore) GetLogsBytes(shardID int, cursor string,
 	if err != nil {
 		return
 	} else if n < 0 || n > len(buf) {
-		err = errors.New(fmt.Sprintf("returned written bytes > len(buf): n=%d available=%d", n, len(buf)))
+		err = fmt.Errorf("returned written bytes > len(buf): n=%d available=%d", n, len(buf))
 	}
 
 	return
