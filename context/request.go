@@ -26,6 +26,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/beego/i18n"
 )
@@ -93,6 +94,7 @@ type asanaRequest struct {
 	Context       *Context
 	pNames        []string
 	pValues       []string
+	dataLock      sync.RWMutex
 	data          map[interface{}]interface{} // store some values in this context when calling context in filter or controller.
 	RequestBody   []byte
 	RunMethod     string
@@ -157,7 +159,7 @@ func (req *asanaRequest) Reset(ctx *Context) {
 	req.Context = ctx
 	req.pNames = req.pNames[:0]
 	req.pValues = req.pValues[:0]
-	req.data = nil
+	req.setData(nil)
 	req.RequestBody = []byte{}
 }
 
@@ -492,14 +494,24 @@ func (req *asanaRequest) CopyBody(MaxMemory int64) []byte {
 
 // data return the implicit data in the input
 func (req *asanaRequest) Data() map[interface{}]interface{} {
+	req.dataLock.Lock()
+	defer req.dataLock.Unlock()
 	if req.data == nil {
 		req.data = make(map[interface{}]interface{})
 	}
 	return req.data
 }
 
+func (req *asanaRequest) setData(data map[interface{}]interface{}) {
+	req.dataLock.Lock()
+	defer req.dataLock.Unlock()
+	req.data = data
+}
+
 // GetFlash returns the stored data in this context.
 func (req *asanaRequest) GetFlash(key interface{}) interface{} {
+	req.dataLock.Lock()
+	defer req.dataLock.Unlock()
 	if v, ok := req.data[key]; ok {
 		return v
 	}
@@ -509,6 +521,8 @@ func (req *asanaRequest) GetFlash(key interface{}) interface{} {
 // SetFlash stores data with given key in this context.
 // This data are only available in this context.
 func (req *asanaRequest) SetFlash(key, val interface{}) {
+	req.dataLock.Lock()
+	defer req.dataLock.Unlock()
 	if req.data == nil {
 		req.data = make(map[interface{}]interface{})
 	}
