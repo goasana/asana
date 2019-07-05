@@ -31,6 +31,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/goasana/asana/utils"
@@ -84,6 +85,7 @@ type Response interface {
 
 // asanaResponse does work for sending.Header.
 type asanaResponse struct {
+	dataLock       sync.RWMutex
 	data           map[interface{}]interface{}
 	ResponseWriter *ResponseWriter
 	Context        *Context
@@ -106,39 +108,40 @@ func newResponse() *asanaResponse {
 func (res *asanaResponse) ServeJSON(encoding ...bool) error {
 	hasIndent := !res.Context.IsPro
 	hasEncoding := len(encoding) > 0 && encoding[0]
-	return res.JSON(res.data["json"], hasIndent, hasEncoding)
+	return res.JSON(res.GetItemData("json"), hasIndent, hasEncoding)
 }
 
 // ServeJSONP sends a jsonp response.
 func (res *asanaResponse) ServeJSONP() error {
 	hasIndent := !res.Context.IsPro
-	return res.JSONP(res.data["jsonp"], hasIndent)
+	return res.JSONP(res.GetItemData("jsonp"), hasIndent)
 }
 
 // ServeXML sends xml response.
 func (res *asanaResponse) ServeXML() error {
 	hasIndent := !res.Context.IsPro
-	return res.XML(res.data["xml"], hasIndent)
+	return res.XML(res.GetItemData("xml"), hasIndent)
 }
 
 // ServeYAML sends yaml response.
 func (res *asanaResponse) ServeYAML() error {
-	return res.YAML(res.data["yaml"])
+	return res.YAML(res.GetItemData("yaml"))
 }
 
 // ServeProtoBuf sends protobuf response.
 func (res *asanaResponse) ServeProtoBuf() error {
-	return res.ProtoBuf(res.data["protobuf"])
+	return res.ProtoBuf(res.GetItemData("protobuf"))
 }
 
 // ServeHTML sends html response.
 func (res *asanaResponse) ServeHTML() error {
-	switch res.data["html"].(type) {
+	item := res.GetItemData("html")
+	switch item.(type) {
 	case string:
-		val := res.data["html"].(string)
+		val := item.(string)
 		return res.HTML(val)
 	case []byte:
-		val := res.data["html"].([]byte)
+		val := item.([]byte)
 		return res.HTMLBlob(val)
 	default:
 		return errors.New("no data found")
@@ -191,18 +194,29 @@ func (res *asanaResponse) ServeFormatted(encoding ...bool) error {
 func (res *asanaResponse) Reset(ctx *Context) Response {
 	res.Context = ctx
 	res.status = 0
-	res.data = make(map[interface{}]interface{})
+	res.SetData(make(map[interface{}]interface{}))
 	res._xsrfToken = ""
 	return res
 }
 
-// GetFlash set the data
+// GetItemData get item in data
+func (res *asanaResponse) GetItemData(item string) interface{} {
+	res.dataLock.Lock()
+	defer res.dataLock.Unlock()
+	return res.data[item]
+}
+
+// GetData set the data
 func (res *asanaResponse) GetData() map[interface{}]interface{} {
+	res.dataLock.Lock()
+	defer res.dataLock.Unlock()
 	return res.data
 }
 
 // SetData set the data
 func (res *asanaResponse) SetData(data map[interface{}]interface{}) Response {
+	res.dataLock.Lock()
+	defer res.dataLock.Unlock()
 	res.data = data
 	return res
 }
@@ -229,6 +243,8 @@ func (res *asanaResponse) SetBody(data interface{}) Response {
 
 // PutData set the data depending on the accepted
 func (res *asanaResponse) PutData(key interface{}, data interface{}) Response {
+	res.dataLock.Lock()
+	defer res.dataLock.Unlock()
 	res.data[key] = data
 	return res
 }
