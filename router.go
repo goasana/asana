@@ -971,7 +971,7 @@ func toURL(params map[string]string) string {
 	return strings.TrimRight(u, "&")
 }
 
-// LogAccess log de request
+// LogAccess logging info HTTP Access
 func LogAccess(ctx *context.Context, startTime *time.Time, statusCode int) {
 	//Skip logging if AccessLogs config is false
 	if !BConfig.Log.AccessLogs {
