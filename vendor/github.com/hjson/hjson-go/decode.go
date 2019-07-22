@@ -455,11 +455,11 @@ func (p *hjsonParser) checkTrailing(v interface{}, err error) (interface{}, erro
 // Unmarshal uses the inverse of the encodings that
 // Marshal uses, allocating maps, slices, and pointers as necessary.
 //
-func Unmarshal(data []byte, v interface{}) (err error) {
-	var value interface{}
+func Unmarshal(data []byte, v interface{}) error {
+
 	parser := &hjsonParser{data, 0, ' '}
 	parser.resetAt()
-	value, err = parser.rootValue()
+	value, err := parser.rootValue()
 	if err != nil {
 		return err
 	}
@@ -471,11 +471,6 @@ func Unmarshal(data []byte, v interface{}) (err error) {
 	for rv.Kind() == reflect.Ptr {
 		rv = rv.Elem()
 	}
-	defer func() {
-		if e := recover(); e != nil {
-			err = fmt.Errorf("%v", e)
-		}
-	}()
 	rv.Set(reflect.ValueOf(value))
-	return err
+	return nil
 }

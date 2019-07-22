@@ -38,7 +38,7 @@ func TestAssignConfig_01(t *testing.T) {
 	_BConfig.AppName = "asana_test"
 	jcf := config.NewConfig()
 
-	_ = jcf.Load(memory.NewSource(memory.WithData([]byte(`{"AppName":"asana_json"}`))))
+	_ = jcf.Load(memory.NewSource(memory.WithJson([]byte(`{"AppName":"asana_json"}`))))
 
 	assignSingleConfig(_BConfig, jcf)
 	if _BConfig.AppName != "asana_json" {
@@ -81,7 +81,7 @@ func TestAssignConfig_02(t *testing.T) {
 
 	jcf := config.NewConfig()
 
-	_ = jcf.Load(memory.NewSource(memory.WithData(bs)))
+	_ = jcf.Load(memory.NewSource(memory.WithJson(bs)))
 
 	for _, i := range []interface{}{_BConfig, &_BConfig.Listen, &_BConfig.WebConfig, &_BConfig.Log, &_BConfig.WebConfig.Session} {
 		assignSingleConfig(i, jcf)

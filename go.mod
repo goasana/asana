@@ -6,35 +6,31 @@ require (
 	github.com/OwnLocal/goes v1.0.0
 	github.com/Unknwon/goconfig v0.0.0-20190425194916-3dba17dd7b9e // indirect
 	github.com/beego/i18n v0.0.0-20161101132742-e9308947f407
-	github.com/bluele/gcache v0.0.0-20190301044115-79ae3b2d8680
+	github.com/bluele/gcache v0.0.0-20190518031135-bc40bd653833
 	github.com/bradfitz/gomemcache v0.0.0-20190329173943-551aad21a668
-	github.com/casbin/casbin v1.8.2
-	github.com/couchbase/go-couchbase v0.0.0-20190429182051-6aeabeae85e5
-	github.com/couchbase/gomemcached v0.0.0-20190420034518-d7858f29a056 // indirect
+	github.com/casbin/casbin v1.9.1
+	github.com/couchbase/go-couchbase v0.0.0-20190708161019-23e7ca2ce2b7
+	github.com/couchbase/gomemcached v0.0.0-20190515232915-c4b4ca0eb21d // indirect
 	github.com/couchbase/goutils v0.0.0-20190315194238-f9d42b11473b // indirect
 	github.com/cupcake/rdb v0.0.0-20161107195141-43ba34106c76 // indirect
 	github.com/edsrzf/mmap-go v1.0.0 // indirect
 	github.com/elazarl/go-bindata-assetfs v1.0.0
 	github.com/go-redis/redis v6.15.2+incompatible
 	github.com/go-sql-driver/mysql v1.4.1
-	github.com/goasana/config v0.0.0-20190503085144-ea96d6cc773f
+	github.com/goasana/config v1.2.0
 	github.com/gogo/protobuf v1.2.1
-	github.com/golang/protobuf v1.3.1
+	github.com/golang/protobuf v1.3.2
 	github.com/gomodule/redigo v2.0.0+incompatible
-	github.com/lib/pq v1.1.1
-	github.com/mattn/go-sqlite3 v1.10.0
+	github.com/lib/pq v1.2.0
+	github.com/mattn/go-sqlite3 v1.11.0
 	github.com/pelletier/go-toml v1.4.0 // indirect
 	github.com/pierrec/lz4 v2.0.5+incompatible
-	github.com/pkg/errors v0.8.1
 	github.com/shiena/ansicolor v0.0.0-20151119151921-a422bbe96644
 	github.com/siddontang/go v0.0.0-20180604090527-bdc77568d726 // indirect
 	github.com/siddontang/ledisdb v0.0.0-20190202134119-8ceb77e66a92
 	github.com/siddontang/rdb v0.0.0-20150307021120-fc89ed2e418d // indirect
-	github.com/smartystreets/goconvey v0.0.0-20190330032615-68dc04aab96a // indirect
 	github.com/ssdb/gossdb v0.0.0-20180723034631-88f6b59b84ec
 	github.com/syndtr/goleveldb v1.0.0 // indirect
-	github.com/ugorji/go v1.1.4
 	go.uber.org/zap v1.10.0
-	golang.org/x/crypto v0.0.0-20190506204251-e1dfcc566284
-	gopkg.in/yaml.v2 v2.2.2
+	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4
 )
