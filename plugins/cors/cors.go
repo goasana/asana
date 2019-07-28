@@ -198,7 +198,7 @@ func Allow(opts *Options) asana.FilterFunc {
 		)
 
 		headers = opts.Header(origin)
-		
+
 		if ctx.Method() == "OPTIONS" &&
 			(requestedMethod != "" || requestedHeaders != "") {
 			headers = opts.PreflightHeader(origin, requestedMethod, requestedHeaders)
