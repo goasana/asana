@@ -48,7 +48,7 @@ func InitGzip(minLength, compressLevel int, methods []string) {
 	if gzipCompressLevel < flate.NoCompression || gzipCompressLevel > flate.BestCompression {
 		gzipCompressLevel = flate.BestSpeed
 	}
-	getMethodOnly = (len(methods) == 0) || (len(methods) == 1 && strings.ToUpper(methods[0]) == "GET")
+	getMethodOnly = (len(methods) == 0) || len(methods) == 1 && strings.EqualFold(methods[0], "GET")
 	includedMethods = make(map[string]bool, len(methods))
 	for _, v := range methods {
 		includedMethods[strings.ToUpper(v)] = true
