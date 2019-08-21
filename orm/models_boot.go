@@ -63,7 +63,7 @@ func registerModel(PrefixOrSuffix string, model interface{}, isPrefix bool) {
 	if mi.fields.pk == nil {
 	outFor:
 		for _, fi := range mi.fields.fieldsDB {
-			if strings.ToLower(fi.name) == "id" {
+			if strings.EqualFold(fi.name, "id") {
 				switch fi.addrValue.Elem().Kind() {
 				case reflect.Int, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint32, reflect.Uint64:
 					fi.auto = true
