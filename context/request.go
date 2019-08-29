@@ -28,6 +28,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/andybalholm/brotli"
 	"github.com/beego/i18n"
 )
 
@@ -480,6 +481,9 @@ func (req *asanaRequest) CopyBody(MaxMemory int64) []byte {
 		if err != nil {
 			return nil
 		}
+		requestBody, _ = ioutil.ReadAll(reader)
+	} else if strings.EqualFold(req.Header(HeaderContentEncoding), "brotli") {
+		reader := brotli.NewReader(safe)
 		requestBody, _ = ioutil.ReadAll(reader)
 	} else {
 		requestBody, _ = ioutil.ReadAll(safe)

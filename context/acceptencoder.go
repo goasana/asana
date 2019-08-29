@@ -19,6 +19,7 @@ import (
 	"compress/flate"
 	"compress/gzip"
 	"compress/zlib"
+	"github.com/andybalholm/brotli"
 	"io"
 	"net/http"
 	"os"
@@ -129,23 +130,31 @@ var (
 		customCompressLevelPool: &sync.Pool{New: func() interface{} { wr, _ := zlib.NewWriterLevel(nil, gzipCompressLevel); return wr }},
 		bestCompressionPool:     &sync.Pool{New: func() interface{} { wr, _ := zlib.NewWriterLevel(nil, flate.BestCompression); return wr }},
 	}
+
+	brotliCompressEncoder = acceptEncoder{
+		name:                    "brotli",
+		levelEncode:             func(level int) resetWriter { wr := brotli.NewWriterLevel(nil, level); return wr },
+		customCompressLevelPool: &sync.Pool{New: func() interface{} { wr := brotli.NewWriterLevel(nil, gzipCompressLevel); return wr }},
+		bestCompressionPool:     &sync.Pool{New: func() interface{} { wr := brotli.NewWriterLevel(nil, flate.BestCompression); return wr }},
+	}
 )
 
 var (
 	encoderMap = map[string]acceptEncoder{ // all the other compress methods will ignore
 		"gzip":     gzipCompressEncoder,
 		"deflate":  deflateCompressEncoder,
+		"brotli":   brotliCompressEncoder,
 		"*":        gzipCompressEncoder, // * means any compress will accept,we prefer gzip
 		"identity": noneCompressEncoder, // identity means none-compress
 	}
 )
 
-// WriteFile reads from file and writes to writer by the specific encoding(gzip/deflate)
+// WriteFile reads from file and writes to writer by the specific encoding(gzip/brotli/deflate)
 func WriteFile(encoding string, writer io.Writer, file *os.File) (bool, string, error) {
 	return writeLevel(encoding, writer, file, flate.BestCompression)
 }
 
-// WriteBody reads  writes content to writer by the specific encoding(gzip/deflate)
+// WriteBody reads  writes content to writer by the specific encoding(gzip/brotli/deflate)
 func WriteBody(encoding string, writer io.Writer, content []byte) (bool, string, error) {
 	if encoding == "" || len(content) < gzipMinLength {
 		_, err := writer.Write(content)

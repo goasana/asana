@@ -5,6 +5,7 @@ go 1.12
 require (
 	github.com/OwnLocal/goes v1.0.0
 	github.com/Unknwon/goconfig v0.0.0-20190425194916-3dba17dd7b9e // indirect
+	github.com/andybalholm/brotli v0.0.0-20190821151343-b60f0d972eeb
 	github.com/beego/i18n v0.0.0-20161101132742-e9308947f407
 	github.com/bluele/gcache v0.0.0-20190518031135-bc40bd653833
 	github.com/bradfitz/gomemcache v0.0.0-20190329173943-551aad21a668
