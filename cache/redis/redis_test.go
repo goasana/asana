@@ -15,7 +15,6 @@
 package redis
 
 import (
-	"strconv"
 	"testing"
 	"time"
 
@@ -45,7 +44,7 @@ func TestRedisCache(t *testing.T) {
 		t.Error("set Error", err)
 	}
 
-	if v, _ := strconv.Atoi(bm.Get("asana").(string)); v != 1 {
+	if v, _ := redis.Int(bm.Get("asana"), err); v != 1 {
 		t.Error("get err")
 	}
 
@@ -53,7 +52,7 @@ func TestRedisCache(t *testing.T) {
 		t.Error("Incr Error", err)
 	}
 
-	if v, _ := strconv.Atoi(bm.Get("asana").(string)); v != 2 {
+	if v, _ := redis.Int(bm.Get("asana"), err); v != 2 {
 		t.Error("get err")
 	}
 
@@ -61,7 +60,7 @@ func TestRedisCache(t *testing.T) {
 		t.Error("Decr Error", err)
 	}
 
-	if v, _ := strconv.Atoi(bm.Get("asana").(string)); v != 1 {
+	if v, _ := redis.Int(bm.Get("asana"), err); v != 1 {
 		t.Error("get err")
 	}
 	_ = bm.Delete("asana")

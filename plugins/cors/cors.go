@@ -130,7 +130,7 @@ func (o *Options) PreflightHeader(origin, rMethod, rHeaders string) (headers map
 		rHeader = strings.TrimSpace(rHeader)
 	lookupLoop:
 		for _, allowedHeader := range o.AllowHeaders {
-			if strings.ToLower(rHeader) == strings.ToLower(allowedHeader) {
+			if strings.EqualFold(rHeader, allowedHeader) {
 				allowed = append(allowed, rHeader)
 				break lookupLoop
 			}
@@ -198,7 +198,7 @@ func Allow(opts *Options) asana.FilterFunc {
 		)
 
 		headers = opts.Header(origin)
-		
+
 		if ctx.Method() == "OPTIONS" &&
 			(requestedMethod != "" || requestedHeaders != "") {
 			headers = opts.PreflightHeader(origin, requestedMethod, requestedHeaders)

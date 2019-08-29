@@ -20,6 +20,9 @@ import (
 )
 
 func Test_ExtractEncoding(t *testing.T) {
+	if parseEncoding(&http.Request{Header: map[string][]string{"Accept-Encoding": {"brotli,gzip,deflate"}}}) != "brotli" {
+		t.Fail()
+	}
 	if parseEncoding(&http.Request{Header: map[string][]string{"Accept-Encoding": {"gzip,deflate"}}}) != "gzip" {
 		t.Fail()
 	}

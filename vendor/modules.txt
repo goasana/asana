@@ -6,6 +6,8 @@ github.com/Knetic/govaluate
 github.com/OwnLocal/goes
 # github.com/Unknwon/goconfig v0.0.0-20190425194916-3dba17dd7b9e
 github.com/Unknwon/goconfig
+# github.com/andybalholm/brotli v0.0.0-20190821151343-b60f0d972eeb
+github.com/andybalholm/brotli
 # github.com/beego/i18n v0.0.0-20161101132742-e9308947f407
 github.com/beego/i18n
 # github.com/bitly/go-simplejson v0.5.0
@@ -26,9 +28,9 @@ github.com/casbin/casbin/rbac/default-role-manager
 github.com/casbin/casbin/util
 github.com/casbin/casbin/config
 github.com/casbin/casbin/errors
-# github.com/couchbase/go-couchbase v0.0.0-20190708161019-23e7ca2ce2b7
+# github.com/couchbase/go-couchbase v0.0.0-20190828225015-86aa785ef73d
 github.com/couchbase/go-couchbase
-# github.com/couchbase/gomemcached v0.0.0-20190515232915-c4b4ca0eb21d
+# github.com/couchbase/gomemcached v0.0.0-20190608153736-7c1f4fd19ef7
 github.com/couchbase/gomemcached
 github.com/couchbase/gomemcached/client
 # github.com/couchbase/goutils v0.0.0-20190315194238-f9d42b11473b
@@ -108,7 +110,7 @@ github.com/mattn/go-sqlite3
 github.com/pborman/uuid
 # github.com/pelletier/go-toml v1.4.0
 github.com/pelletier/go-toml
-# github.com/pierrec/lz4 v2.0.5+incompatible
+# github.com/pierrec/lz4 v2.2.6+incompatible
 github.com/pierrec/lz4
 github.com/pierrec/lz4/internal/xxh32
 # github.com/pkg/errors v0.8.1
@@ -160,7 +162,7 @@ go.uber.org/zap/zapcore
 go.uber.org/zap/buffer
 go.uber.org/zap/internal/color
 go.uber.org/zap/internal/exit
-# golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4
+# golang.org/x/crypto v0.0.0-20190829043050-9756ffdc2472
 golang.org/x/crypto/acme/autocert
 golang.org/x/crypto/acme
 golang.org/x/crypto/pbkdf2
