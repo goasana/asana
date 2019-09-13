@@ -19,13 +19,14 @@ import (
 	"compress/flate"
 	"compress/gzip"
 	"compress/zlib"
-	"github.com/andybalholm/brotli"
 	"io"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
 	"sync"
+
+	"github.com/andybalholm/brotli"
 )
 
 var (
