@@ -174,8 +174,7 @@ func (rc *Cache) connectInit() {
 		Addr:     rc.connInfo,
 		DB:       rc.dbNum,
 		Password: rc.password,
-	},
-	)
+	})
 }
 
 func init() {
