@@ -12,7 +12,7 @@ require (
 	github.com/casbin/casbin v1.9.1
 	github.com/couchbase/go-couchbase v0.0.0-20191013193455-4240e28ff9f2
 	github.com/couchbase/gomemcached v0.0.0-20191004160342-7b5da2ec40b2 // indirect
-	github.com/couchbase/goutils v0.0.0-20190315194238-f9d42b11473b // indirect
+	github.com/couchbase/goutils v0.0.0-20191018232750-b49639060d85 // indirect
 	github.com/cupcake/rdb v0.0.0-20161107195141-43ba34106c76 // indirect
 	github.com/edsrzf/mmap-go v1.0.0 // indirect
 	github.com/elazarl/go-bindata-assetfs v1.0.0
@@ -42,7 +42,7 @@ require (
 	github.com/syndtr/goleveldb v1.0.0 // indirect
 	go.uber.org/atomic v1.4.0 // indirect
 	go.uber.org/multierr v1.2.0 // indirect
-	go.uber.org/zap v1.10.0
+	go.uber.org/zap v1.11.0
 	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550
 	golang.org/x/net v0.0.0-20191021144547-ec77196f6094 // indirect
 	golang.org/x/sys v0.0.0-20191024073052-e66fe6eb8e0c // indirect
