@@ -222,22 +222,24 @@ func (res *asanaResponse) SetData(data map[interface{}]interface{}) Response {
 }
 
 // SetFlash set the data depending on the accepted
+// SetFlash set the data depending on the accepted
 func (res *asanaResponse) SetBody(data interface{}) Response {
-	if res.Context.Accepts(ApplicationYAML) {
-		res.PutData("yaml", data)
-	} else if res.Context.Accepts(ApplicationXML, TextXML) {
-		res.PutData("xml", data)
-	} else if res.Context.Accepts(ApplicationProtoBuf) {
-		res.PutData("protobuf", data)
-	} else if res.Context.Accepts(ApplicationJSONP) {
-		res.PutData("jsonp", data)
-	} else if res.Context.Accepts(ApplicationJSON) {
+	if res.Context.AcceptsJSON() {
 		res.PutData("json", data)
-	} else if res.Context.Accepts(TextHTML) {
+	} else if res.Context.AcceptsYAML() {
+		res.PutData("yaml", data)
+	} else if res.Context.AcceptsXML() {
+		res.PutData("xml", data)
+	} else if res.Context.AcceptsProtoBuf() {
+		res.PutData("protobuf", data)
+	} else if res.Context.AcceptsJSONP() {
+		res.PutData("jsonp", data)
+	} else if res.Context.AcceptsHTML() {
 		res.PutData("html", data)
 	} else {
 		res.PutData("txt", data)
 	}
+
 	return res
 }
 
@@ -389,7 +391,7 @@ func (res *asanaResponse) SetCookie(name string, value string, others ...interfa
 
 		switch {
 		case maxAge > 0:
-			_, _ = fmt.Fprintf(&b, "; Expires=%s; Max-Age=%d", time.Now().Add(time.Duration(maxAge) * time.Second).UTC().Format(time.RFC1123), maxAge)
+			_, _ = fmt.Fprintf(&b, "; Expires=%s; Max-Age=%d", time.Now().Add(time.Duration(maxAge)*time.Second).UTC().Format(time.RFC1123), maxAge)
 		case maxAge < 0:
 			_, _ = fmt.Fprintf(&b, "; Max-Age=0")
 		}
