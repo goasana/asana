@@ -61,6 +61,8 @@ type Request interface {
 	IsUpload() bool
 	Accepts(contentTypes ...string) bool
 	AcceptsHTML() bool
+	AcceptsMSGPack() bool
+	AcceptsTextPlain() bool
 	AcceptsXML() bool
 	AcceptsJSON() bool
 	AcceptsJSONP() bool
@@ -289,6 +291,16 @@ func (req *asanaRequest) Accepts(contentTypes ...string) bool {
 // AcceptsHTML Checks if request accepts html response
 func (req *asanaRequest) AcceptsHTML() bool {
 	return req.Accepts(ApplicationHTML, TextHTML)
+}
+
+// AcceptsTextPlain Checks if request accepts txt response
+func (req *asanaRequest) AcceptsTextPlain() bool {
+	return req.Accepts(TextPlain)
+}
+
+// AcceptsMSGPack Checks if request accepts MSGPack response
+func (req *asanaRequest) AcceptsMSGPack() bool {
+	return req.Accepts(ApplicationMSGPack)
 }
 
 // AcceptsXML Checks if request accepts xml response

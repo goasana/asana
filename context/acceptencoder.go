@@ -1,4 +1,4 @@
-// Copyright 2015 asana Author. All Rights Reserved.
+// Copyright 2019 asana Author. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,13 +19,14 @@ import (
 	"compress/flate"
 	"compress/gzip"
 	"compress/zlib"
-	"github.com/andybalholm/brotli"
 	"io"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
 	"sync"
+
+	"github.com/andybalholm/brotli"
 )
 
 var (
