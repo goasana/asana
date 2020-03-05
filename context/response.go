@@ -36,6 +36,7 @@ import (
 
 	"github.com/goasana/asana/utils"
 	"github.com/goasana/config/encoder/json"
+	"github.com/goasana/config/encoder/msgpack"
 	"github.com/goasana/config/encoder/proto"
 	"github.com/goasana/config/encoder/xml"
 	"github.com/goasana/config/encoder/yaml"
@@ -58,6 +59,7 @@ type Response interface {
 	IsServerError() bool
 	JSON(data interface{}, hasIndent bool, encoding bool) error
 	ProtoBuf(data interface{}) error
+	MSGPack(data interface{}) error
 	YAML(data interface{}) error
 	JSONP(data interface{}, hasIndent bool) error
 	XML(data interface{}, hasIndent bool) error
@@ -133,6 +135,11 @@ func (res *asanaResponse) ServeProtoBuf() error {
 	return res.ProtoBuf(res.GetItemData("protobuf"))
 }
 
+// ServeMSGPack sends msgpack response.
+func (res *asanaResponse) ServeMSGPack() error {
+	return res.MSGPack(res.GetItemData("msgpack"))
+}
+
 // ServeHTML sends html response.
 func (res *asanaResponse) ServeHTML() error {
 	item := res.GetItemData("html")
@@ -186,8 +193,13 @@ func (res *asanaResponse) ServeFormatted(encoding ...bool) error {
 		return res.ServeJSONP()
 	} else if res.Context.AcceptsHTML() {
 		return res.ServeHTML()
+	} else if res.Context.AcceptsTextPlain() {
+		return res.ServeText()
+	} else if res.Context.AcceptsMSGPack() {
+		return res.ServeMSGPack()
 	}
-	return res.ServeText()
+
+	return res.ServeJSON(encoding...)
 }
 
 // Reset init asanaResponse
@@ -236,8 +248,12 @@ func (res *asanaResponse) SetBody(data interface{}) Response {
 		res.PutData("jsonp", data)
 	} else if res.Context.AcceptsHTML() {
 		res.PutData("html", data)
-	} else {
+	} else if res.Context.AcceptsTextPlain() {
 		res.PutData("txt", data)
+	} else if res.Context.AcceptsMSGPack() {
+		res.PutData("msgpack", data)
+	} else {
+		res.PutData("json", data)
 	}
 
 	return res
@@ -329,6 +345,16 @@ func (res *asanaResponse) ProtoBuf(data interface{}) error {
 		return err
 	}
 	return res.SetHeader(HeaderContentType, getContentTypeHead(ApplicationProtoBuf)).Body(content)
+}
+
+// MSGPack writes protobuf to.Body.
+func (res *asanaResponse) MSGPack(data interface{}) error {
+	content, err := msgpack.Encode(data)
+	if err != nil {
+		http.Error(res.ResponseWriter, err.Error(), http.StatusInternalServerError)
+		return err
+	}
+	return res.SetHeader(HeaderContentType, getContentTypeHead(ApplicationMSGPack)).Body(content)
 }
 
 // YAML writes yaml to.Body.
