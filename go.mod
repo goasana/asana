@@ -19,12 +19,10 @@ require (
 	github.com/frankban/quicktest v1.7.3 // indirect
 	github.com/go-redis/redis v6.15.7+incompatible
 	github.com/go-sql-driver/mysql v1.5.0
-	github.com/goasana/config v1.2.1-0.20200305181224-333bceb3b9c5
+	github.com/goasana/config v1.13.1
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/protobuf v1.3.4
 	github.com/gomodule/redigo v2.0.0+incompatible
-	github.com/hjson/hjson-go v3.0.1+incompatible // indirect
-	github.com/imdario/mergo v0.3.8 // indirect
 	github.com/lib/pq v1.3.0
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/pelletier/go-toml v1.6.0 // indirect
@@ -38,6 +36,4 @@ require (
 	github.com/syndtr/goleveldb v1.0.0 // indirect
 	go.uber.org/zap v1.14.0
 	golang.org/x/crypto v0.0.0-20200302210943-78000ba7a073
-	golang.org/x/sys v0.0.0-20200302150141-5c8b2ff67527 // indirect
-	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
