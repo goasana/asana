@@ -7,7 +7,7 @@ Asana is a framework based on [Beego](http://beego.me) (fork).
 
 #### Download and install
 
-    go get github.com/goasana/asana
+    go get github.com/goasana/asana@v1.13.0
 
 #### Create file `hello.go`
 ```go
