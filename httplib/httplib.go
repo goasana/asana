@@ -46,6 +46,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"path"
 	"strings"
 	"sync"
 	"time"
@@ -560,12 +561,6 @@ func (b *AsanaHTTPRequest) Bytes() ([]byte, error) {
 // ToFile saves the body data in response to one file.
 // it calls ResponseWriter inner.
 func (b *AsanaHTTPRequest) ToFile(filename string) error {
-	f, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
 	resp, err := b.getResponse()
 	if err != nil {
 		return err
@@ -574,7 +569,32 @@ func (b *AsanaHTTPRequest) ToFile(filename string) error {
 		return nil
 	}
 	defer resp.Body.Close()
+	err = pathExistAndMkdir(filename)
+	if err != nil {
+		return err
+	}
+	f, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
 	_, err = io.Copy(f, resp.Body)
+	return err
+}
+
+//Check that the file directory exists, there is no automatically created
+func pathExistAndMkdir(filename string) (err error) {
+	filename = path.Dir(filename)
+	_, err = os.Stat(filename)
+	if err == nil {
+		return nil
+	}
+	if os.IsNotExist(err) {
+		err = os.MkdirAll(filename, os.ModePerm)
+		if err == nil {
+			return nil
+		}
+	}
 	return err
 }
 
