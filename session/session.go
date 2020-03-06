@@ -123,7 +123,7 @@ type Manager struct {
 // 5. mysql
 // json config:
 // 1. is https  default false
-// 2. hashfunc  default sha1
+// 2. hashfunc  default sha256
 // 3. hashkey default asanasessionkey
 // 4. maxage default is none
 func NewManager(provideName string, cf *ManagerConfig) (*Manager, error) {

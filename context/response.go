@@ -18,7 +18,7 @@ import (
 	"bufio"
 	"bytes"
 	"crypto/hmac"
-	"crypto/sha1"
+	"crypto/sha256"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -525,7 +525,7 @@ func (res *asanaResponse) GetSecureCookie(Secret, key string) (string, bool) {
 	timestamp := parts[1]
 	sig := parts[2]
 
-	h := hmac.New(sha1.New, []byte(Secret))
+	h := hmac.New(sha256.New, []byte(Secret))
 	_, _ = fmt.Fprintf(h, "%s%s", vs, timestamp)
 
 	if fmt.Sprintf("%02x", h.Sum(nil)) != sig {
@@ -539,7 +539,7 @@ func (res *asanaResponse) GetSecureCookie(Secret, key string) (string, bool) {
 func (res *asanaResponse) SetSecureCookie(Secret, name, value string, others ...interface{}) Response {
 	vs := base64.URLEncoding.EncodeToString([]byte(value))
 	timestamp := strconv.FormatInt(time.Now().UnixNano(), 10)
-	h := hmac.New(sha1.New, []byte(Secret))
+	h := hmac.New(sha256.New, []byte(Secret))
 	_, _ = fmt.Fprintf(h, "%s%s", vs, timestamp)
 	sig := fmt.Sprintf("%02x", h.Sum(nil))
 	cookie := strings.Join([]string{vs, timestamp, sig}, "|")
