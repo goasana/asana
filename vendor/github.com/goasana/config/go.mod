@@ -35,7 +35,7 @@ require (
 	go.uber.org/zap v1.14.0 // indirect
 	gocloud.dev v0.19.0
 	golang.org/x/net v0.0.0-20200301022130-244492dfa37a
-	google.golang.org/grpc v1.27.1
+	google.golang.org/grpc v1.26.0
 	k8s.io/api v0.17.3
 	k8s.io/apimachinery v0.17.3
 	k8s.io/client-go v11.0.0+incompatible
