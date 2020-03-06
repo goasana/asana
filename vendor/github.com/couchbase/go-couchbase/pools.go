@@ -167,22 +167,23 @@ type Pools struct {
 
 // A Node is a computer in a cluster running the couchbase software.
 type Node struct {
-	ClusterCompatibility int                `json:"clusterCompatibility"`
-	ClusterMembership    string             `json:"clusterMembership"`
-	CouchAPIBase         string             `json:"couchApiBase"`
-	Hostname             string             `json:"hostname"`
-	InterestingStats     map[string]float64 `json:"interestingStats,omitempty"`
-	MCDMemoryAllocated   float64            `json:"mcdMemoryAllocated"`
-	MCDMemoryReserved    float64            `json:"mcdMemoryReserved"`
-	MemoryFree           float64            `json:"memoryFree"`
-	MemoryTotal          float64            `json:"memoryTotal"`
-	OS                   string             `json:"os"`
-	Ports                map[string]int     `json:"ports"`
-	Services             []string           `json:"services"`
-	Status               string             `json:"status"`
-	Uptime               int                `json:"uptime,string"`
-	Version              string             `json:"version"`
-	ThisNode             bool               `json:"thisNode,omitempty"`
+	ClusterCompatibility int                           `json:"clusterCompatibility"`
+	ClusterMembership    string                        `json:"clusterMembership"`
+	CouchAPIBase         string                        `json:"couchApiBase"`
+	Hostname             string                        `json:"hostname"`
+	AlternateNames       map[string]NodeAlternateNames `json:"alternateAddresses"`
+	InterestingStats     map[string]float64            `json:"interestingStats,omitempty"`
+	MCDMemoryAllocated   float64                       `json:"mcdMemoryAllocated"`
+	MCDMemoryReserved    float64                       `json:"mcdMemoryReserved"`
+	MemoryFree           float64                       `json:"memoryFree"`
+	MemoryTotal          float64                       `json:"memoryTotal"`
+	OS                   string                        `json:"os"`
+	Ports                map[string]int                `json:"ports"`
+	Services             []string                      `json:"services"`
+	Status               string                        `json:"status"`
+	Uptime               int                           `json:"uptime,string"`
+	Version              string                        `json:"version"`
+	ThisNode             bool                          `json:"thisNode,omitempty"`
 }
 
 // A Pool of nodes and buckets.
@@ -262,9 +263,15 @@ type PoolServices struct {
 // NodeServices is all the bucket-independent services running on
 // a node (given by Hostname)
 type NodeServices struct {
-	Services map[string]int `json:"services,omitempty"`
+	Services       map[string]int                `json:"services,omitempty"`
+	Hostname       string                        `json:"hostname"`
+	ThisNode       bool                          `json:"thisNode"`
+	AlternateNames map[string]NodeAlternateNames `json:"alternateAddresses"`
+}
+
+type NodeAlternateNames struct {
 	Hostname string         `json:"hostname"`
-	ThisNode bool           `json:"thisNode"`
+	Ports    map[string]int `json:"ports"`
 }
 
 type BucketNotFoundError struct {
@@ -344,6 +351,13 @@ func (b *Bucket) GetName() string {
 	b.RLock()
 	defer b.RUnlock()
 	ret := b.Name
+	return ret
+}
+
+func (b *Bucket) GetUUID() string {
+	b.RLock()
+	defer b.RUnlock()
+	ret := b.UUID
 	return ret
 }
 
@@ -477,7 +491,7 @@ func (b *Bucket) getRandomConnection() (*memcached.Client, *connectionPool, erro
 // Client.GetRandomDoc() call to get a random document from that node.
 //
 
-func (b *Bucket) GetRandomDoc() (*gomemcached.MCResponse, error) {
+func (b *Bucket) GetRandomDoc(context ...*memcached.ClientContext) (*gomemcached.MCResponse, error) {
 	// get a connection from the pool
 	conn, pool, err := b.getRandomConnection()
 
@@ -494,7 +508,7 @@ func (b *Bucket) GetRandomDoc() (*gomemcached.MCResponse, error) {
 	}
 
 	// get a randomm document from the connection
-	doc, err := conn.GetRandomDoc()
+	doc, err := conn.GetRandomDoc(context...)
 	// need to return the connection to the pool
 	pool.Return(conn)
 	return doc, err
@@ -815,7 +829,8 @@ func queryRestAPI(
 
 	d := json.NewDecoder(res.Body)
 	if err = d.Decode(&out); err != nil {
-		return err
+		return fmt.Errorf("json decode err: %#v, for requestUrl: %s",
+			err, requestUrl)
 	}
 	return nil
 }
@@ -1263,11 +1278,10 @@ func (b *Bucket) refresh(preserveConnections bool) error {
 	uri := b.URI
 	client := pool.client
 	b.RUnlock()
-	tlsConfig := client.tlsConfig
 
 	var poolServices PoolServices
 	var err error
-	if tlsConfig != nil {
+	if client.tlsConfig != nil {
 		poolServices, err = client.GetPoolServices("default")
 		if err != nil {
 			return err
@@ -1295,10 +1309,10 @@ func (b *Bucket) refresh(preserveConnections bool) error {
 
 	newcps := make([]*connectionPool, len(tmpb.VBSMJson.ServerList))
 	for i := range newcps {
-
+		hostport := tmpb.VBSMJson.ServerList[i]
 		if preserveConnections {
-			pool := b.getConnPoolByHost(tmpb.VBSMJson.ServerList[i], true /* bucket already locked */)
-			if pool != nil && pool.inUse == false {
+			pool := b.getConnPoolByHost(hostport, true /* bucket already locked */)
+			if pool != nil && pool.inUse == false && (!pool.encrypted || pool.tlsConfig == client.tlsConfig) {
 				// if the hostname and index is unchanged then reuse this pool
 				newcps[i] = pool
 				pool.inUse = true
@@ -1306,9 +1320,9 @@ func (b *Bucket) refresh(preserveConnections bool) error {
 			}
 		}
 
-		hostport := tmpb.VBSMJson.ServerList[i]
-		if tlsConfig != nil {
-			hostport, err = MapKVtoSSL(hostport, &poolServices)
+		var encrypted bool
+		if client.tlsConfig != nil {
+			hostport, encrypted, err = MapKVtoSSL(hostport, &poolServices)
 			if err != nil {
 				b.Unlock()
 				return err
@@ -1317,12 +1331,12 @@ func (b *Bucket) refresh(preserveConnections bool) error {
 
 		if b.ah != nil {
 			newcps[i] = newConnectionPool(hostport,
-				b.ah, AsynchronousCloser, PoolSize, PoolOverflow, tlsConfig, b.Name)
+				b.ah, AsynchronousCloser, PoolSize, PoolOverflow, client.tlsConfig, b.Name, encrypted)
 
 		} else {
 			newcps[i] = newConnectionPool(hostport,
 				b.authHandler(true /* bucket already locked */),
-				AsynchronousCloser, PoolSize, PoolOverflow, tlsConfig, b.Name)
+				AsynchronousCloser, PoolSize, PoolOverflow, client.tlsConfig, b.Name, encrypted)
 		}
 	}
 	b.replaceConnPools2(newcps, true /* bucket already locked */)
@@ -1358,6 +1372,7 @@ func (p *Pool) refresh() (err error) {
 		p.BucketMap[b.Name] = b
 		runtime.SetFinalizer(b, bucketFinalizer)
 	}
+	buckets = nil
 	return nil
 }
 
@@ -1377,6 +1392,9 @@ func (c *Client) GetPool(name string) (p Pool, err error) {
 	}
 
 	err = c.parseURLResponse(poolURI, &p)
+	if err != nil {
+		return p, err
+	}
 
 	p.client = c
 
@@ -1484,15 +1502,32 @@ func (p *Pool) GetClient() *Client {
 
 // Release bucket connections when the pool is no longer in use
 func (p *Pool) Close() {
+
+	// MB-36186 make the bucket map inaccessible
+	bucketMap := p.BucketMap
+	p.BucketMap = nil
+
 	// fine to loop through the buckets unlocked
 	// locking happens at the bucket level
-	for b, _ := range p.BucketMap {
+	for b, _ := range bucketMap {
+
+		// MB-36186 make the bucket unreachable and avoid concurrent read/write map panics
+		bucket := bucketMap[b]
+		bucketMap[b] = nil
+
+		bucket.Lock()
 
 		// MB-33208 defer closing connection pools until the bucket is no longer used
-		bucket := p.BucketMap[b]
-		bucket.Lock()
+		// MB-36186 if the bucket is unused make it unreachable straight away
+		needClose := bucket.connPools == nil && !bucket.closed
+		if needClose {
+			runtime.SetFinalizer(&bucket, nil)
+		}
 		bucket.closed = true
 		bucket.Unlock()
+		if needClose {
+			bucket.Close()
+		}
 	}
 }
 

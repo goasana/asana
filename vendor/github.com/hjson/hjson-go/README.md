@@ -37,7 +37,7 @@ Make sure you have a working Go environment. See the [install instructions](http
 ```bash
 $ go get -u github.com/hjson/hjson-go
 ```
-2. Build the **hjson-cli** commandl ine tool (optional)
+2. Build the **hjson-cli** commandline tool (optional)
 ```bash
 $ cd $(go env GOPATH)/src/github.com/hjson/hjson-go/hjson-cli && go install
 $ hjson-cli --version
@@ -123,6 +123,52 @@ func main() {
     // options := hjson.DefaultOptions()
     // hjson, _ := hjson.MarshalWithOptions(sampleMap, options)
     fmt.Println(string(hjson))
+}
+```
+
+If you prefer, you can also unmarshal to Go objects by converting to JSON:
+
+```go
+
+package main
+
+import (
+  "github.com/hjson/hjson-go"
+  "encoding/json"
+  "fmt"
+)
+
+type Sample struct {
+    Rate  int
+    Array []string
+}
+
+func main() {
+
+    sampleText := []byte(`
+    {
+        # specify rate in requests/second
+        rate: 1000
+        array:
+        [
+            foo
+            bar
+        ]
+    }`)
+
+    // read Hjson
+    var dat map[string]interface{}
+    hjson.Unmarshal(sampleText, &dat)
+
+    // convert to JSON
+    b, _ := json.Marshal(dat)
+
+    // unmarshal
+    var sample Sample
+    json.Unmarshal(b, &sample)
+
+    fmt.Println(sample.Rate)
+    fmt.Println(sample.Array)
 }
 ```
 

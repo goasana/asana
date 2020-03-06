@@ -3,14 +3,15 @@ package encoder
 var encoders = make(map[string]Encoder)
 
 const (
-	HCL   = "hcl"
-	HJSON = "hjson"
-	JSON  = "json"
-	PROTO = "proto"
-	TOML  = "toml"
-	XML   = "xml"
-	YAML  = "yaml"
-	YML   = "yml"
+	HCL     = "hcl"
+	HJSON   = "hjson"
+	JSON    = "json"
+	MSGPACK = "msgpack"
+	PROTO   = "proto"
+	TOML    = "toml"
+	XML     = "xml"
+	YAML    = "yaml"
+	YML     = "yml"
 )
 
 type Encoder interface {

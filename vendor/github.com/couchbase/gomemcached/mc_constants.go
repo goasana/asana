@@ -6,8 +6,10 @@ import (
 )
 
 const (
-	REQ_MAGIC = 0x80
-	RES_MAGIC = 0x81
+	REQ_MAGIC      = 0x80
+	RES_MAGIC      = 0x81
+	FLEX_MAGIC     = 0x08
+	FLEX_RES_MAGIC = 0x18
 )
 
 // CommandCode for memcached packets.
@@ -72,6 +74,7 @@ const (
 	TAP_VBUCKET_SET      = CommandCode(0x45) // Sets state of vbucket in receiver (used in takeover)
 	TAP_CHECKPOINT_START = CommandCode(0x46) // Notifies start of new checkpoint
 	TAP_CHECKPOINT_END   = CommandCode(0x47) // Notifies end of checkpoint
+	GET_ALL_VB_SEQNOS    = CommandCode(0x48) // Get current high sequence numbers from all vbuckets located on the server
 
 	UPR_OPEN        = CommandCode(0x50) // Open a UPR connection with a name
 	UPR_ADDSTREAM   = CommandCode(0x51) // Sent by ebucketMigrator to UPR Consumer
@@ -98,6 +101,8 @@ const (
 	COLLECTIONS_GET_CID      = CommandCode(0xbb) // Get collection id.
 	SUBDOC_GET               = CommandCode(0xc5) // Get subdoc. Returns with xattrs
 	SUBDOC_MULTI_LOOKUP      = CommandCode(0xd0) // Multi lookup. Doc xattrs and meta.
+
+	DCP_SYSTEM_EVENT = CommandCode(0x5f) // A system event has occurred
 
 )
 
