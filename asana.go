@@ -27,7 +27,7 @@ import (
 
 const (
 	// VERSION represent asana web framework version.
-	VERSION = "1.13.0"
+	VERSION = "1.13.1"
 
 	// DEV is for develop
 	DEV = "dev"
