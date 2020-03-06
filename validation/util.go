@@ -224,7 +224,7 @@ func parseFunc(vfunc, key string, label string) (v ValidFunc, err error) {
 func numIn(name string) (num int, err error) {
 	fn, ok := funcs[name]
 	if !ok {
-		err = fmt.Errorf("doesn't exsits %s valid function", name)
+		err = fmt.Errorf("doesn't exists %s valid function", name)
 		return
 	}
 	// sub *Validation obj and key
@@ -236,7 +236,7 @@ func trim(name, key string, s []string) (ts []interface{}, err error) {
 	ts = make([]interface{}, len(s), len(s)+1)
 	fn, ok := funcs[name]
 	if !ok {
-		err = fmt.Errorf("doesn't exsits %s valid function", name)
+		err = fmt.Errorf("doesn't exists %s valid function", name)
 		return
 	}
 	for i := 0; i < len(s); i++ {
@@ -257,7 +257,7 @@ func parseParam(t reflect.Type, s string) (i interface{}, err error) {
 	case reflect.Int:
 		i, err = strconv.Atoi(s)
 	case reflect.Int64:
-		if wordSize == 32 {
+		if wordsize == 32 {
 			return nil, ErrInt64On32
 		}
 		i, err = strconv.ParseInt(s, 10, 64)

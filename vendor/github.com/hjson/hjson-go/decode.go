@@ -2,7 +2,6 @@ package hjson
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"reflect"
 	"strings"
@@ -117,7 +116,7 @@ func (p *hjsonParser) readString(allowML bool) (string, error) {
 				return "", p.errAt("Bad escape \\" + string(p.ch))
 			}
 		} else if p.ch == '\n' || p.ch == '\r' {
-			return "", p.errAt("Bad string containing newline");
+			return "", p.errAt("Bad string containing newline")
 		} else {
 			res.WriteByte(p.ch)
 		}
@@ -425,7 +424,7 @@ func (p *hjsonParser) rootValue() (interface{}, error) {
 	}
 
 	// assume we have a root object without braces
-	res, err := p.checkTrailing(p.readObject(true));
+	res, err := p.checkTrailing(p.readObject(true))
 	if err == nil {
 		return res, nil
 	}
@@ -455,22 +454,27 @@ func (p *hjsonParser) checkTrailing(v interface{}, err error) (interface{}, erro
 // Unmarshal uses the inverse of the encodings that
 // Marshal uses, allocating maps, slices, and pointers as necessary.
 //
-func Unmarshal(data []byte, v interface{}) error {
-
+func Unmarshal(data []byte, v interface{}) (err error) {
+	var value interface{}
 	parser := &hjsonParser{data, 0, ' '}
 	parser.resetAt()
-	value, err := parser.rootValue()
+	value, err = parser.rootValue()
 	if err != nil {
 		return err
 	}
 
 	rv := reflect.ValueOf(v)
 	if rv.Kind() != reflect.Ptr || rv.IsNil() {
-		return errors.New("non-pointer " + reflect.TypeOf(v).String())
+		return fmt.Errorf("non-pointer %v", reflect.TypeOf(v))
 	}
 	for rv.Kind() == reflect.Ptr {
 		rv = rv.Elem()
 	}
+	defer func() {
+		if e := recover(); e != nil {
+			err = fmt.Errorf("%v", e)
+		}
+	}()
 	rv.Set(reflect.ValueOf(value))
-	return nil
+	return err
 }
