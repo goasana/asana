@@ -123,7 +123,7 @@ type Manager struct {
 // 5. mysql
 // json config:
 // 1. is https  default false
-// 2. hashfunc  default sha1
+// 2. hashfunc  default sha256
 // 3. hashkey default asanasessionkey
 // 4. maxage default is none
 func NewManager(provideName string, cf *ManagerConfig) (*Manager, error) {
@@ -270,7 +270,8 @@ func (manager *Manager) SessionDestroy(w http.ResponseWriter, r *http.Request) {
 			Path:     "/",
 			HttpOnly: !manager.config.DisableHTTPOnly,
 			Expires:  expiration,
-			MaxAge:   -1}
+			MaxAge:   -1,
+			Domain:   manager.config.Domain}
 
 		http.SetCookie(w, cookie)
 	}
