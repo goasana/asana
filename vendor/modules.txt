@@ -58,7 +58,7 @@ github.com/go-redis/redis/internal/proto
 github.com/go-redis/redis/internal/util
 # github.com/go-sql-driver/mysql v1.5.0
 github.com/go-sql-driver/mysql
-# github.com/goasana/config v1.13.1
+# github.com/goasana/config v1.13.3
 github.com/goasana/config
 github.com/goasana/config/encoder
 github.com/goasana/config/encoder/hcl
