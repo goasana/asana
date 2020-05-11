@@ -62,7 +62,7 @@ func (db *DB) checkAndCleanFiles() error {
 		case storage.TypeManifest:
 			keep = fd.Num >= db.s.manifestFd.Num
 		case storage.TypeJournal:
-			if !db.frozenJournalFd.Zero() {
+			if !db.frozenJournalFd.Nil() {
 				keep = fd.Num >= db.frozenJournalFd.Num
 			} else {
 				keep = fd.Num >= db.journalFd.Num
@@ -84,7 +84,7 @@ func (db *DB) checkAndCleanFiles() error {
 		var mfds []storage.FileDesc
 		for num, present := range tmap {
 			if !present {
-				mfds = append(mfds, storage.FileDesc{Type: storage.TypeTable, Num: num})
+				mfds = append(mfds, storage.FileDesc{storage.TypeTable, num})
 				db.logf("db@janitor table missing @%d", num)
 			}
 		}

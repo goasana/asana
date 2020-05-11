@@ -8,8 +8,8 @@ import (
 	"sync"
 
 	"github.com/goasana/asana/session"
-	"github.com/siddontang/ledisdb/config"
-	"github.com/siddontang/ledisdb/ledis"
+	"github.com/ledisdb/ledisdb/config"
+	"github.com/ledisdb/ledisdb/ledis"
 )
 
 var (
