@@ -110,15 +110,15 @@ const (
 // NewContext return the Context with Request and ResponseWriter
 func NewContext() *Context {
 	return &Context{
-		asanaRequest:  newRequest(),
+		AsanaRequest:  NewRequest(),
 		asanaResponse: newResponse(),
 	}
 }
 
-// Context Http request context struct including asanaRequest, asanaResponse, http.HTTPRequest and http.ResponseWriter.
-// asanaRequest and asanaResponse provides some api to operate request and response more easily.
+// Context Http request context struct including AsanaRequest, asanaResponse, http.HTTPRequest and http.ResponseWriter.
+// AsanaRequest and asanaResponse provides some api to operate request and response more easily.
 type Context struct {
-	*asanaRequest
+	*AsanaRequest
 	*asanaResponse
 
 	CruSession session.Store
@@ -131,7 +131,7 @@ type Context struct {
 
 // Request get actions for requests
 func (ctx *Context) Request() Request {
-	return ctx.asanaRequest
+	return ctx.AsanaRequest
 }
 
 // Response get actions for response
@@ -145,7 +145,7 @@ func (ctx *Context) Session(key interface{}) interface{} {
 	return ctx.CruSession.Get(key)
 }
 
-// Reset init Context, asanaRequest and asanaResponse
+// Reset init Context, AsanaRequest and asanaResponse
 func (ctx *Context) Reset(rw http.ResponseWriter, r *http.Request) {
 	ctx.HTTPRequest = r
 	if ctx.ResponseWriter == nil {

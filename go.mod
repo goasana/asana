@@ -21,6 +21,7 @@ require (
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/protobuf v1.4.1
 	github.com/gomodule/redigo v2.0.0+incompatible
+	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/ledisdb/ledisdb v0.0.0-20200510135210-d35789ec47e6
 	github.com/lib/pq v1.5.2
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible

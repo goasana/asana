@@ -1,0 +1,39 @@
+version: "3.8"
+services:
+  redis:
+    container_name: "asana-redis"
+    image: redis
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - "6379:6379"
+
+  mysql:
+    container_name: "asana-mysql"
+    image: mysql:5.7.30
+    ports:
+    - "13306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=1q2w3e
+      - MYSQL_DATABASE=orm_test
+      - MYSQL_USER=asana
+      - MYSQL_PASSWORD=test
+
+  postgresql:
+    container_name: "asana-postgresql"
+    image: bitnami/postgresql:latest
+    ports:
+    - "5432:5432"
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+  ssdb:
+    container_name: "asana-ssdb"
+    image: wendal/ssdb
+    ports:
+    - "8888:8888"
+  memcache:
+    container_name: "asana-memcache"
+    image: memcached
+    ports:
+    - "11211:11211"
+

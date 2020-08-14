@@ -145,6 +145,7 @@ type AsanaHTTPSettings struct {
 	Gzip             bool
 	DumpBody         bool
 	Retries          int // if set to -1 means will retry forever
+	RetryDelay       time.Duration
 }
 
 // AsanaHTTPRequest provides more useful methods for requesting one url than http.HTTPRequest.
@@ -200,6 +201,11 @@ func (b *AsanaHTTPRequest) Debug(isdebug bool) *AsanaHTTPRequest {
 // others means retried times.
 func (b *AsanaHTTPRequest) Retries(times int) *AsanaHTTPRequest {
 	b.setting.Retries = times
+	return b
+}
+
+func (b *AsanaHTTPRequest) RetryDelay(delay time.Duration) *AsanaHTTPRequest {
+	b.setting.RetryDelay = delay
 	return b
 }
 
@@ -408,6 +414,7 @@ func (b *AsanaHTTPRequest) buildURL(paramBody string) {
 			}()
 			b.Header("Content-Type", bodyWriter.FormDataContentType())
 			b.req.Body = ioutil.NopCloser(pr)
+			b.Header("Transfer-Encoding", "chunked")
 			return
 		}
 
@@ -512,11 +519,13 @@ func (b *AsanaHTTPRequest) DoRequest() (resp *http.Response, err error) {
 	// retries default value is 0, it will run once.
 	// retries equal to -1, it will run forever until success
 	// retries is setted, it will retries fixed times.
+	// Sleeps for a 400ms inbetween calls to reduce spam
 	for i := 0; b.setting.Retries == -1 || i <= b.setting.Retries; i++ {
 		resp, err = client.Do(b.req)
 		if err == nil {
 			break
 		}
+		time.Sleep(b.setting.RetryDelay)
 	}
 	return resp, err
 }

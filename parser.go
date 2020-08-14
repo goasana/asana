@@ -500,7 +500,7 @@ func genRouterCode(pkgRealpath string) {
     asana.GlobalControllerRouter["` + k + `"] = append(asana.GlobalControllerRouter["` + k + `"],
         asana.ControllerComments{
             Method: "` + strings.TrimSpace(c.Method) + `",
-            ` + "Router: `" + c.Router + "`" + `,
+            ` + `Router: "` + c.Router + `"` + `,
             AllowHTTPMethods: ` + allMethod + `,
             MethodParams: ` + methodParams + `,
             Filters: ` + filters + `,

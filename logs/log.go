@@ -295,7 +295,11 @@ func (bl *AsanaLogger) writeMsg(logLevel int, msg string, v ...interface{}) erro
 		lm.level = logLevel
 		lm.msg = msg
 		lm.when = when
-		bl.msgChan <- lm
+		if bl.outputs != nil {
+			bl.msgChan <- lm
+		} else {
+			logMsgPool.Put(lm)
+		}
 	} else {
 		bl.writeToLoggers(when, msg, logLevel)
 	}

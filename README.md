@@ -1,9 +1,18 @@
 # Asana [![Build Status](https://travis-ci.org/goasana/asana.svg?branch=master)](https://travis-ci.org/goasana/asana) [![GoDoc](http://godoc.org/github.com/goasana/asana?status.svg)](http://godoc.org/github.com/goasana/asana) [![Go Report Card](https://goreportcard.com/badge/github.com/goasana/asana)](https://goreportcard.com/report/github.com/goasana/asana)
 
 
-Asana is a framework based on [Beego](http://beego.me) (fork).
+Asana is a framework based on [Asana](http://asana.me) (fork).
 
 ## Quick Start
+
+#### Create `hello` directory, cd `hello` directory
+
+    mkdir hello
+    cd hello
+ 
+#### Init module
+
+    go mod init
 
 #### Download and install
 
@@ -27,6 +36,8 @@ func main(){
 #### Go to [http://localhost:8080](http://localhost:8080)
 
 Congratulations! You've just built your first **Asana** app.
+
+###### [asana-example](https://github.com/asana-dev/asana-example)
 
 ## Features
 * YAML file default config

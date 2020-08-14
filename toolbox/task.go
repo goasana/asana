@@ -33,7 +33,7 @@ type bounds struct {
 // The bounds for each field.
 var (
 	AdminTaskList map[string]Tasker
-	taskLock      sync.Mutex
+	taskLock      sync.RWMutex
 	stop          chan bool
 	changed       chan bool
 	isStart       bool
@@ -102,6 +102,8 @@ type taskerr struct {
 }
 
 // Task task struct
+// It's not a thread-safe structure.
+// Only nearest errors will be saved in ErrList
 type Task struct {
 	TaskName string
 	Spec     *Schedule
@@ -111,6 +113,7 @@ type Task struct {
 	Next     time.Time
 	ErrList  []*taskerr // like errtime:errinfo
 	ErrLimit int        // max length for the errlist, 0 stand for no limit
+	errCnt   int        // records the error count during the execution
 }
 
 // NewTask add new task with name, time and func
@@ -119,8 +122,11 @@ func NewTask(tName string, spec string, f TaskFunc) *Task {
 	task := &Task{
 		TaskName: tName,
 		DoFunc:   f,
+		// Make configurable
 		ErrLimit: 100,
 		SpecStr:  spec,
+		// we only store the pointer, so it won't use too many space
+		Errlist: make([]*taskerr, 100, 100),
 	}
 	task.SetCron(spec)
 	return task
@@ -144,9 +150,9 @@ func (t *Task) GetStatus() string {
 func (t *Task) Run() error {
 	err := t.DoFunc()
 	if err != nil {
-		if t.ErrLimit > 0 && t.ErrLimit > len(t.ErrList) {
-			t.ErrList = append(t.ErrList, &taskerr{t: t.Next, errinfo: err.Error()})
-		}
+		index := t.errCnt % t.ErrLimit
+		t.Errlist[index] = &taskerr{t: t.Next, errinfo: err.Error()}
+		t.errCnt++
 	}
 	return err
 }
@@ -408,7 +414,10 @@ func run() {
 	}
 
 	for {
+		// we only use RLock here because NewMapSorter copy the reference, do not change any thing
+		taskLock.RLock()
 		sortList := NewMapSorter(AdminTaskList)
+		taskLock.RUnlock()
 		sortList.Sort()
 		var effective time.Time
 		if len(AdminTaskList) == 0 || sortList.Vals[0].GetNext().IsZero() {
@@ -432,9 +441,11 @@ func run() {
 			continue
 		case <-changed:
 			now = time.Now().Local()
+			taskLock.Lock()
 			for _, t := range AdminTaskList {
 				t.SetNext(now)
 			}
+			taskLock.Unlock()
 			continue
 		case <-stop:
 			return

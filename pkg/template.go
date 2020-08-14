@@ -1,0 +1,406 @@
+// Copyright 2019 asana Author. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package asana
+
+import (
+	"errors"
+	"fmt"
+	"html/template"
+	"io"
+	"io/ioutil"
+	"net/http"
+	"os"
+	"path/filepath"
+	"regexp"
+	"strings"
+	"sync"
+
+	"github.com/goasana/asana/logs"
+	"github.com/goasana/asana/utils"
+)
+
+var (
+	asanaTplFuncMap             = make(template.FuncMap)
+	asanaViewPathTemplateLocked = false
+	// asanaViewPathTemplates caching map and supported template file extensions per view
+	asanaViewPathTemplates = make(map[string]map[string]*template.Template)
+	templatesLock          sync.RWMutex
+	// asanaTemplateExt stores the template extension which will build
+	asanaTemplateExt = []string{"tpl", "html", "gohtml"}
+	// asanaTemplatePreprocessors stores associations of extension -> preprocessor handler
+	asanaTemplateEngines = map[string]templatePreProcessor{}
+	asanaTemplateFS      = defaultFSFunc
+)
+
+// ExecuteTemplate applies the template with name  to the specified data object,
+// writing the output to wr.
+// A template will be executed safely in parallel.
+func ExecuteTemplate(wr io.Writer, name string, data interface{}) error {
+	return ExecuteViewPathTemplate(wr, name, BConfig.WebConfig.ViewsPath, data)
+}
+
+// ExecuteViewPathTemplate applies the template with name and from specific viewPath to the specified data object,
+// writing the output to wr.
+// A template will be executed safely in parallel.
+func ExecuteViewPathTemplate(wr io.Writer, name string, viewPath string, data interface{}) error {
+	if BConfig.RunMode == DEV {
+		templatesLock.RLock()
+		defer templatesLock.RUnlock()
+	}
+	if asanaTemplates, ok := asanaViewPathTemplates[viewPath]; ok {
+		if t, ok := asanaTemplates[name]; ok {
+			var err error
+			if t.Lookup(name) != nil {
+				err = t.ExecuteTemplate(wr, name, data)
+			} else {
+				err = t.Execute(wr, data)
+			}
+			if err != nil {
+				logs.Trace("template Execute err:", err)
+			}
+			return err
+		}
+		panic("can't find templatefile in the path:" + viewPath + "/" + name)
+	}
+	panic("Unknown view path:" + viewPath)
+}
+
+func init() {
+	asanaTplFuncMap["dateformat"] = DateFormat
+	asanaTplFuncMap["date"] = Date
+	asanaTplFuncMap["compare"] = Compare
+	asanaTplFuncMap["compare_not"] = CompareNot
+	asanaTplFuncMap["not_nil"] = NotNil
+	asanaTplFuncMap["not_null"] = NotNil
+	asanaTplFuncMap["substr"] = Substr
+	asanaTplFuncMap["html2str"] = HTML2str
+	asanaTplFuncMap["str2html"] = Str2html
+	asanaTplFuncMap["htmlquote"] = Htmlquote
+	asanaTplFuncMap["htmlunquote"] = Htmlunquote
+	asanaTplFuncMap["renderform"] = RenderForm
+	asanaTplFuncMap["assets_js"] = AssetsJs
+	asanaTplFuncMap["assets_css"] = AssetsCSS
+	asanaTplFuncMap["config"] = GetConfig
+	asanaTplFuncMap["map_get"] = MapGet
+
+	// Comparisons
+	asanaTplFuncMap["eq"] = eq // ==
+	asanaTplFuncMap["ge"] = ge // >=
+	asanaTplFuncMap["gt"] = gt // >
+	asanaTplFuncMap["le"] = le // <=
+	asanaTplFuncMap["lt"] = lt // <
+	asanaTplFuncMap["ne"] = ne // !=
+
+	asanaTplFuncMap["urlfor"] = URLFor // build a URL to match a Controller and it's method
+}
+
+// AddFuncMap let user to register a func in the template.
+func AddFuncMap(key string, fn interface{}) error {
+	asanaTplFuncMap[key] = fn
+	return nil
+}
+
+type templatePreProcessor func(root, path string, funcs template.FuncMap) (*template.Template, error)
+
+type templateFile struct {
+	root  string
+	files map[string][]string
+}
+
+// visit will make the paths into two part,the first is subDir (without tf.root),the second is full path(without tf.root).
+// if tf.root="views" and
+// paths is "views/errors/404.html",the subDir will be "errors",the file will be "errors/404.html"
+// paths is "views/admin/errors/404.html",the subDir will be "admin/errors",the file will be "admin/errors/404.html"
+func (tf *templateFile) visit(paths string, f os.FileInfo, err error) error {
+	if f == nil {
+		return err
+	}
+	if f.IsDir() || (f.Mode()&os.ModeSymlink) > 0 {
+		return nil
+	}
+	if !HasTemplateExt(paths) {
+		return nil
+	}
+
+	replace := strings.NewReplacer("\\", "/")
+	file := strings.TrimLeft(replace.Replace(paths[len(tf.root):]), "/")
+	subDir := filepath.Dir(file)
+
+	tf.files[subDir] = append(tf.files[subDir], file)
+	return nil
+}
+
+// HasTemplateExt return this path contains supported template extension of asana or not.
+func HasTemplateExt(paths string) bool {
+	for _, v := range asanaTemplateExt {
+		if strings.HasSuffix(paths, "."+v) {
+			return true
+		}
+	}
+	return false
+}
+
+// AddTemplateExt add new extension for template.
+func AddTemplateExt(ext string) {
+	for _, v := range asanaTemplateExt {
+		if v == ext {
+			return
+		}
+	}
+	asanaTemplateExt = append(asanaTemplateExt, ext)
+}
+
+// AddViewPath adds a new path to the supported view paths.
+//Can later be used by setting a controller ViewPath to this folder
+//will panic if called after asana.Run()
+func AddViewPath(viewPath string) error {
+	if asanaViewPathTemplateLocked {
+		if _, exist := asanaViewPathTemplates[viewPath]; exist {
+			return nil //Ignore if viewpath already exists
+		}
+		panic("Can not add new view paths after asana.Run()")
+	}
+	asanaViewPathTemplates[viewPath] = make(map[string]*template.Template)
+	return BuildTemplate(viewPath)
+}
+
+func lockViewPaths() {
+	asanaViewPathTemplateLocked = true
+}
+
+// BuildTemplate will build all template files in a directory.
+// it makes asana can render any template file in view directory.
+func BuildTemplate(dir string, files ...string) error {
+	var err error
+	fs := asanaTemplateFS()
+	f, err := fs.Open(dir)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return errors.New("dir open err")
+	}
+	defer f.Close()
+
+	asanaTemplates, ok := asanaViewPathTemplates[dir]
+	if !ok {
+		panic("Unknown view path: " + dir)
+	}
+	self := &templateFile{
+		root:  dir,
+		files: make(map[string][]string),
+	}
+	err = Walk(fs, dir, func(path string, f os.FileInfo, err error) error {
+		return self.visit(path, f, err)
+	})
+	if err != nil {
+		fmt.Printf("Walk() returned %v\n", err)
+		return err
+	}
+	buildAllFiles := len(files) == 0
+	for _, v := range self.files {
+		for _, file := range v {
+			if buildAllFiles || utils.InSlice(file, files) {
+				templatesLock.Lock()
+				ext := filepath.Ext(file)
+				var t *template.Template
+				if len(ext) == 0 {
+					t, err = getTemplate(self.root, fs, file, v...)
+				} else if fn, ok := asanaTemplateEngines[ext[1:]]; ok {
+					t, err = fn(self.root, file, asanaTplFuncMap)
+				} else {
+					t, err = getTemplate(self.root, fs, file, v...)
+				}
+				if err != nil {
+					logs.Error("parse template err:", file, err)
+					templatesLock.Unlock()
+					return err
+				}
+				asanaTemplates[file] = t
+				templatesLock.Unlock()
+			}
+		}
+	}
+	return nil
+}
+
+func getTplDeep(root string, fs http.FileSystem, file string, parent string, t *template.Template) (*template.Template, [][]string, error) {
+	var fileAbsPath string
+	var rParent string
+	var err error
+	if strings.HasPrefix(file, "../") {
+		rParent = filepath.Join(filepath.Dir(parent), file)
+		fileAbsPath = filepath.Join(root, filepath.Dir(parent), file)
+	} else {
+		rParent = file
+		fileAbsPath = filepath.Join(root, file)
+	}
+	f, err := fs.Open(fileAbsPath)
+	if err != nil {
+		panic("can't find template file:" + file)
+	}
+	defer f.Close()
+	data, err := ioutil.ReadAll(f)
+	if err != nil {
+		return nil, [][]string{}, err
+	}
+	t, err = t.New(file).Parse(string(data))
+	if err != nil {
+		return nil, [][]string{}, err
+	}
+	reg := regexp.MustCompile(BConfig.WebConfig.TemplateLeft + "[ ]*template[ ]+\"([^\"]+)\"")
+	allSub := reg.FindAllStringSubmatch(string(data), -1)
+	for _, m := range allSub {
+		if len(m) == 2 {
+			tl := t.Lookup(m[1])
+			if tl != nil {
+				continue
+			}
+			if !HasTemplateExt(m[1]) {
+				continue
+			}
+			_, _, err = getTplDeep(root, fs, m[1], rParent, t)
+			if err != nil {
+				return nil, [][]string{}, err
+			}
+		}
+	}
+	return t, allSub, nil
+}
+
+func getTemplate(root string, fs http.FileSystem, file string, others ...string) (t *template.Template, err error) {
+	t = template.New(file).Delims(BConfig.WebConfig.TemplateLeft, BConfig.WebConfig.TemplateRight).Funcs(asanaTplFuncMap)
+	var subMods [][]string
+	t, subMods, err = getTplDeep(root, fs, file, "", t)
+	if err != nil {
+		return nil, err
+	}
+	t, err = _getTemplate(t, root, fs, subMods, others...)
+
+	if err != nil {
+		return nil, err
+	}
+	return
+}
+
+func _getTemplate(t0 *template.Template, root string, fs http.FileSystem, subMods [][]string, others ...string) (t *template.Template, err error) {
+	t = t0
+	for _, m := range subMods {
+		if len(m) == 2 {
+			tpl := t.Lookup(m[1])
+			if tpl != nil {
+				continue
+			}
+			//first check filename
+			for _, otherFile := range others {
+				if otherFile == m[1] {
+					var subMods1 [][]string
+					t, subMods1, err = getTplDeep(root, fs, otherFile, "", t)
+					if err != nil {
+						logs.Trace("template parse file err:", err)
+					} else if len(subMods1) > 0 {
+						t, err = _getTemplate(t, root, fs, subMods1, others...)
+					}
+					break
+				}
+			}
+			//second check define
+			for _, otherFile := range others {
+				var data []byte
+				fileAbsPath := filepath.Join(root, otherFile)
+				f, err := fs.Open(fileAbsPath)
+				if err != nil {
+					f.Close()
+					logs.Trace("template file parse error, not success open file:", err)
+					continue
+				}
+				data, err = ioutil.ReadAll(f)
+				f.Close()
+				if err != nil {
+					logs.Trace("template file parse error, not success read file:", err)
+					continue
+				}
+				reg := regexp.MustCompile(BConfig.WebConfig.TemplateLeft + "[ ]*define[ ]+\"([^\"]+)\"")
+				allSub := reg.FindAllStringSubmatch(string(data), -1)
+				for _, sub := range allSub {
+					if len(sub) == 2 && sub[1] == m[1] {
+						var subMods1 [][]string
+						t, subMods1, err = getTplDeep(root, fs, otherFile, "", t)
+						if err != nil {
+							logs.Trace("template parse file err:", err)
+						} else if len(subMods1) > 0 {
+							t, err = _getTemplate(t, root, fs, subMods1, others...)
+							if err != nil {
+								logs.Trace("template parse file err:", err)
+							}
+						}
+						break
+					}
+				}
+			}
+		}
+
+	}
+	return
+}
+
+type templateFSFunc func() http.FileSystem
+
+func defaultFSFunc() http.FileSystem {
+	return FileSystem{}
+}
+
+// SetTemplateFSFunc set default filesystem function
+func SetTemplateFSFunc(fnt templateFSFunc) {
+	asanaTemplateFS = fnt
+}
+
+// SetViewsPath sets view directory path in asana application.
+func SetViewsPath(path string) *App {
+	BConfig.WebConfig.ViewsPath = path
+	return AsanaApp
+}
+
+// SetStaticPath sets static directory path and proper url pattern in asana application.
+// if asana.SetStaticPath("static","public"), visit /static/* to load static file in folder "public".
+func SetStaticPath(url string, path string) *App {
+	if !strings.HasPrefix(url, "/") {
+		url = "/" + url
+	}
+	if url != "/" {
+		url = strings.TrimRight(url, "/")
+	}
+	BConfig.WebConfig.StaticDir[url] = path
+	return AsanaApp
+}
+
+// DelStaticPath removes the static folder setting in this url pattern in asana application.
+func DelStaticPath(url string) *App {
+	if !strings.HasPrefix(url, "/") {
+		url = "/" + url
+	}
+	if url != "/" {
+		url = strings.TrimRight(url, "/")
+	}
+	delete(BConfig.WebConfig.StaticDir, url)
+	return AsanaApp
+}
+
+// AddTemplateEngine add a new templatePreProcessor which support extension
+func AddTemplateEngine(extension string, fn templatePreProcessor) *App {
+	AddTemplateExt(extension)
+	asanaTemplateEngines[extension] = fn
+	return AsanaApp
+}

@@ -33,6 +33,7 @@
 package rediscluster
 
 import (
+	"github.com/goasana/asana/session"
 	"net/http"
 	"strconv"
 	"strings"
@@ -40,7 +41,6 @@ import (
 	"time"
 
 	"github.com/go-redis/redis"
-	"github.com/goasana/asana/session"
 )
 
 var redispder = &Provider{}
@@ -188,7 +188,6 @@ func (rp *Provider) SessionExist(sid string) bool {
 // SessionRegenerate generate new sid for redis_cluster session
 func (rp *Provider) SessionRegenerate(oldsid, sid string) (session.Store, error) {
 	c := rp.poolList
-
 	if existed, err := c.Exists(oldsid).Result(); err != nil || existed == 0 {
 		// oldsid doesn't exists, set the new sid directly
 		// ignore error here, since if it return error

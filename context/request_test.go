@@ -91,7 +91,7 @@ func TestBind(t *testing.T) {
 	}
 	for _, c := range cases {
 		r, _ := http.NewRequest("GET", c.request, nil)
-		asanaInput := newRequest()
+		asanaInput := NewRequest()
 		asanaInput.Context = NewContext()
 		asanaInput.Context.Reset(httptest.NewRecorder(), r)
 
@@ -111,7 +111,7 @@ func TestBind(t *testing.T) {
 
 func TestSubDomain(t *testing.T) {
 	r, _ := http.NewRequest("GET", "http://www.example.com/?id=123&isok=true&ft=1.2&ol[0]=1&ol[1]=2&ul[]=str&ul[]=array&user.Name=asana", nil)
-	asanaInput := newRequest()
+	asanaInput := NewRequest()
 	asanaInput.Context = NewContext()
 	asanaInput.Context.Reset(httptest.NewRecorder(), r)
 
@@ -133,7 +133,7 @@ func TestSubDomain(t *testing.T) {
 	}
 
 	/* TODO Fix this
-	r, _ = http.newRequest("GET", "http://127.0.0.1/", nil)
+	r, _ = http.NewRequest("GET", "http://127.0.0.1/", nil)
 	asanaInput.Context.HTTPRequest = r
 	if asanaInput.SubDomains() != "" {
 		t.Fatal("Subdomain parse error, got " + asanaInput.SubDomains())
@@ -154,7 +154,7 @@ func TestSubDomain(t *testing.T) {
 }
 
 func TestParams(t *testing.T) {
-	inp := newRequest()
+	inp := NewRequest()
 
 	inp.SetParam("p1", "val1_ver1")
 	inp.SetParam("p2", "val2_ver1")
@@ -204,4 +204,14 @@ func TestParams(t *testing.T) {
 		t.Fatalf("Request.Param wrong value: %s, expected %s", val, "val1_ver2")
 	}
 
+}
+func BenchmarkQuery(b *testing.B) {
+	asanaRequest := NewRequest()
+	asanaRequest.Context = NewContext()
+	asanaRequest.Context.HTTPRequest, _ = http.NewRequest("POST", "http://www.example.com/?q=foo", nil)
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			asanaRequest.Query("q")
+		}
+	})
 }
